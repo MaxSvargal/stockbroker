@@ -2,28 +2,60 @@ import { Component } from 'react'
 import { connect } from 'react-redux'
 import { hh, div } from 'react-hyperscript-helpers'
 
+import AskTable from 'components/AskTable'
+import BidTable from 'components/BidTable'
+import TradeTable from 'components/TradeTable'
 import Table from 'components/table'
-import CurrencyStats from 'components/currencyStats'
+import CurrencyStats from 'components/CurrencyStats'
 
 class App extends Component {
   render() {
-    const { ask, bid, buy, sell, currency } = this.props
+    const styles = this.getStyles()
 
-    return div([
-      div({ style: { margin: '1rem' } }, [
-        CurrencyStats({ data: currency })
+    return div({ style: styles.root }, [
+      div( { style: styles.row }, [
+        div({ style: styles.currency }, [
+          CurrencyStats()
+        ]),
+        div({ style:  styles.trade }, [
+          TradeTable()
+        ])
       ]),
-      div({ style: { display: 'flex', maxHeight: '100vh' } }, [
-        Table({ data: bid.sort() }),
-        Table({ data: ask.sort() }),
-        Table({ data: sell }),
-        Table({ data: buy})
+      div({ style: styles.row }, [
+        AskTable(),
+        BidTable()
       ])
     ])
   }
+
+  getStyles() {
+    return {
+      root: {
+        background: '#08151a',
+        color: '#fff',
+        fontFamily: '"Courier New", monospace',
+        fontSize: '16px',
+        height: '98vh',
+        overflow: 'hidden',
+        padding: '2.5vh 2.5vw',
+        WebkitFontSmoothing: 'antialiased'
+      },
+      row: {
+        display: 'flex',
+        margin: '1rem 0 3rem 0',
+        justifyContent: 'space-around'
+      },
+      currency: {
+        minWidth: '40vw'
+      },
+      trade: {
+        minWidth: '40vw',
+        maxWidth: '100vw',
+        display: 'flex',
+        justifyContent: 'center'
+      }
+    }
+  }
 }
 
-export default hh(connect(
-  ({ ask, bid, buy, sell, currencies }) =>
-    ({ ask, bid, buy, sell, currency: currencies['USDT_ETH'] })
-)(App))
+export default hh(App)

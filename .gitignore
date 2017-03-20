@@ -6,3 +6,4 @@ server/build/*
 .env
 .c9
 .nyc_output
+dist/*
