@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "autobahn": "^0.11.2",
+    "babili-webpack-plugin": "^0.0.11",
     "crypto-js": "^3.1.9-1",
     "deep-equal": "^1.0.1",
     "node-fetch": "^1.6.3",

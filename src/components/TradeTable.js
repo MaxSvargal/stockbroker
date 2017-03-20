@@ -13,7 +13,6 @@ class TradeTable extends Component {
 
     return Table({
       data: data,
-      title: 'История',
       headers: [ 'Date', 'Price USDT', 'Amount ETH', 'Total USDT' ]
     })
   }

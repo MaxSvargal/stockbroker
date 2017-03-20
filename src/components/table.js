@@ -13,7 +13,7 @@ const formatDate = time => {
 
 class Table extends Component {
   shouldComponentUpdate(nextProps) {
-    return !deepEqual(nextProps.data !== this.props.data)
+    return !deepEqual(nextProps.data, this.props.data)
   }
 
   render() {
@@ -21,6 +21,7 @@ class Table extends Component {
     const styles = this.getStyles()
 
     return div({ style: styles.root }, [
+      div({ style: styles.title }, title),
       table({ style: styles.table }, [
         tbody({ style: styles.tbody }, [
           tr({ style: styles.tr }, headers.map(header =>
@@ -58,6 +59,11 @@ class Table extends Component {
         display: 'block',
         overflow: 'scroll',
         height: '50vh'
+      },
+      title: {
+        fontSize: '1.2rem',
+        fontWeight: 'bold',
+        color: '#f6f8b7'
       },
       coloredTypedRow: type => {
         switch (type) {

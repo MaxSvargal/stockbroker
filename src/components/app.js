@@ -2,8 +2,7 @@ import { Component } from 'react'
 import { connect } from 'react-redux'
 import { hh, div } from 'react-hyperscript-helpers'
 
-import AskTable from 'components/AskTable'
-import BidTable from 'components/BidTable'
+import BigTable from 'components/BigTable'
 import TradeTable from 'components/TradeTable'
 import Table from 'components/table'
 import CurrencyStats from 'components/CurrencyStats'
@@ -22,8 +21,10 @@ class App extends Component {
         ])
       ]),
       div({ style: styles.row }, [
-        AskTable(),
-        BidTable()
+        BigTable(({ ask }) => ({ data: ask }))
+          ({ title: 'Спрос', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] }),
+        BigTable(({ bid }) => ({ data: bid }))
+          ({ title: 'Предложение', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] })
       ])
     ])
   }
