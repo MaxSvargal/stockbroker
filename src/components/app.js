@@ -1,10 +1,8 @@
 import { Component } from 'react'
-import { connect } from 'react-redux'
 import { hh, div } from 'react-hyperscript-helpers'
 
 import BigTable from 'components/BigTable'
 import TradeTable from 'components/TradeTable'
-import Table from 'components/table'
 import CurrencyStats from 'components/CurrencyStats'
 
 class App extends Component {
@@ -12,19 +10,19 @@ class App extends Component {
     const styles = this.getStyles()
 
     return div({ style: styles.root }, [
-      div( { style: styles.row }, [
+      div({ style: styles.row }, [
         div({ style: styles.currency }, [
           CurrencyStats()
         ]),
-        div({ style:  styles.trade }, [
+        div({ style: styles.trade }, [
           TradeTable()
         ])
       ]),
       div({ style: styles.row }, [
-        BigTable(({ ask }) => ({ data: ask }))
-          ({ title: 'Спрос', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] }),
-        BigTable(({ bid }) => ({ data: bid }))
-          ({ title: 'Предложение', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] })
+        BigTable(({ ask }) => ({ data: ask }))(
+          { title: 'Спрос', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] }),
+        BigTable(({ bid }) => ({ data: bid }))(
+          { title: 'Предложение', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] })
       ])
     ])
   }

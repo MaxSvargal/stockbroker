@@ -1,5 +1,5 @@
 import { Component, PropTypes } from 'react'
-import { hh, table, tbody, thead, tr, td, th, div } from 'react-hyperscript-helpers'
+import { hh, table, tbody, tr, td, th, div } from 'react-hyperscript-helpers'
 import throttle from 'react-throttle-render'
 import deepEqual from 'deep-equal'
 
@@ -7,7 +7,9 @@ const formatDate = time => {
   const date = new Date(time)
   const hours = date.getHours()
   const minutes = date.getMinutes()
-  return `${hours}:${minutes.toString().length > 1 ? minutes : '0' + minutes}`
+  const hoursStr = hours.toString().length > 1 ? hours : `0${hours}`
+  const minutesStr = minutes.toString().length > 1 ? minutes : `0${minutes}`
+  return `${hoursStr}:${minutesStr}`
 }
 
 
@@ -69,7 +71,7 @@ class Table extends Component {
         switch (type) {
           case 'sell': return { background: '#542a2a' }
           case 'buy': return { background: '#214a2c' }
-          default: {}
+          default: return {}
         }
       }
     }

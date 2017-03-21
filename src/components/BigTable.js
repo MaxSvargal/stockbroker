@@ -1,6 +1,6 @@
 import { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
-import { hh, h1, div } from 'react-hyperscript-helpers'
+import { hh } from 'react-hyperscript-helpers'
 import Table from 'components/table'
 
 import throttle from 'react-throttle-render'
