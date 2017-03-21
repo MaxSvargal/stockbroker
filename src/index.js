@@ -1,6 +1,4 @@
-require('react-hot-loader/patch')
-
-import React from 'react'
+import 'react-hot-loader/patch'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { AppContainer } from 'react-hot-loader'

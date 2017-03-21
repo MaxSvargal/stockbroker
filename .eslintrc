@@ -1,0 +1,46 @@
+{
+  "extends": [ "airbnb-base", "plugin:ava/recommended" ],
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "rules": {
+    "array-bracket-spacing": [2, "always"],
+    "arrow-parens": ["off"],
+    "comma-dangle": "off",
+    "consistent-return": "off",
+    "class-methods-use-this": [2, {
+      "exceptMethods": [
+        "render",
+        "componentWillMount",
+        "componentDidMount",
+        "shouldComponentUpdate",
+        "componentWillUpdate",
+        "getStyles"
+    ]}],
+    "guard-for-in": 0,
+    "generator-star-spacing": "off",
+    "import/no-extraneous-dependencies": "off",
+    "import/no-unresolved": ["error", { "ignore": ["electron"] }],
+    "jsx-quotes": [2, "prefer-single"],
+    "no-confusing-arrow": 0,
+    "no-unused-expressions": 0,
+    "no-use-before-define": "off",
+    "no-constant-condition": ["error", { "checkLoops": false }],
+    "semi": [1, "never"]
+  },
+  "plugins": [
+    "ava",
+    "import"
+  ],
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "moduleDirectory": [ "node_modules", "src" ]
+      },
+      "webpack": {
+        "config": "webpack.config.eslint.js"
+      }
+    }
+  }
+}
