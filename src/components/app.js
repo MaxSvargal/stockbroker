@@ -2,6 +2,7 @@ import { Component } from 'react'
 import { hh, div } from 'react-hyperscript-helpers'
 
 import BigTable from 'components/BigTable'
+import BotLog from 'components/BotLog'
 import TradeTable from 'components/TradeTable'
 import CurrencyStats from 'components/CurrencyStats'
 
@@ -19,10 +20,13 @@ class App extends Component {
         ])
       ]),
       div({ style: styles.row }, [
+        BotLog()
+      ]),
+      div({ style: styles.row }, [
         BigTable(({ ask }) => ({ data: ask }))(
-          { title: 'Спрос', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] }),
+          { title: 'Предложение', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] }),
         BigTable(({ bid }) => ({ data: bid }))(
-          { title: 'Предложение', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] })
+          { title: 'Спрос', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] })
       ])
     ])
   }
@@ -30,12 +34,11 @@ class App extends Component {
   getStyles() {
     return {
       root: {
-        background: '#08151a',
+        background: '#282c34',
         color: '#fff',
         fontFamily: '"Courier New", monospace',
         fontSize: '16px',
-        height: '98vh',
-        overflow: 'hidden',
+        minHeight: '98vh',
         padding: '2.5vh 2.5vw',
         WebkitFontSmoothing: 'antialiased'
       },

@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import { hh, h1, div } from 'react-hyperscript-helpers'
 
-class TrendIndicator extends Component {
+class TradeIndicator extends Component {
   render() {
     const { data } = this.props
     const styles = this.getStyles()
@@ -31,4 +31,4 @@ class TrendIndicator extends Component {
   }
 }
 
-export default hh(CurrencyStats)
+export default hh(TradeIndicator)

@@ -1,8 +1,15 @@
 import { createAction } from 'redux-act'
 
+export const addConclusion = createAction('ADD_CONCLUSION')
+export const addStats = createAction('ADD_STATS')
+export const botMessage = createAction('BOT_MESSAGE')
+export const coverSell = createAction('COVER_SELL')
+export const coverBuy = createAction('COVER_BUY')
+export const doBuy = createAction('DO_BUY')
+export const doSell = createAction('DO_SELL')
+export const newTrade = createAction('NEW_TRADE')
 export const orderBookModify = createAction('ORDER_BOOK_MODIFY')
 export const orderBookRemove = createAction('ORDER_BOOK_REMOVE')
-export const newTrade = createAction('NEW_TRADE')
 export const setCurrency = createAction('SET_CURRENCY')
-export const setTrends = createAction('SET_TRENDS')
 export const setCurrencyPair = createAction('SET_CURRENCY_PAIR')
+export const setTrends = createAction('SET_TRENDS')

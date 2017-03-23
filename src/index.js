@@ -5,7 +5,7 @@ import { AppContainer } from 'react-hot-loader'
 import { h } from 'react-hyperscript-helpers'
 import configureStore from 'store/configureStore'
 import rootSaga from 'sagas'
-import App from 'components/app'
+import App from 'components/App'
 
 const store = configureStore()
 
@@ -19,4 +19,4 @@ const render = Component =>
 render(App)
 store.runSaga(rootSaga)
 
-if (module.hot) module.hot.accept('components/app', () => render(App))
+if (module.hot) module.hot.accept('components/App', () => render(App))

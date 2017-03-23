@@ -19,6 +19,12 @@ module.exports = {
     modules: [ 'node_modules', 'src' ]
   },
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify('production'),
+        BROWSER: JSON.stringify(false)
+      }
+    }),
     new webpack.BannerPlugin({
       banner: 'require("source-map-support").install();',
       raw: true,

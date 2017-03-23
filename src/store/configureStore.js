@@ -4,7 +4,7 @@ import replicate from 'redux-replicate'
 import localforage from 'redux-replicate-localforage'
 import rootReducer from 'reducers'
 
-const replicateEnable = false
+const replicateEnable = true
 
 /* eslint no-underscore-dangle: 0 */
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
@@ -16,11 +16,11 @@ export default function configureStore(initialState = {}) {
   const middlewares = applyMiddleware(sagaMiddleware)
 
   if (replicateEnable) {
-    localforage.debounce = 10000
+    localforage.debounce = 5000
     const key = 'PoloniexGolumBotStorageUnit'
     const reducerKeys = [
-      'ask', 'bid', 'buy', 'sell',
-      'currentPair', 'totals'
+      'amountVolume', 'botMessages', 'buy', 'sell', 'currencies', 'currentPair',
+      'stats', 'myBuys', 'mySells', 'stats', 'threshold', 'wallet'
     ]
     const replicator = localforage
     const replication = replicate({ key, reducerKeys, replicator })

@@ -29,6 +29,12 @@ module.exports = {
   },
   plugins: [
     new webpack.NamedModulesPlugin(),
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify('development'),
+        BROWSER: JSON.stringify(true)
+      }
+    }),
     new HtmlWebpackPlugin({
       title: 'Poloniex Bot',
       template: 'template.html',

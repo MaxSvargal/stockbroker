@@ -69,8 +69,8 @@ class Table extends Component {
       },
       coloredTypedRow: type => {
         switch (type) {
-          case 'sell': return { background: '#542a2a' }
-          case 'buy': return { background: '#214a2c' }
+          case 'sell': return { background: '#82373b' }
+          case 'buy': return { background: '#6e8436' }
           default: return {}
         }
       }
