@@ -1,7 +1,7 @@
 import { take, select, fork, put } from 'redux-saga/effects'
 import { setCurrency, addStats } from 'actions'
 import { selectSellsLastTime, selectBuysLastTime, selectCurrencyPair } from 'sagas/selectors'
-import { CURRENT_PAIR, FIVE_MINUTES } from 'const'
+import { CURRENT_PAIR, TWENTY_MINUTES } from 'const'
 
 const getRate = i => i[1]
 const getAmount = i => i[2]
@@ -14,8 +14,8 @@ const getRateChange = arr => arr
     (index === arr.length - 1 ? prev / arr.length : prev + curr), 0)
 
 export function* generateStatsSaga() {
-  const sells = yield select(selectSellsLastTime, FIVE_MINUTES)
-  const buys = yield select(selectBuysLastTime, FIVE_MINUTES)
+  const sells = yield select(selectSellsLastTime, TWENTY_MINUTES)
+  const buys = yield select(selectBuysLastTime, TWENTY_MINUTES)
   const { last } = yield select(selectCurrencyPair, CURRENT_PAIR)
 
   const buyVolume = buys.map(getAmount).reduce(getSummNumber, 0)

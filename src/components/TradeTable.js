@@ -16,7 +16,7 @@ const mapStateToProps = ({ buy, sell }) => ({
   data: [
     ...sell.map(v => (Object.defineProperty(v, 'type', { value: 'sell', enumerable: false }))),
     ...buy.map(v => (Object.defineProperty(v, 'type', { value: 'buy', enumerable: false })))
-  ].slice().sort().reverse()
+  ].slice().sort().reverse().slice(0, 100)
 })
 
 export default hh(connect(mapStateToProps)(TradeTable))

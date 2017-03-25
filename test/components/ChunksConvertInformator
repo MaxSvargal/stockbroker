@@ -1,0 +1,15 @@
+// import test from 'ava'
+// import { shallow } from 'enzyme'
+// import configureMockStore from 'redux-mock-store'
+//
+// import ChunksConvertInformator from 'components/ChunksConvertInformator'
+//
+// const mockStore = configureMockStore()
+//
+// test('ChunksConvertInformator should show message when free amounts isset for current pair', t => {
+//   const state = {}
+//   const props = {}
+//   const store = mockStore(state)
+//   const wrapper = shallow(ChunksConvertInformator({ store, ...props })).shallow()
+//   t.deepEqual(wrapper.find('button').length, 1)
+// })

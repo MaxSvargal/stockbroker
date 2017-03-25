@@ -8,8 +8,8 @@ class BotLog extends Component {
     const { data } = this.props
     const styles = this.getStyles()
 
-    return div({ style: styles.root, data }, data.slice().reverse().map(item =>
-      div([ formatDate(item[0]), ' ', item[1] ])))
+    return div({ style: styles.root }, data.slice().reverse().map(item =>
+      div(`${formatDate(item[0])} ${item[1]}`)))
   }
 
   getStyles() {
@@ -17,7 +17,7 @@ class BotLog extends Component {
       root: {
         fontSize: '1.1rem',
         lineHeight: '1.4rem',
-        width: '90vw',
+        maxWidth: '60vw',
         height: '30vh',
         overflow: 'scroll'
       }

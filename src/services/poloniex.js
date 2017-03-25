@@ -3,18 +3,19 @@ const nonce = require('nonce')()
 
 const keySymbol = Symbol('key')
 const secretSymbol = Symbol('secret')
-const PUBLIC_API_URL = 'https://poloniex.com/public'
+// const PUBLIC_API_URL = 'https://poloniex.com/public'
 const PRIVATE_API_URL = 'https://poloniex.com/tradingApi'
 
 class Poloniex {
   constructor({ key, secret }) {
     this[keySymbol] = key
     this[secretSymbol] = secret
+    this.privateRequest = this.privateRequest.bind(this)
   }
 
-  toParamsString(props) {
+  static toParamsString(props) {
     const e = encodeURIComponent
-    return Object.keys(props).map(prop => e(prop) + '=' + e(props[prop])).join('&')
+    return Object.keys(props).map(prop => `${e(prop)}=${e(props[prop])}`).join('&')
   }
 
   getPrivateHeaders(paramsString) {
@@ -26,7 +27,7 @@ class Poloniex {
     }
   }
 
-  request(options) {
+  static request(options) {
     return fetch(options.url, options)
       .then(response => response.json().then(json => ({ json, response })))
       .then(({ json, response }) => {
@@ -37,15 +38,15 @@ class Poloniex {
   }
 
   privateRequest(props) {
-    props.nonce = nonce(16)
-    const paramsString = this.toParamsString(props)
+    const propsWithNonce = Object.assign({}, props, { nonce: nonce(16) })
+    const paramsString = Poloniex.toParamsString(propsWithNonce)
     const options = {
       method: 'POST',
       url: PRIVATE_API_URL,
       body: paramsString,
       headers: this.getPrivateHeaders(paramsString)
     }
-    return this.request(options)
+    return Poloniex.request(options)
   }
 }
 

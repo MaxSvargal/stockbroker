@@ -2,7 +2,12 @@ import { take, select, fork, put } from 'redux-saga/effects'
 import { addStats, coverBuy, coverSell, doBuy, doSell, botMessage } from 'actions'
 import { selectPrevStat, selectUncoveredSells, selectUncoveredBuys, selectThreshold, selectAmountVolume } from 'sagas/selectors'
 
+const cropNumber = num => Number(num.toString().slice(0, 10))
+
 export default function* TradeSaga() {
+  // initial
+  // yield fork(buySaga, stat[0], hold, amountVolume)
+
   while (true) {
     const { payload } = yield take(addStats)
     const prevStat = yield select(selectPrevStat)
@@ -14,43 +19,52 @@ export function* estimateStatsSaga(prevStat, stat) {
   const hold = yield select(selectThreshold)
   const amountVolume = yield select(selectAmountVolume)
 
-  const searchUncoveredBuysIndex = arr =>
-    arr.reverse().reduce((prev, curr, index) =>
-      (curr[1] + hold >= stat[0] ? index : prev), -1)
+  const isUp = prevStat[0] < stat[0] && prevStat[1] < stat[1] && prevStat[3] < stat[3]
+  const isDown = prevStat[0] > stat[0] && prevStat[2] < stat[2] && prevStat[4] < stat[4]
 
+  if (isDown) yield fork(buySaga, stat[0], hold, cropNumber(amountVolume + 0.00000001))
+  if (isUp) yield fork(sellSaga, stat[0], hold, cropNumber(amountVolume - 0.00000001))
+
+  // if (!isUp && !isDown) yield put(botMessage('Стагнация, господа.'))
+}
+
+export function* buySaga(rate, hold, amountVolume) {
   const searchUncoveredSellsIndex = arr =>
     arr.reverse().reduce((prev, curr, index) =>
-      (curr[1] + hold <= stat[0] ? index : prev), -1)
+      (curr[1] + hold >= rate ? index : prev), -1)
 
-  if (prevStat[0] > stat[0] &&
-      prevStat[1] >= stat[1] &&
-      prevStat[2] - stat[2] <= 5 &&
-      prevStat[3] >= stat[3] &&
-      prevStat[4] < stat[4]) {
-    const buys = yield select(selectUncoveredSells)
-    const uncoveredIndex = searchUncoveredBuysIndex(buys)
+  const sells = yield select(selectUncoveredSells)
+  const uncoveredIndex = searchUncoveredSellsIndex(sells)
 
-    if (uncoveredIndex !== -1 || buys.length === 0) {
-      const buy = [ stat[0], amountVolume ]
+  if (uncoveredIndex !== -1) {
+    const fee = amountVolume * 0.15
+    const profit = cropNumber((sells[uncoveredIndex][1] - rate - fee) * amountVolume)
 
-      yield put(coverSell(uncoveredIndex))
-      yield put(doBuy(buy))
-      yield put(botMessage(`Куплено за ${stat[0]} объёмом ${amountVolume}`))
-    } else {
-      yield put(botMessage(`Покупка за ${stat[0]} не покрывает суммы ни одной предыдущей продажи.`))
-    }
+    yield put(coverSell(uncoveredIndex))
+    yield put(doBuy([ rate, amountVolume ]))
+    yield put(botMessage(`Куплено за ${rate} объёмом ${amountVolume}, покрыта ставка по ${sells[uncoveredIndex][1]}, профит: ${profit}`))
   } else {
-    const sells = yield select(selectUncoveredBuys)
-    const uncoveredIndex = searchUncoveredSellsIndex(sells)
+    yield put(botMessage(`Покупка за ${rate} не покрывает ни одной предыдущей продажи.`))
+  }
+}
 
-    if (uncoveredIndex !== -1 || sells.length === 0) {
-      const sell = [ stat[0], amountVolume ]
+export function* sellSaga(rate, hold, amountVolume) {
+  // Проверить наоборот что бы покрываемая ставка была больше покупки
+  const searchUncoveredBuysIndex = arr =>
+    arr.reverse().reduce((prev, curr, index) =>
+      (curr[1] + hold <= rate ? index : prev), -1)
 
-      yield put(coverBuy(uncoveredIndex))
-      yield put(doSell(sell))
-      yield put(botMessage(`Продано за ${stat[0]} объёмом ${amountVolume}`))
-    } else {
-      yield put(botMessage(`Продажа за ${stat[0]} не покрывает суммы ни одной предыдущей покупки.`))
-    }
+  const buys = yield select(selectUncoveredBuys)
+  const uncoveredIndex = searchUncoveredBuysIndex(buys)
+
+  if (uncoveredIndex !== -1) {
+    const fee = amountVolume * 0.15
+    const profit = cropNumber((rate - buys[uncoveredIndex][1] - fee) * amountVolume)
+
+    yield put(coverBuy(uncoveredIndex))
+    yield put(doSell([ rate, amountVolume, profit ]))
+    yield put(botMessage(`Продано за ${rate} объёмом ${amountVolume}, покрыта ставка по ${buys[uncoveredIndex][1]}, профит: ${profit}`))
+  } else {
+    yield put(botMessage(`Продажа за ${rate} не покрывает ни одной предыдущей покупки.`))
   }
 }

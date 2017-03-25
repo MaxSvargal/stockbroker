@@ -5,22 +5,22 @@ import BigTable from 'components/BigTable'
 import BotLog from 'components/BotLog'
 import TradeTable from 'components/TradeTable'
 import CurrencyStats from 'components/CurrencyStats'
+import ChunksConvertInformator from 'components/ChunksConvertInformator'
 
 class App extends Component {
   render() {
     const styles = this.getStyles()
 
     return div({ style: styles.root }, [
-      div({ style: styles.row }, [
+      ChunksConvertInformator(),
+      div({ style: styles.column }, [
         div({ style: styles.currency }, [
-          CurrencyStats()
+          CurrencyStats(),
+          BotLog()
         ]),
         div({ style: styles.trade }, [
           TradeTable()
         ])
-      ]),
-      div({ style: styles.row }, [
-        BotLog()
       ]),
       div({ style: styles.row }, [
         BigTable(({ ask }) => ({ data: ask }))(
@@ -47,14 +47,17 @@ class App extends Component {
         margin: '1rem 0 3rem 0',
         justifyContent: 'space-around'
       },
+      column: {
+        display: 'flex'
+      },
       currency: {
         minWidth: '40vw'
       },
       trade: {
-        minWidth: '40vw',
+        minWidth: '35vw',
         maxWidth: '100vw',
         display: 'flex',
-        justifyContent: 'center'
+        justifyContent: 'flex-end'
       }
     }
   }

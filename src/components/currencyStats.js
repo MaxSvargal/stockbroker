@@ -85,7 +85,8 @@ class CurrencyStats extends Component {
       root: {
         fontSize: '1.2rem',
         lineHeight: '1.8rem',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        marginBottom: '2.5rem'
       },
       h1: {
         fontSize: '3rem'

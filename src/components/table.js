@@ -60,7 +60,7 @@ class Table extends Component {
       tbody: {
         display: 'block',
         overflow: 'scroll',
-        height: '50vh'
+        height: '87vh'
       },
       title: {
         fontSize: '1.2rem',

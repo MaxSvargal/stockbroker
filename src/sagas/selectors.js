@@ -9,6 +9,7 @@ export const selectSells = state => state.sell
 export const selectTotals = state => state.totals
 export const selectWallet = state => state.wallet
 export const selectThreshold = state => state.threshold
+export const selectChunkedCurrency = state => state.chunkedCurrency
 
 export const selectSellsLastTime = state =>
   state.sell.filter(i => i[0] > new Date().getTime() - TEN_MINUTES)
