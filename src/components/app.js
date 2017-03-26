@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import { hh, div } from 'react-hyperscript-helpers'
 
-import BigTable from 'components/BigTable'
+// import BigTable from 'components/BigTable'
 import BotLog from 'components/BotLog'
 import TradeTable from 'components/TradeTable'
 import CurrencyStats from 'components/CurrencyStats'
@@ -25,13 +25,13 @@ class App extends Component {
           TradeTable(),
           // ClearDbBtn()
         ])
-      ]),
-      div({ style: styles.row }, [
-        BigTable(({ ask }) => ({ data: ask }))(
-          { title: 'Предложение', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] }),
-        BigTable(({ bid }) => ({ data: bid }))(
-          { title: 'Спрос', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] })
       ])
+      // div({ style: styles.row }, [
+      //   BigTable(({ ask }) => ({ data: ask }))(
+      //     { title: 'Предложение', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] }),
+      //   BigTable(({ bid }) => ({ data: bid }))(
+      //     { title: 'Спрос', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] })
+      // ])
     ])
   }
 
@@ -42,7 +42,7 @@ class App extends Component {
         color: '#fff',
         fontFamily: '"Courier New", monospace',
         fontSize: '16px',
-        minHeight: '98vh',
+        minHeight: '100vh',
         WebkitFontSmoothing: 'antialiased'
       },
       row: {

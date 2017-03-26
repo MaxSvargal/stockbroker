@@ -17,18 +17,20 @@ function* channelUsdtDash(session) {
       const data = yield take(currChan)
       /* eslint no-restricted-syntax: 0 */
       for (const item of data) {
-        switch (item.type) {
-          case 'orderBookRemove':
-            yield put(orderBookRemove(item.data))
-            break
-          case 'orderBookModify':
-            yield put(orderBookModify(item.data))
-            break
-          case 'newTrade':
-            yield put(newTrade(item.data))
-            break
-          default:
-            break
+        if (item.data.type === 'sell' || item.data.type === 'buy') {
+          switch (item.type) {
+            case 'orderBookRemove':
+              yield put(orderBookRemove(item.data))
+              break
+            case 'orderBookModify':
+              yield put(orderBookModify(item.data))
+              break
+            case 'newTrade':
+              yield put(newTrade(item.data))
+              break
+            default:
+              break
+          }
         }
       }
     }
