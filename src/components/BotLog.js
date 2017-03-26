@@ -8,7 +8,7 @@ class BotLog extends Component {
     const { data } = this.props
     const styles = this.getStyles()
 
-    return div({ style: styles.root }, data.slice().reverse().map(item =>
+    return div({ style: styles.root }, data.slice(0, 200).reverse().map(item =>
       div(`${formatDate(item[0])} ${item[1]}`)))
   }
 

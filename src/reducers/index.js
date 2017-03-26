@@ -6,9 +6,9 @@ import { time, removeIndex, mergeOnAmount, getOnlyLast } from 'reducers/helpers'
 import {
   orderBookModify, orderBookRemove, newTrade,
   setCurrency, setCurrencyPair, addStats,
-  doBuy, doSell, botMessage, coverSell, coverBuy,
+  buySuccess, sellSuccess, botMessage, coverSell, coverBuy,
   addBuyChunks, addSellChunks, addChunkedCurrency,
-  updateWallet, setFreeCurrencyIsset, setChunkAmount
+  updateWallet, setFreeCurrencyIsset, sellFailure, buyFailure
 } from 'actions'
 
 export const botMessages = createReducer({
@@ -79,15 +79,23 @@ export const stats = createReducer({
 }, [])
 
 export const myBuys = createReducer({
-  [doBuy]: (state, data) => [ ...state, [ time(), ...data, 0 ] ],
-  [coverBuy]: (state, index) => state.slice().sort().map((v, i) => i === index ? [ ...v.slice(0, 3), 1 ] : v),
+  [buySuccess]: (state, data) => [ ...state, [ time(), ...data, 0 ] ],
+  [coverBuy]: (state, index) => state.slice().sort().map((v, i) => i === index ? [ ...v.slice(0, 4), 1 ] : v),
   [addBuyChunks]: (state, data) => [ ...state, ...data.map(v => [ time(), ...v, 0, 1 ]) ]
 }, [])
 
 export const mySells = createReducer({
-  [doSell]: (state, data) => [ ...state, [ time(), ...data, 0 ] ],
-  [coverSell]: (state, index) => state.slice().sort().map((v, i) => i === index ? [ ...v.slice(0, 3), 1 ] : v),
+  [sellSuccess]: (state, data) => [ ...state, [ time(), ...data, 0 ] ],
+  [coverSell]: (state, index) => state.slice().sort().map((v, i) => i === index ? [ ...v.slice(0, 4), 1 ] : v),
   [addSellChunks]: (state, data) => [ ...state, ...data.map(v => [ time(), ...v, 0, 1 ]) ]
+}, [])
+
+export const myFailureSells = createReducer({
+  [sellFailure]: (state, data) => [ ...state, [ time(), ...data ] ]
+}, [])
+
+export const myFailureBuys = createReducer({
+  [buyFailure]: (state, data) => [ ...state, [ time(), ...data ] ]
 }, [])
 
 export const wallet = createReducer({
@@ -104,25 +112,24 @@ export const freeCurrencyIsset = createReducer({
   [setFreeCurrencyIsset]: (state, status) => status
 }, [ 0, 0 ])
 
-export const amountVolume = createReducer({
-  [setChunkAmount]: (state, rate) => rate
-}, 0.01000001)
-
 export const threshold = createReducer({}, 0.000019)
 
+export const chunksNumber = createReducer({}, 24)
 
 const rootReducer = combineReducers({
-  amountVolume,
   ask,
   bid,
   botMessages,
   buy,
   chunkedCurrency,
+  chunksNumber,
   currencies,
   currentPair,
   freeCurrencyIsset,
   myBuys,
   mySells,
+  myFailureSells,
+  myFailureBuys,
   sell,
   stats,
   threshold,

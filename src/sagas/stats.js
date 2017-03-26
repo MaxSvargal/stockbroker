@@ -16,7 +16,7 @@ const getRateChange = arr => arr
 export function* generateStatsSaga() {
   const sells = yield select(selectSellsLastTime, TWENTY_MINUTES)
   const buys = yield select(selectBuysLastTime, TWENTY_MINUTES)
-  const { last } = yield select(selectCurrencyPair, CURRENT_PAIR)
+  const { last } = yield select(selectCurrencyPair)
 
   const buyVolume = buys.map(getAmount).reduce(getSummNumber, 0)
   const sellVolume = sells.map(getAmount).reduce(getSummNumber, 0)

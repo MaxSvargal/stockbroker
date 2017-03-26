@@ -1,13 +1,10 @@
 import { take, select, fork, put } from 'redux-saga/effects'
 import { addStats, coverBuy, coverSell, doBuy, doSell, botMessage } from 'actions'
-import { selectPrevStat, selectUncoveredSells, selectUncoveredBuys, selectThreshold } from 'sagas/selectors'
+import { selectPrevStat, selectUncoveredSells, selectUncoveredBuys, selectThreshold, selectCurrencyPair } from 'sagas/selectors'
 
 const cropNumber = num => Number(num.toString().slice(0, 10))
 
 export default function* TradeSaga() {
-  // initial
-  // yield fork(buySaga, stat[0], hold, amountVolume)
-
   while (true) {
     const { payload } = yield take(addStats)
     const prevStat = yield select(selectPrevStat)
@@ -29,9 +26,9 @@ export function* estimateStatsSaga(prevStat, stat) {
 }
 
 export function* buySaga(rate, hold) {
-  const searchMinimalSellIndex = arr => {
+  const searchMinimalSellIndex = (arr, byRate) => {
     const moreThenBuy = arr.map(v => v[1]).reduce((prev, curr) =>
-      (curr > rate + hold ? [ ...prev, curr ] : prev), [])
+      (curr > byRate + hold ? [ ...prev, curr ] : prev), [])
     const minRate = Math.min(...moreThenBuy)
     const valIndex = arr.findIndex(v => v[1] === minRate)
     const valVolume = arr[valIndex] && arr[valIndex][2]
@@ -39,45 +36,46 @@ export function* buySaga(rate, hold) {
   }
 
   // цену спроса указать как цену спроса бля
-
+  const { lowestAsk } = yield select(selectCurrencyPair)
+  const fullRate = cropNumber(Number(lowestAsk) + 0.00000001)
   const sells = yield select(selectUncoveredSells)
-  const [ coverIndex, coverRate, coverValue ] = searchMinimalSellIndex(sells)
+  const [ coverIndex, coverRate, coverValue ] = searchMinimalSellIndex(sells, fullRate)
 
   if (coverIndex !== -1) {
     // const fee = coverValue * 0.25
-    const profit = cropNumber((coverRate - rate) * coverValue)
+    const profit = cropNumber((coverRate - fullRate) * coverValue)
 
     yield put(coverSell(coverIndex))
-    yield put(doBuy([ rate, coverValue ]))
-    yield put(botMessage(`Куплено за ${rate} объёмом ${coverValue}, покрыта ставка продажи ${coverRate}, профит: ${profit}`))
+    yield put(doBuy([ fullRate, coverValue ]))
+    yield put(botMessage(`Куплено за ${fullRate} объёмом ${coverValue}, покрыта ставка продажи ${coverRate}, профит: ${profit}`))
   } else {
-    yield put(botMessage(`Покупка за ${rate} не покрывает ни одной предыдущей продажи.`))
+    yield put(botMessage(`Покупка за ${fullRate} не покрывает ни одной предыдущей продажи.`))
   }
 }
 
 export function* sellSaga(rate, hold) {
-  const searchMinimalBuyIndex = arr => {
+  const searchMinimalBuyIndex = (arr, byRate) => {
     const moreThenSell = arr.map(v => v[1]).reduce((prev, curr) =>
-      (curr < rate - hold ? [ ...prev, curr ] : prev), [])
+      (curr < byRate - hold ? [ ...prev, curr ] : prev), [])
     const minRate = Math.min(...moreThenSell)
     const valIndex = arr.findIndex(v => v[1] === minRate)
     const valVolume = arr[valIndex] && arr[valIndex][2]
     return [ valIndex, minRate, valVolume ]
   }
 
-  // цену продажи указать по цене предложения, а не курса и чуть менее (на копейку)
-
+  // const fee = coverValue * 0.25
+  const { highestBid } = yield select(selectCurrencyPair)
+  const fullRate = cropNumber(Number(highestBid) - 0.00000001)
   const buys = yield select(selectUncoveredBuys)
-  const [ coverIndex, coverRate, coverValue ] = searchMinimalBuyIndex(buys)
+  const [ coverIndex, coverRate, coverValue ] = searchMinimalBuyIndex(buys, fullRate)
 
   if (coverIndex !== -1) {
-    // const fee = coverValue * 0.25
-    const profit = cropNumber((rate - coverRate) * coverValue)
+    const profit = cropNumber((fullRate - coverRate) * coverValue)
 
     yield put(coverBuy(coverIndex))
-    yield put(doSell([ rate, coverValue ]))
-    yield put(botMessage(`Продано за ${rate} объёмом ${coverValue}, покрыта ставка покупки ${coverRate}, профит: ${profit}`))
+    yield put(doSell([ fullRate, coverValue ]))
+    yield put(botMessage(`Продано за ${fullRate} объёмом ${coverValue}, покрыта ставка покупки ${coverRate}, профит: ${profit}`))
   } else {
-    yield put(botMessage(`Продажа за ${rate} не покрывает ни одной предыдущей покупки.`))
+    yield put(botMessage(`Продажа за ${fullRate} не покрывает ни одной предыдущей покупки.`))
   }
 }

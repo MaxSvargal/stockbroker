@@ -25,7 +25,7 @@ class ChunksConvertInformator extends Component {
     const styles = this.getStyles()
     const pairs = currentPair.split('_')
 
-    return /* this.state.show && (freeCurrencyIsset[0] > 0 || freeCurrencyIsset[1] > 0) && */ div([
+    return this.state.show && (freeCurrencyIsset[0] > 0 || freeCurrencyIsset[1] > 0) && div([
       div({ style: styles.box }, [
         div({ style: styles.row }, [
           div([

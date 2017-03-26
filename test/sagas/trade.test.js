@@ -1,7 +1,7 @@
 import test from 'ava'
 import testSaga from 'redux-saga-test-plan'
 import TradeSaga, { estimateStatsSaga, buySaga, sellSaga } from 'sagas/trade'
-import { selectUncoveredSells, selectUncoveredBuys, selectThreshold, selectAmountVolume, selectPrevStat } from 'sagas/selectors'
+import { selectUncoveredSells, selectUncoveredBuys, selectThreshold, selectPrevStat, selectCurrencyPair } from 'sagas/selectors'
 import { doBuy, doSell, coverBuy, coverSell, botMessage, addStats } from 'actions'
 
 test('TradeSaga shouil work correctly', () =>
@@ -42,34 +42,40 @@ test('estimateStatsSaga should sell on up', () =>
 test('buySaga should compare bill with uncovered sells and buy one', () =>
   testSaga(buySaga, 40.2, 0.19, 0.1)
     .next()
+    .select(selectCurrencyPair)
+    .next({ lowestAsk: 40.25 })
     .select(selectUncoveredSells)
     // [ time, rate, amount, covered ]
     .next([ [ 1, 40.3, 0.1, 0 ], [ 1, 40.4, 0.15, 0 ], [ 0, 40.5, 0.2, 0 ] ])
     // update [ 0, 41.2, 0.0001, 0 ] to [ 0, 41.2, 0.0001, 1 ]
     // do profit 40.4 - 40.2 = 0.2 coins
-    .put(coverSell(1))
+    .put(coverSell(2))
     .next()
-    .put(doBuy([ 40.2, 0.15 ]))
+    .put(doBuy([ 40.25, 0.2 ]))
     .next()
-    .put(botMessage(`Куплено за ${40.2} объёмом ${0.15}, покрыта ставка продажи ${40.4}, профит: ${0.02437499}`))
+    .put(botMessage(`Куплено за ${40.25} объёмом ${0.2}, покрыта ставка продажи ${40.5}, профит: ${0.05}`))
     .next()
     .isDone())
 
 test('buySaga should not buy when does not cover a minimal rate of any sell', () =>
   testSaga(buySaga, 40.2, 0.19, 0.1)
     .next()
+    .select(selectCurrencyPair)
+    .next({ lowestAsk: 40.35 })
     .select(selectUncoveredSells)
     // [ time, rate, amount, covered ]
     .next([ [ 0, 39.1, 0.0001, 0 ], [ 1, 38.1, 0.0001, 0 ] ])
     // update [ 0, 41.2, 0.0001, 0 ] to [ 0, 41.2, 0.0001, 1 ]
     // do profit 40.4 - 40.2 = 0.2 coins
-    .put(botMessage(`Покупка за ${40.2} не покрывает ни одной предыдущей продажи.`))
+    .put(botMessage(`Покупка за ${40.35} не покрывает ни одной предыдущей продажи.`))
     .next()
     .isDone())
 
 test('sellSaga should compare bill with uncovered buys and sell one', () =>
   testSaga(sellSaga, 40.3, 0.19, 0.1)
     .next()
+    .select(selectCurrencyPair)
+    .next({ highestBid: 40.25 })
     .select(selectUncoveredBuys)
     // [ time, rate, amount, covered ]
     .next([ [ 0, 39.8, 0.1, 0 ], [ 1, 39.6, 0.2, 0 ], [ 1, 39.7, 0.1, 0 ] ])
@@ -77,20 +83,22 @@ test('sellSaga should compare bill with uncovered buys and sell one', () =>
     // do profit 40.4 - 40.2 = 0.2 coins
     .put(coverBuy(1))
     .next()
-    .put(doSell([ 40.3, 0.2 ]))
+    .put(doSell([ 40.2499999, 0.2 ]))
     .next()
-    .put(botMessage(`Продано за ${40.3} объёмом ${0.2}, покрыта ставка покупки ${39.6}, профит: ${0.12999999}`))
+    .put(botMessage(`Продано за ${40.2499999} объёмом ${0.2}, покрыта ставка покупки ${39.6}, профит: ${0.12999997}`))
     .next()
     .isDone())
 
 test('sellSaga should not sell when does not cover a minimal rate of any buy', () =>
   testSaga(sellSaga, 40.5, 0.19, 0.1)
     .next()
+    .select(selectCurrencyPair)
+    .next({ highestBid: 40.35 })
     .select(selectUncoveredBuys)
     // [ time, rate, amount, covered ]
     .next([ [ 0, 41, 0.1, 0 ], [ 1, 40.7, 0.1, 0 ] ])
     // update [ 0, 41.2, 0.1, 0 ] to [ 0, 41.2, 0.1, 1 ]
     // do profit 40.4 - 40.2 = 0.2 coins
-    .put(botMessage(`Продажа за ${40.5} не покрывает ни одной предыдущей покупки.`))
+    .put(botMessage(`Продажа за ${40.3499999} не покрывает ни одной предыдущей покупки.`))
     .next()
     .isDone())

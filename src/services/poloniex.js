@@ -31,10 +31,10 @@ class Poloniex {
     return fetch(options.url, options)
       .then(response => response.json().then(json => ({ json, response })))
       .then(({ json, response }) => {
-        if (!response.ok) throw new Error('Network response was not ok.')
-        else return json
+        if (!response.ok) return { error: json.error || 'Network response was not ok.' }
+        return { response: json }
       })
-      .catch(error => console.log(error))
+      .catch(error => ({ error }))
   }
 
   privateRequest(props) {

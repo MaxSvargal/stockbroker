@@ -1,12 +1,12 @@
 import test from 'ava'
 import testSaga from 'redux-saga-test-plan'
 import { getWallet, chunksCreator, checkFreeValues, doBuySaga, doSellSaga, poloniex } from 'sagas/wallet'
-import { selectWallet, selectChunkedCurrency } from 'sagas/selectors'
+import { selectWallet, selectChunkedCurrency, selectChunksNumber } from 'sagas/selectors'
 import { CURRENT_PAIR } from 'const'
 import {
   addSellChunks, addBuyChunks, addChunkedCurrency,
   updateWallet, setCurrency, convertCurrencyToChunks,
-  setFreeCurrencyIsset, doBuy, doSell, setChunkAmount
+  setFreeCurrencyIsset, doBuy, doSell, sellSuccess, sellFailure, buySuccess, buyFailure
 } from 'actions'
 
 const repeat = (num, item) => {
@@ -14,7 +14,6 @@ const repeat = (num, item) => {
   let index = num
   /* eslint no-plusplus: 0 */
   while (index--) arr.push(item)
-  console.log(arr.length)
   return arr
 }
 
@@ -22,7 +21,7 @@ test('getWallet should request currencies from poloniex immediately', () =>
   testSaga(getWallet)
     .next()
     .call(poloniex.privateRequest, { command: 'returnBalances' })
-    .next({ USDT: '40.5', ETH: '1' })
+    .next({ response: { USDT: '40.5', ETH: '1' } })
     .put(updateWallet({ USDT: '40.5', ETH: '1' }))
     .next()
     .isDone())
@@ -39,8 +38,8 @@ test('chunksCreator should create chunks for every minute of a day', () =>
     .next([ 40.5, 1 ])
     .take(convertCurrencyToChunks)
     .next()
-    .put(setChunkAmount(0.04166666))
-    .next()
+    .select(selectChunksNumber)
+    .next(24)
     .put(addSellChunks(repeat(24, [ 40.5, 0.04166666 ])))
     .next()
     .put(addChunkedCurrency([ 'USDT', 40.5 ]))
@@ -62,6 +61,8 @@ test('chunksCreator should not create chunks if no free values', () =>
     .next([ 0, 0 ])
     .take(convertCurrencyToChunks)
     .next()
+    .select(selectChunksNumber)
+    .next(12)
     .isDone())
 
 test('checkFreeValues should return unused currency positive status', () =>
@@ -97,8 +98,19 @@ test('doBuySaga should work correctly', () =>
     .take(doBuy)
     .next({ payload: [ 40.5, 0.0007 ] })
     .call(poloniex.privateRequest, { command: 'buy', currencyPair: CURRENT_PAIR, rate: 40.5, amount: 0.0007 })
+    .next({ response: { orderNumber: '257473046371' } })
+    .put(buySuccess([ 40.5, 0.0007, '257473046371' ]))
     .next()
     .take(doBuy))
+
+test('doBuySaga should store error', () =>
+  testSaga(doBuySaga)
+    .next()
+    .take(doBuy)
+    .next({ payload: [ 40.5, 0.0007 ] })
+    .call(poloniex.privateRequest, { command: 'buy', currencyPair: CURRENT_PAIR, rate: 40.5, amount: 0.0007 })
+    .next({ error: 'Not enough money' })
+    .put(buyFailure([ 40.5, 0.0007, 'Not enough money' ])))
 
 test('doSellSaga should work correctly', () =>
   testSaga(doSellSaga)
@@ -106,5 +118,18 @@ test('doSellSaga should work correctly', () =>
     .take(doSell)
     .next({ payload: [ 40.5, 0.0007 ] })
     .call(poloniex.privateRequest, { command: 'sell', currencyPair: CURRENT_PAIR, rate: 40.5, amount: 0.0007 })
+    .next({ response: { orderNumber: '257473046371' } })
+    .put(sellSuccess([ 40.5, 0.0007, '257473046371' ]))
+    .next()
+    .take(doSell))
+
+test('doSellSaga should store error', () =>
+  testSaga(doSellSaga)
+    .next()
+    .take(doSell)
+    .next({ payload: [ 40.5, 0.0007 ] })
+    .call(poloniex.privateRequest, { command: 'sell', currencyPair: CURRENT_PAIR, rate: 40.5, amount: 0.0007 })
+    .next({ error: 'Not enough money' })
+    .put(sellFailure([ 40.5, 0.0007, 'Not enough money' ]))
     .next()
     .take(doSell))
