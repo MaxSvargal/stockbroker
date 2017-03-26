@@ -47,7 +47,7 @@ class CurrencyStats extends Component {
     const styles = this.getStyles()
 
     return div({ style: styles.root }, [
-      h1({ style: styles.h1 }, 'USDT_ETH'),
+      h1({ style: styles.h1 }, CURRENT_PAIR),
       data ?
         div([
           div({ style: styles.watcher }, [
