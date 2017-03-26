@@ -108,7 +108,7 @@ export const amountVolume = createReducer({
   [setChunkAmount]: (state, rate) => rate
 }, 0.01000001)
 
-export const threshold = createReducer({}, 0.0019)
+export const threshold = createReducer({}, 0.000019)
 
 
 const rootReducer = combineReducers({

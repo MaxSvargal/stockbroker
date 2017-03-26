@@ -6,10 +6,13 @@ import BotLog from 'components/BotLog'
 import TradeTable from 'components/TradeTable'
 import CurrencyStats from 'components/CurrencyStats'
 import ChunksConvertInformator from 'components/ChunksConvertInformator'
+// import ClearDbBtn from 'components/ClearDbBtn'
 
 class App extends Component {
   render() {
     const styles = this.getStyles()
+
+    // toggle between minimal and full mode interface
 
     return div({ style: styles.root }, [
       ChunksConvertInformator(),
@@ -19,7 +22,8 @@ class App extends Component {
           BotLog()
         ]),
         div({ style: styles.trade }, [
-          TradeTable()
+          TradeTable(),
+          // ClearDbBtn()
         ])
       ]),
       div({ style: styles.row }, [
@@ -39,16 +43,17 @@ class App extends Component {
         fontFamily: '"Courier New", monospace',
         fontSize: '16px',
         minHeight: '98vh',
-        padding: '2.5vh 2.5vw',
         WebkitFontSmoothing: 'antialiased'
       },
       row: {
         display: 'flex',
         margin: '1rem 0 3rem 0',
-        justifyContent: 'space-around'
+        justifyContent: 'space-around',
+        padding: '2.5vh 2.5vw'
       },
       column: {
-        display: 'flex'
+        display: 'flex',
+        padding: '2.5vh 2.5vw'
       },
       currency: {
         minWidth: '40vw'

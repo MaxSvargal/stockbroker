@@ -21,7 +21,7 @@ export default function configureStore(initialState = {}) {
 
     const reducerKeys = [
       'amountVolume', 'botMessages', 'buy', 'sell', 'currencies', 'currentPair',
-      'stats', 'myBuys', 'mySells', 'stats', 'threshold', 'wallet', 'chunkedCurrency'
+      'stats', 'myBuys', 'mySells', 'stats', 'wallet', 'chunkedCurrency'
     ]
     const replicator = localforage
     const replication = replicate({ key, reducerKeys, replicator })

@@ -25,11 +25,11 @@ class ChunksConvertInformator extends Component {
     const styles = this.getStyles()
     const pairs = currentPair.split('_')
 
-    return this.state.show && (freeCurrencyIsset[0] > 0 || freeCurrencyIsset[1] > 0) && div([
+    return /* this.state.show && (freeCurrencyIsset[0] > 0 || freeCurrencyIsset[1] > 0) && */ div([
       div({ style: styles.box }, [
         div({ style: styles.row }, [
           div([
-            span('Обнаружена свободная валюта'),
+            span({ style: styles.title }, 'Обнаружена свободная валюта'),
             freeCurrencyIsset[0] > 0 && span(` ${pairs[0]}: ${freeCurrencyIsset[0]} `),
             freeCurrencyIsset[1] > 0 && span(` ${pairs[1]}: ${freeCurrencyIsset[1]} `)
           ]),
@@ -42,11 +42,8 @@ class ChunksConvertInformator extends Component {
   getStyles() {
     return {
       box: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
         width: '100vw',
-        background: '#54a9eb',
+        background: '#3b4048',
         color: '#fff',
         fontWeight: 'bold',
         padding: '.75rem 1rem'
@@ -58,9 +55,12 @@ class ChunksConvertInformator extends Component {
       btn: {
         marginLeft: '2rem',
         background: '#fff',
-        color: '#54a9eb',
+        color: '#3b4048',
         border: 0,
         padding: '.25rem 1rem'
+      },
+      title: {
+        lineHeight: '1.8rem'
       }
     }
   }

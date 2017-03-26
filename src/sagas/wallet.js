@@ -14,7 +14,7 @@ const secret = '758c86f9c922e164f573801663f641acb625e4118f646f0b5612da38cd18a171
 export const poloniex = new Poloniex({ key, secret })
 
 const makeChunks = (rate, value) => {
-  const perChunk = Number((value / 24).toString().slice(0, 10))
+  const perChunk = Number((value / 12).toString().slice(0, 10))
   let numOfChunks = Math.round(value / perChunk)
   const chunks = []
   /* eslint no-plusplus: 0 */
@@ -104,7 +104,7 @@ export default function* walletSaga() {
   yield [
     fork(getWallet),
     fork(chunksCreator),
-    // fork(doBuySaga),
-    // fork(doSellSaga)
+    fork(doBuySaga),
+    fork(doSellSaga)
   ]
 }

@@ -23,9 +23,7 @@ test('estimateStatsSaga should buy on down', () =>
     // value of minimum profit is 0.19 coins
     .select(selectThreshold)
     .next(0.19)
-    .select(selectAmountVolume)
-    .next(0.0002)
-    .fork(buySaga, 40.2, 0.19, 0.00020001)
+    .fork(buySaga, 40.2, 0.19)
     .next()
     .isDone())
 
@@ -37,9 +35,7 @@ test('estimateStatsSaga should sell on up', () =>
     // value of minimum profit is 0.19 coins
     .select(selectThreshold)
     .next(0.19)
-    .select(selectAmountVolume)
-    .next(0.0002)
-    .fork(sellSaga, 40.3, 0.19, 0.00019999)
+    .fork(sellSaga, 40.3, 0.19)
     .next()
     .isDone())
 
@@ -48,14 +44,14 @@ test('buySaga should compare bill with uncovered sells and buy one', () =>
     .next()
     .select(selectUncoveredSells)
     // [ time, rate, amount, covered ]
-    .next([ [ 0, 40.4, 0.1, 0 ], [ 1, 40.1, 0.1, 0 ] ])
+    .next([ [ 1, 40.3, 0.1, 0 ], [ 1, 40.4, 0.15, 0 ], [ 0, 40.5, 0.2, 0 ] ])
     // update [ 0, 41.2, 0.0001, 0 ] to [ 0, 41.2, 0.0001, 1 ]
     // do profit 40.4 - 40.2 = 0.2 coins
     .put(coverSell(1))
     .next()
-    .put(doBuy([ 40.2, 0.1 ]))
+    .put(doBuy([ 40.2, 0.15 ]))
     .next()
-    .put(botMessage(`Куплено за ${40.2} объёмом ${0.1}, покрыта ставка по ${40.4}, профит: ${0.01849999}`))
+    .put(botMessage(`Куплено за ${40.2} объёмом ${0.15}, покрыта ставка продажи ${40.4}, профит: ${0.02437499}`))
     .next()
     .isDone())
 
@@ -76,14 +72,14 @@ test('sellSaga should compare bill with uncovered buys and sell one', () =>
     .next()
     .select(selectUncoveredBuys)
     // [ time, rate, amount, covered ]
-    .next([ [ 1, 40.6, 0.1, 0 ], [ 0, 39.8, 0.1, 0 ] ])
+    .next([ [ 0, 39.8, 0.1, 0 ], [ 1, 39.6, 0.2, 0 ], [ 1, 39.7, 0.1, 0 ] ])
     // update [ 0, 41.2, 0.0001, 0 ] to [ 0, 41.2, 0.0001, 1 ]
     // do profit 40.4 - 40.2 = 0.2 coins
-    .put(coverBuy(0))
+    .put(coverBuy(1))
     .next()
-    .put(doSell([ 40.3, 0.1, 0.0485 ]))
+    .put(doSell([ 40.3, 0.2 ]))
     .next()
-    .put(botMessage(`Продано за ${40.3} объёмом ${0.1}, покрыта ставка по ${39.8}, профит: ${0.0485}`))
+    .put(botMessage(`Продано за ${40.3} объёмом ${0.2}, покрыта ставка покупки ${39.6}, профит: ${0.12999999}`))
     .next()
     .isDone())
 
