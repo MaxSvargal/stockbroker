@@ -1,6 +1,6 @@
 import test from 'ava'
 import testSaga from 'redux-saga-test-plan'
-import TradeSaga, { estimateStatsSaga, buySaga, sellSaga } from 'sagas/trade'
+import TradeSaga, { estimateStatsSaga, buySaga, sellSaga, checkLastDynamicIsDown } from 'sagas/trade'
 import { selectUncoveredSells, selectUncoveredBuys, selectThreshold, selectPrevStat, selectCurrencyPair } from 'sagas/selectors'
 import { doBuy, doSell, coverBuy, coverSell, botMessage, addStats } from 'actions'
 
@@ -102,3 +102,27 @@ test('sellSaga should not sell when does not cover a minimal rate of any buy', (
     .put(botMessage(`Продажа за ${40.3499999} не покрывает ни одной предыдущей покупки.`))
     .next()
     .isDone())
+
+test('checkLastDynamicIsDown should return true on dramatically down', t => {
+  const stats = [
+    [ 40.5, 2200, 5790, -0.00004848, -0.00003525 ],
+    [ 40.1, 2635, 5800, -0.00004016, -0.00003228 ],
+    [ 40.2, 2780, 6027, -0.00002966, -0.00002469 ],
+    [ 40.3, 2815, 6027, -0.00003145, -0.00002520 ],
+    [ 40.4, 2835, 6041, -0.00002876, -0.00002439 ]
+  ]
+
+  t.true(checkLastDynamicIsDown(stats))
+})
+
+test('checkLastDynamicIsDown should return true on up', t => {
+  const stats = [
+    [ 40.5, 2200, 5790, -0.00004848, -0.00003525 ],
+    [ 40.6, 2635, 5800, -0.00004016, -0.00003228 ],
+    [ 40.7, 2880, 5927, -0.00002966, -0.00003469 ],
+    [ 40.8, 3015, 6027, -0.00002945, -0.00003520 ],
+    [ 40.9, 3535, 6041, -0.00002876, -0.00003439 ]
+  ]
+
+  t.false(checkLastDynamicIsDown(stats))
+})

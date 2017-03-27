@@ -8,12 +8,15 @@ import {
   setCurrency, setCurrencyPair, addStats,
   buySuccess, sellSuccess, botMessage, coverSell, coverBuy,
   addBuyChunks, addSellChunks, addChunkedCurrency,
-  updateWallet, setFreeCurrencyIsset, sellFailure, buyFailure
+  updateWallet, sellFailure, buyFailure,
+  setThreshold, setChunksNumbers
 } from 'actions'
 
 export const botMessages = createReducer({
-  [botMessage]: (state, msg) => [ ...state, [ time(), msg ] ]
-}, [])
+  [botMessage]: (state, msg) => msg !== state[state.length - 1][1] ?
+    [ ...state, [ time(), msg ] ] :
+    state
+}, [ [ time(), 'Initiated' ] ])
 
 // запрос на покупку
 export const ask = createReducer({
@@ -81,13 +84,13 @@ export const stats = createReducer({
 export const myBuys = createReducer({
   [buySuccess]: (state, data) => [ ...state, [ time(), ...data, 0 ] ],
   [coverBuy]: (state, index) => state.slice().sort().map((v, i) => i === index ? [ ...v.slice(0, 4), 1 ] : v),
-  [addBuyChunks]: (state, data) => [ ...state, ...data.map(v => [ time(), ...v, 0, 1 ]) ]
+  [addBuyChunks]: (state, data) => [ ...state, ...data.map(v => [ time(), ...v, -1, 0 ]) ]
 }, [])
 
 export const mySells = createReducer({
   [sellSuccess]: (state, data) => [ ...state, [ time(), ...data, 0 ] ],
   [coverSell]: (state, index) => state.slice().sort().map((v, i) => i === index ? [ ...v.slice(0, 4), 1 ] : v),
-  [addSellChunks]: (state, data) => [ ...state, ...data.map(v => [ time(), ...v, 0, 1 ]) ]
+  [addSellChunks]: (state, data) => [ ...state, ...data.map(v => [ time(), ...v, -1, 0 ]) ]
 }, [])
 
 export const myFailureSells = createReducer({
@@ -102,19 +105,19 @@ export const wallet = createReducer({
   [updateWallet]: (state, data) =>
     Object.keys(data).reduce((prev, key) =>
       (data[key] !== '0.00000000' ? Object.assign({}, prev, { [key]: data[key] }) : prev), {})
-}, [])
+}, {})
 
 export const chunkedCurrency = createReducer({
   [addChunkedCurrency]: (state, data) => [ ...state, data ]
 }, [])
 
-export const freeCurrencyIsset = createReducer({
-  [setFreeCurrencyIsset]: (state, status) => status
+export const threshold = createReducer({
+  [setThreshold]: (state, value) => value
+}, 0.0001)
+
+export const chunksNumbers = createReducer({
+  [setChunksNumbers]: (state, nums) => nums
 }, [ 0, 0 ])
-
-export const threshold = createReducer({}, 0.000019)
-
-export const chunksNumber = createReducer({}, 24)
 
 const rootReducer = combineReducers({
   ask,
@@ -122,10 +125,9 @@ const rootReducer = combineReducers({
   botMessages,
   buy,
   chunkedCurrency,
-  chunksNumber,
+  chunksNumbers,
   currencies,
   currentPair,
-  freeCurrencyIsset,
   myBuys,
   mySells,
   myFailureSells,
