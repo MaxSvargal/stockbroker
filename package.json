@@ -10,7 +10,8 @@
     "coverage": "nyc report --reporter=lcov --reporter=text-lcov | coveralls",
     "start": "node ./server/index.js",
     "build": "webpack --config=./webpack.config.production.js",
-    "dev": "webpack-dev-server --config=./webpack.config.js --inline --hot --open"
+    "dev": "webpack-dev-server --config=./webpack.config.js --inline --hot --open",
+    "db": "rethinkdb"
   },
   "ava": {
     "require": [
@@ -26,7 +27,9 @@
     "autobahn": "^0.11.2",
     "babili-webpack-plugin": "^0.0.11",
     "crypto-js": "^3.1.9-1",
+    "debounce": "^1.0.0",
     "deep-equal": "^1.0.1",
+    "express": "^4.15.2",
     "node-fetch": "^1.6.3",
     "nonce": "^1.0.4",
     "react": "^15.4.2",
@@ -34,6 +37,8 @@
     "react-hyperscript-helpers": "^1.2.0",
     "react-redux": "^5.0.3",
     "react-redux-provide": "^7.0.0-rc.21",
+    "react-router": "v4.0.0-beta.7",
+    "react-router-dom": "v4.0.0-beta.7",
     "react-throttle-render": "^2.0.0",
     "redux": "^3.6.0",
     "redux-act": "^1.1.1",
@@ -42,7 +47,9 @@
     "redux-replicate-fs": "^3.0.1",
     "redux-replicate-localforage": "^3.0.2",
     "redux-saga": "^0.14.3",
-    "source-map-support": "^0.4.14"
+    "rethinkdb": "^2.3.3",
+    "source-map-support": "^0.4.14",
+    "ws": "^2.2.2"
   },
   "devDependencies": {
     "ava": "^0.18.2",
