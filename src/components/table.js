@@ -45,7 +45,6 @@ class Table extends Component {
       root: {
       },
       table: {
-        width: '100%'
       },
       thead: {
 
@@ -58,9 +57,7 @@ class Table extends Component {
         padding: '.1rem .5rem'
       },
       tbody: {
-        display: 'block',
-        overflow: 'scroll',
-        height: '87vh'
+        display: 'block'
       },
       title: {
         fontSize: '1.2rem',

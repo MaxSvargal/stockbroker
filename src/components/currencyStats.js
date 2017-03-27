@@ -66,7 +66,7 @@ class CurrencyStats extends Component {
             }),
             div({ style: styles.x }, 'x'),
             div({ style: styles.bigger }, data.last),
-            outputValue > 0 && div({ style: styles.total }, `= ${outputValue} $`)
+            outputValue > 0 && div({ style: styles.total }, `= ${outputValue} ${CURRENT_PAIR.split('_')[0]}`)
           ]),
           div([ 'Спрос: ', data.lowestAsk ]),
           div([ 'Предложение: ', data.highestBid ]),
@@ -83,13 +83,14 @@ class CurrencyStats extends Component {
   getStyles() {
     return {
       root: {
-        fontSize: '1.2rem',
-        lineHeight: '1.8rem',
+        fontSize: '1.1rem',
+        lineHeight: '1.6rem',
         fontWeight: 'bold',
-        marginBottom: '2.5rem'
+        marginBottom: '2rem'
       },
       h1: {
-        fontSize: '3rem'
+        fontSize: '3rem',
+        margin: '1rem 0 2.5rem 0'
       },
       bigger: {
         fontSize: '3.6rem',
@@ -97,8 +98,7 @@ class CurrencyStats extends Component {
         color: '#e352c9'
       },
       course: {
-        display: 'flex',
-        marginBottom: '1rem'
+        display: 'flex'
       },
       input: {
         width: '7rem',
