@@ -7,3 +7,4 @@ server/build/*
 .c9
 .nyc_output
 dist/*
+rethinkdb_data

@@ -1,6 +1,6 @@
 const webpack = require('webpack')
 const path = require('path')
-const BabiliPlugin = require('babili-webpack-plugin')
+// const BabiliPlugin = require('babili-webpack-plugin')
 // const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
@@ -24,6 +24,6 @@ module.exports = {
         BROWSER: JSON.stringify(true)
       }
     }),
-    new BabiliPlugin()
+    // new BabiliPlugin()
   ]
 }

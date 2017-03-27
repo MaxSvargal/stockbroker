@@ -1,6 +1,12 @@
 const HmacSHA512 = require('crypto-js/hmac-sha512')
 const nonce = require('nonce')()
 
+if (!process.env.BROWSER) {
+  /* eslint global-require: 0 */
+  global.fetch = require('node-fetch')
+}
+
+
 const keySymbol = Symbol('key')
 const secretSymbol = Symbol('secret')
 // const PUBLIC_API_URL = 'https://poloniex.com/public'
