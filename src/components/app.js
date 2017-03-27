@@ -1,37 +1,29 @@
 import { Component } from 'react'
-import { hh, div } from 'react-hyperscript-helpers'
+import { h, hh, div, span } from 'react-hyperscript-helpers'
+import { NavLink, Route, Switch } from 'react-router-dom'
 
-// import BigTable from 'components/BigTable'
-import BotLog from 'components/BotLog'
-import TradeTable from 'components/TradeTable'
-import CurrencyStats from 'components/CurrencyStats'
-import ChunksConvertInformator from 'components/ChunksConvertInformator'
-// import ClearDbBtn from 'components/ClearDbBtn'
+import SimpleMode from 'components/SimpleMode'
+import Settings from 'components/Settings'
+import MyOrders from 'components/MyOrders'
+import FullMode from 'components/FullMode'
 
 class App extends Component {
   render() {
     const styles = this.getStyles()
 
-    // toggle between minimal and full mode interface
-
     return div({ style: styles.root }, [
-      ChunksConvertInformator(),
-      div({ style: styles.column }, [
-        div({ style: styles.currency }, [
-          CurrencyStats(),
-          BotLog()
-        ]),
-        div({ style: styles.trade }, [
-          TradeTable(),
-          // ClearDbBtn()
-        ])
+      div({ style: styles.linksBox }, [
+        h(NavLink, { to: '/', style: styles.link, exact: true, activeStyle: styles.activeLink }, [ span('Минимал') ]),
+        h(NavLink, { to: '/full', style: styles.link, activeStyle: styles.activeLink }, [ span('Отслеживание') ]),
+        h(NavLink, { to: '/orders', style: styles.link, activeStyle: styles.activeLink }, [ span('Транзакции') ]),
+        h(NavLink, { to: '/settings', style: styles.link, activeStyle: styles.activeLink }, [ span('Настройки') ])
+      ]),
+      h(Switch, [
+        h(Route, { exact: true, path: '/', component: SimpleMode }),
+        h(Route, { path: '/full', component: FullMode }),
+        h(Route, { path: '/orders', component: MyOrders }),
+        h(Route, { path: '/settings', component: Settings })
       ])
-      // div({ style: styles.row }, [
-      //   BigTable(({ ask }) => ({ data: ask }))(
-      //     { title: 'Предложение', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] }),
-      //   BigTable(({ bid }) => ({ data: bid }))(
-      //     { title: 'Спрос', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] })
-      // ])
     ])
   }
 
@@ -45,24 +37,22 @@ class App extends Component {
         minHeight: '100vh',
         WebkitFontSmoothing: 'antialiased'
       },
-      row: {
+      linksBox: {
         display: 'flex',
-        margin: '1rem 0 3rem 0',
-        justifyContent: 'space-around',
-        padding: '2.5vh 2.5vw'
+        justifyContent: 'center',
+        background: '#303030',
+        borderBottom: '1px solid #0e0f10'
       },
-      column: {
-        display: 'flex',
-        padding: '2.5vh 2.5vw'
+      link: {
+        display: 'inline-block',
+        padding: '0.5rem 1rem',
+        fontSize: '1.4rem',
+        color: '#aaaaaa',
+        textDecoration: 'none',
+        fontWeight: 'bold'
       },
-      currency: {
-        minWidth: '40vw'
-      },
-      trade: {
-        minWidth: '35vw',
-        maxWidth: '100vw',
-        display: 'flex',
-        justifyContent: 'flex-end'
+      activeLink: {
+        color: '#fc983e'
       }
     }
   }

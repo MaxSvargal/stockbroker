@@ -2,6 +2,7 @@ import 'react-hot-loader/patch'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { AppContainer } from 'react-hot-loader'
+import { HashRouter as Router } from 'react-router-dom'
 import { h } from 'react-hyperscript-helpers'
 import configureStore from 'store/configureStore'
 import rootSaga from 'sagas'
@@ -11,8 +12,10 @@ const store = configureStore()
 
 const render = Component =>
   ReactDOM.render(
-    h(AppContainer, [
-      h(Provider, { store }, [ Component() ])
+    h(Router, [
+      h(AppContainer, [
+        h(Provider, { store }, [ Component() ])
+      ])
     ]),
     document.getElementById('root'))
 
