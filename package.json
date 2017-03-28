@@ -8,9 +8,10 @@
     "test": "NODE_ENV=test NODE_PATH=src nyc ava",
     "test:watch": "npm test -- --watch",
     "coverage": "nyc report --reporter=lcov --reporter=text-lcov | coveralls",
-    "start": "node ./server/index.js",
-    "build": "webpack --config=./webpack.config.production.js",
-    "dev": "webpack-dev-server --config=./webpack.config.js --inline --hot --open",
+    "start": "ACCOUNT=me node ./server/index.js",
+    "build:me": "ACCOUNT=me webpack --config=./webpack.config.production.js",
+    "build:pahan": "ACCOUNT=pahan webpack --config=./webpack.config.production.js",
+    "dev": "ACCOUNT=me webpack-dev-server --config=./webpack.config.js --inline --hot --open",
     "db": "rethinkdb"
   },
   "ava": {

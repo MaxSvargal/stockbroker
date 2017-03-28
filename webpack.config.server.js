@@ -1,6 +1,8 @@
 const path = require('path')
 const webpack = require('webpack')
 
+const accountConfig = require(path.resolve(__dirname, 'accounts', `${process.env.ACCOUNT}.json`))
+
 module.exports = {
   target: 'node',
   devtool: 'source-map',
@@ -22,7 +24,8 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify('production'),
-        BROWSER: JSON.stringify(false)
+        BROWSER: JSON.stringify(false),
+        ACCOUNT: JSON.stringify(accountConfig)
       }
     }),
     new webpack.BannerPlugin({

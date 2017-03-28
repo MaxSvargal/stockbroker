@@ -20,15 +20,7 @@ import {
   updateWallet
 } from 'actions'
 
-// my
-const key = 'I94AGT6H-HEUAIL5B-G34YF99I-IYR0777F'
-const secret = '758c86f9c922e164f573801663f641acb625e4118f646f0b5612da38cd18a171716d580af12104c3719b935b2cf1510f6df3359e28f403e9bf32e2cbe2faa97f'
-
-/* eslint max-len: 0 */
-// pa
-// const key = 'CMF66JGJ-9PJOIUPU-EFUCU5Y1-A2LEC3UF'
-// const secret = 'e1ceb16dc61f209cc00d8c6f08c3285a099242faaebb889eadf14a528e9517ca4e148ca7b17e3f86f49590f306c6c903defbeb5cfa1ac6168d3e36276404693b'
-
+const { ACCOUNT: { key, secret } } = process.env
 export const poloniex = new Poloniex({ key, secret })
 
 const makeChunks = (rate, amount, chunksNum) => {

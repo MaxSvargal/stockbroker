@@ -8,3 +8,4 @@ server/build/*
 .nyc_output
 dist/*
 rethinkdb_data
+accounts

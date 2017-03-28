@@ -5,6 +5,8 @@ const ChunkManifestPlugin = require('chunk-manifest-webpack-plugin')
 const WebpackChunkHash = require('webpack-chunk-hash')
 const formatter = require('eslint-formatter-pretty')
 
+const accountConfig = require(path.resolve(__dirname, 'accounts', `${process.env.ACCOUNT}.json`))
+
 module.exports = {
   entry: {
     vendor: './vendor.js',
@@ -32,7 +34,8 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify('development'),
-        BROWSER: JSON.stringify(true)
+        BROWSER: JSON.stringify(true),
+        ACCOUNT: JSON.stringify(accountConfig)
       }
     }),
     new HtmlWebpackPlugin({
