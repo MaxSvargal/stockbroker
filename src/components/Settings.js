@@ -3,12 +3,14 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import debounce from 'debounce'
 import { hh, h2, div, input, label, span, button } from 'react-hyperscript-helpers'
-import { setThreshold, setChunksNumbers, sendSells, sendBuys } from 'actions'
+import { setThreshold, setChunksNumbers, sendSells, sendBuys, removeOpenBuys, removeOpenSells } from 'actions'
 import { CURRENT_PAIR } from 'const'
 
 import CloseIcon from 'components/CloseIcon'
 
 const pairNames = CURRENT_PAIR.split('_')
+
+const assign = (from, to) => Object.assign({}, from, to)
 
 class Settings extends Component {
   constructor(props) {
@@ -21,6 +23,8 @@ class Settings extends Component {
     }
     this.sendSells = this.sendSells.bind(this)
     this.sendBuys = this.sendBuys.bind(this)
+    this.removeOpenSells = this.removeOpenSells.bind(this)
+    this.removeOpenBuys = this.removeOpenBuys.bind(this)
     this.changeThreshold = debounce(props.setThreshold, 500)
   }
 
@@ -35,6 +39,16 @@ class Settings extends Component {
   flashBackground() {
     this.setState({ flashBg: true })
     setTimeout(() => this.setState({ flashBg: false }), 200)
+  }
+
+  removeOpenSells() {
+    this.props.removeOpenSells()
+    this.flashBackground()
+  }
+
+  removeOpenBuys() {
+    this.props.removeOpenBuys()
+    this.flashBackground()
   }
 
   sendSells() {
@@ -93,7 +107,7 @@ class Settings extends Component {
         ]),
 
         div({ style: styles.row }, [
-          h2({ style: styles.title }, 'Продажа')
+          h2({ style: styles.title }, 'Купить')
         ]),
         div({ style: styles.row }, [
           div({ style: styles.col }, [
@@ -143,7 +157,7 @@ class Settings extends Component {
         ]),
 
         div({ style: styles.row }, [
-          h2({ style: styles.title }, 'Покупка')
+          h2({ style: styles.title }, 'Продать')
         ]),
         div({ style: styles.row }, [
           div({ style: styles.col }, [
@@ -188,6 +202,19 @@ class Settings extends Component {
               style: styles.createBtn,
               onClick: this.sendBuys
             }, 'Создать')
+          ])
+        ]),
+
+        div({ style: styles.row }, [
+          div({ style: assign(styles.col, styles.controls) }, [
+            button({
+              style: styles.removeBtn,
+              onClick: this.removeOpenSells
+            }, 'Удалить открытые продажи'),
+            button({
+              style: styles.removeBtn,
+              onClick: this.removeOpenBuys
+            }, 'Удалить открытые покупки')
           ])
         ])
       ])
@@ -234,6 +261,11 @@ class Settings extends Component {
       col: {
         margin: '1rem .5rem'
       },
+      controls: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        paddingTop: '2rem'
+      },
       output: {
         fontSize: '2rem',
         display: 'inline-block',
@@ -246,6 +278,14 @@ class Settings extends Component {
         fontSize: '1.2rem',
         padding: '.45rem 1rem',
         margin: '2rem 0'
+      },
+      removeBtn: {
+        background: '#de6a70',
+        color: '#fff',
+        border: 0,
+        fontSize: '1.1rem',
+        padding: '.45rem 1rem',
+        margin: '0 .5rem'
       },
       title: {
         margin: '0 .5rem',
@@ -264,6 +304,8 @@ Settings.propTypes = {
 const mapStateToProps = ({ threshold, chunksNumbers, currencies, wallet }) =>
   ({ threshold, chunksNumbers, currency: currencies[CURRENT_PAIR], wallet })
 
-const dispatchToProps = { setThreshold, setChunksNumbers, sendSells, sendBuys }
+const dispatchToProps = {
+  setThreshold, setChunksNumbers, sendSells, sendBuys, removeOpenBuys, removeOpenSells
+}
 
 export default hh(withRouter(connect(mapStateToProps, dispatchToProps)(Settings)))

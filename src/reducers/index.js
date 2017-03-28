@@ -9,7 +9,8 @@ import {
   buySuccess, sellSuccess, botMessage, coverSell, coverBuy,
   addBuyChunks, addSellChunks, addChunkedCurrency,
   updateWallet, sellFailure, buyFailure,
-  setThreshold, setChunksNumbers
+  setThreshold, setChunksNumbers,
+  removeOpenSells, removeOpenBuys
 } from 'actions'
 
 export const botMessages = createReducer({
@@ -84,13 +85,15 @@ export const stats = createReducer({
 export const myBuys = createReducer({
   [buySuccess]: (state, data) => [ ...state, [ time(), ...data, 0 ] ],
   [coverBuy]: (state, index) => state.slice().sort().map((v, i) => i === index ? [ ...v.slice(0, 4), 1 ] : v),
-  [addBuyChunks]: (state, data) => [ ...state, ...data.map(v => [ time(), ...v, -1, 0 ]) ]
+  [addBuyChunks]: (state, data) => [ ...state, ...data.map(v => [ time(), ...v, -1, 0 ]) ],
+  [removeOpenBuys]: (state) => state.filter(v => v[4] !== 0)
 }, [])
 
 export const mySells = createReducer({
   [sellSuccess]: (state, data) => [ ...state, [ time(), ...data, 0 ] ],
   [coverSell]: (state, index) => state.slice().sort().map((v, i) => i === index ? [ ...v.slice(0, 4), 1 ] : v),
-  [addSellChunks]: (state, data) => [ ...state, ...data.map(v => [ time(), ...v, -1, 0 ]) ]
+  [addSellChunks]: (state, data) => [ ...state, ...data.map(v => [ time(), ...v, -1, 0 ]) ],
+  [removeOpenSells]: (state) => state.filter(v => v[4] !== 0)
 }, [])
 
 export const myFailureSells = createReducer({

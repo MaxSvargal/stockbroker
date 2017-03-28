@@ -32,4 +32,4 @@ export const selectPrevStat = state =>
   state.stats[state.stats.length - 2]
 
 export const selectLastTenStat = state =>
-  state.stats.slice(state.stats.length - 10, state.stats.length)
+  state.stats.slice(state.stats.length - 11, state.stats.length - 1)
