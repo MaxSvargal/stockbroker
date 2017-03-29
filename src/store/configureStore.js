@@ -20,8 +20,8 @@ export default function configureStore(initialState = {}) {
     const key = 'PoloniexGolumBotStorageUnit'
 
     const reducerKeys = [
-      'botMessages', 'buy', 'sell', 'chunksNumber', 'currencies', 'threshold',
-      'stats', 'myBuys', 'mySells', 'myFailureSells', 'myFailureBuys', 'stats', 'chunkedCurrency'
+      'botMessages', 'buy', 'sell', 'threshold', 'stats', 'myBuys',
+      'mySells', 'myFailureSells', 'myFailureBuys', 'freeCurrencies', 'currentPair'
     ]
     const replicator = localforage
     const replication = replicate({ key, reducerKeys, replicator })
