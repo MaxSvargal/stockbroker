@@ -5,7 +5,7 @@
   "author": "MaxSvargal",
   "license": "MIT",
   "scripts": {
-    "test": "NODE_ENV=test NODE_PATH=src nyc ava",
+    "test": "ACCOUNT=me NODE_ENV=test NODE_PATH=src nyc ava",
     "test:watch": "npm test -- --watch",
     "coverage": "nyc report --reporter=lcov --reporter=text-lcov | coveralls",
     "start": "ACCOUNT=me node ./server/index.js",
@@ -27,6 +27,7 @@
   "dependencies": {
     "autobahn": "^0.11.2",
     "babili-webpack-plugin": "^0.0.11",
+    "bignumber.js": "^4.0.0",
     "crypto-js": "^3.1.9-1",
     "debounce": "^1.0.0",
     "deep-equal": "^1.0.1",
