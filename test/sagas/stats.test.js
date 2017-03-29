@@ -3,7 +3,7 @@ import testSaga from 'redux-saga-test-plan'
 import { generateStatsSaga } from 'sagas/stats'
 import { selectSellsLastTime, selectBuysLastTime, selectCurrencyPair } from 'sagas/selectors'
 import { addStats } from 'actions'
-import { TWENTY_MINUTES } from 'const'
+import { TEN_MINUTES } from 'const'
 
 test('generateStatsSaga should calculate statistics on buy up, sell down', () => {
   const buy = [ [ 0, 0.4, 1 ], [ 2, 0.5, 2 ], [ 4, 0.6, 2 ] ]
@@ -13,9 +13,9 @@ test('generateStatsSaga should calculate statistics on buy up, sell down', () =>
 
   testSaga(generateStatsSaga)
     .next()
-    .select(selectSellsLastTime, TWENTY_MINUTES)
+    .select(selectSellsLastTime, TEN_MINUTES)
     .next(sell)
-    .select(selectBuysLastTime, TWENTY_MINUTES)
+    .select(selectBuysLastTime, TEN_MINUTES)
     .next(buy)
     .select(selectCurrencyPair)
     .next({ last: 0.5 })
@@ -29,9 +29,9 @@ test('generateStatsSaga should calculate statistics on sell up (dumping down)', 
 
   testSaga(generateStatsSaga)
     .next()
-    .select(selectSellsLastTime, TWENTY_MINUTES)
+    .select(selectSellsLastTime, TEN_MINUTES)
     .next(sell)
-    .select(selectBuysLastTime, TWENTY_MINUTES)
+    .select(selectBuysLastTime, TEN_MINUTES)
     .next(buy)
     .select(selectCurrencyPair)
     .next({ last: 0.1 })
@@ -45,9 +45,9 @@ test('generateStatsSaga should calculate statistics on buy up (dumping up)', () 
 
   testSaga(generateStatsSaga)
     .next()
-    .select(selectSellsLastTime, TWENTY_MINUTES)
+    .select(selectSellsLastTime, TEN_MINUTES)
     .next(sell)
-    .select(selectBuysLastTime, TWENTY_MINUTES)
+    .select(selectBuysLastTime, TEN_MINUTES)
     .next(buy)
     .select(selectCurrencyPair)
     .next({ last: 0.7 })

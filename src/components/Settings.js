@@ -2,13 +2,10 @@ import { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import debounce from 'debounce'
+import BigNumber from 'bignumber.js'
+import { cropNumber } from 'utils'
 import { hh, h2, div, input, label, span, button } from 'react-hyperscript-helpers'
-import { setThreshold, setChunksNumbers, sendSells, sendBuys, removeOpenBuys, removeOpenSells } from 'actions'
-import { CURRENT_PAIR } from 'const'
-
-import CloseIcon from 'components/CloseIcon'
-
-const pairNames = CURRENT_PAIR.split('_')
+import { setThreshold, sendSells, sendBuys, removeOpenBuys, removeOpenSells } from 'actions'
 
 const assign = (from, to) => Object.assign({}, from, to)
 
@@ -26,10 +23,6 @@ class Settings extends Component {
     this.removeOpenSells = this.removeOpenSells.bind(this)
     this.removeOpenBuys = this.removeOpenBuys.bind(this)
     this.changeThreshold = debounce(props.setThreshold, 500)
-  }
-
-  static getChunkAmount(value, numOfParts) {
-    return Number((value / numOfParts).toString().slice(0, 10))
   }
 
   onThresholdChange(e) {
@@ -70,21 +63,26 @@ class Settings extends Component {
   }
 
   calculateSells() {
-    const { sellAmount, sellChunks, sellRate } = this.refers
+    const { sellAmount, sellChunks } = this.refers
     this.setState({
-      sellChunkAmount: Settings.getChunkAmount(sellAmount.value / sellRate.value, sellChunks.value)
+      sellChunkAmount: new BigNumber(sellAmount.value || 0)
+        .div(sellChunks.value || 0)
+        .toFixed(8)
     })
   }
 
   calculateBuys() {
-    const { buyAmount, buyChunks } = this.refers
+    const { buyAmount, buyChunks, buyRate } = this.refers
     this.setState({
-      buyChunkAmount: Settings.getChunkAmount(buyAmount.value, buyChunks.value)
+      buyChunkAmount: new BigNumber(buyAmount.value || 0)
+        .div(buyRate.value || 0)
+        .div(buyChunks.value || 0)
+        .toFixed(8)
     })
   }
 
   render() {
-    const { threshold, currency, chunksNumbers, wallet } = this.props
+    const { pairNames, currency, freeCurrencies, threshold, wallet } = this.props
     const isWalletIsset = !!(wallet[pairNames[0]] || wallet[pairNames[1]])
     const isCurrencyIsset = !!(currency && currency.highestBid)
     const styles = this.getStyles()
@@ -93,7 +91,30 @@ class Settings extends Component {
     div({ style: styles.loading }, 'Получение баланса...') :
     div({ style: styles.root(this.state.flashBg) }, [
       div({ style: styles.box }, [
-        CloseIcon(),
+
+        div({ style: styles.row }, [
+          div({ style: styles.col }, [
+            label({ style: styles.label }, 'Валюта'),
+            div({ style: styles.info }, pairNames[0]),
+            div({ style: styles.info }, pairNames[1])
+          ]),
+          div({ style: styles.col }, [
+            label({ style: styles.label }, 'На счету'),
+            div({ style: styles.info }, wallet[pairNames[0]]),
+            div({ style: styles.info }, wallet[pairNames[1]])
+          ]),
+          div({ style: styles.col }, [
+            label({ style: styles.label }, 'Доступно'),
+            div({ style: styles.info }, freeCurrencies[0]),
+            div({ style: styles.info }, freeCurrencies[1])
+          ]),
+          div({ style: styles.col }, [
+            label({ style: styles.label }, 'В чанках'),
+            div({ style: styles.info }, cropNumber(wallet[pairNames[0]] - freeCurrencies[0])),
+            div({ style: styles.info }, cropNumber(wallet[pairNames[1]] - freeCurrencies[1]))
+          ])
+        ]),
+
         div({ style: styles.row }, [
           div({ style: styles.col }, [
             label({ style: styles.label }, 'Порог прибыли'),
@@ -107,15 +128,15 @@ class Settings extends Component {
         ]),
 
         div({ style: styles.row }, [
-          h2({ style: styles.title }, 'Купить')
+          h2({ style: styles.title }, `Создать продажи (задача купить ${pairNames[1]})`)
         ]),
         div({ style: styles.row }, [
           div({ style: styles.col }, [
-            label({ style: styles.label }, `Объём ${pairNames[0]}`),
+            label({ style: styles.label }, `Объём ${pairNames[1]}`),
             input({
               type: 'number',
               style: styles.input,
-              defaultValue: wallet[pairNames[0]],
+              defaultValue: wallet[pairNames[1]],
               ref: ref => (this.refers.sellAmount = ref),
               onChange: e => this.calculateSells(e)
             })
@@ -125,7 +146,7 @@ class Settings extends Component {
             input({
               type: 'number',
               style: styles.input,
-              defaultValue: chunksNumbers[0],
+              defaultValue: 0,
               ref: ref => (this.refers.sellChunks = ref),
               onChange: e => this.calculateSells(e)
             })
@@ -157,15 +178,15 @@ class Settings extends Component {
         ]),
 
         div({ style: styles.row }, [
-          h2({ style: styles.title }, 'Продать')
+          h2({ style: styles.title }, `Создать покупки (задача продать ${pairNames[1]})`)
         ]),
         div({ style: styles.row }, [
           div({ style: styles.col }, [
-            label({ style: styles.label }, `Объём ${pairNames[1]}`),
+            label({ style: styles.label }, `Объём ${pairNames[0]}`),
             input({
               type: 'number',
               style: styles.input,
-              defaultValue: wallet[pairNames[1]],
+              defaultValue: wallet[pairNames[0]],
               ref: ref => (this.refers.buyAmount = ref),
               onChange: e => this.calculateBuys(e)
             })
@@ -175,7 +196,7 @@ class Settings extends Component {
             input({
               type: 'number',
               style: styles.input,
-              defaultValue: chunksNumbers[1],
+              defaultValue: 0,
               ref: ref => (this.refers.buyChunks = ref),
               onChange: e => this.calculateBuys(e)
             })
@@ -259,7 +280,7 @@ class Settings extends Component {
         padding: '0.5rem 0.5rem'
       },
       col: {
-        margin: '1rem .5rem'
+        margin: '.5rem'
       },
       controls: {
         display: 'flex',
@@ -297,15 +318,21 @@ class Settings extends Component {
 
 Settings.propTypes = {
   threshold: PropTypes.number,
-  currencies: PropTypes.array,
-  currency: PropTypes.object
+  currency: PropTypes.object,
+  wallet: PropTypes.object
 }
 
-const mapStateToProps = ({ threshold, chunksNumbers, currencies, wallet }) =>
-  ({ threshold, chunksNumbers, currency: currencies[CURRENT_PAIR], wallet })
+const mapStateToProps = ({ threshold, currencies, currentPair, freeCurrencies, wallet }) =>
+  ({
+    pairNames: currentPair.split('_'),
+    currency: currencies[currentPair],
+    freeCurrencies,
+    threshold,
+    wallet
+  })
 
 const dispatchToProps = {
-  setThreshold, setChunksNumbers, sendSells, sendBuys, removeOpenBuys, removeOpenSells
+  setThreshold, sendSells, sendBuys, removeOpenBuys, removeOpenSells
 }
 
 export default hh(withRouter(connect(mapStateToProps, dispatchToProps)(Settings)))

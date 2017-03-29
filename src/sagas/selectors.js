@@ -10,7 +10,6 @@ export const selectTotals = state => state.totals
 export const selectWallet = state => state.wallet
 export const selectThreshold = state => state.threshold
 export const selectChunkedCurrency = state => state.chunkedCurrency
-export const selectChunksNumbers = state => state.chunksNumbers
 
 export const selectSellsLastTime = (state, time) => {
   const currTime = new Date().getTime()
@@ -27,6 +26,7 @@ export const selectUncoveredSells = state =>
 
 export const selectUncoveredBuys = state =>
   state.myBuys.reduce((prev, curr) => curr[4] === 0 ? [ ...prev, curr ] : prev, [])
+
 
 export const selectPrevStat = state =>
   state.stats[state.stats.length - 2]

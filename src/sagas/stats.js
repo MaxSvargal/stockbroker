@@ -3,6 +3,9 @@ import { setCurrency, addStats } from 'actions'
 import { selectSellsLastTime, selectBuysLastTime, selectCurrencyPair } from 'sagas/selectors'
 import { CURRENT_PAIR, TEN_MINUTES } from 'const'
 
+// пересчитывать статистику при изменении курса на большой процент (1% пример)
+// в зависимости от разрядности курса (> 100 === 0.1%)
+
 const getRate = i => i[1]
 const getAmount = i => i[2]
 const getSummNumber = (a, b) => Number(a) + Number(b)

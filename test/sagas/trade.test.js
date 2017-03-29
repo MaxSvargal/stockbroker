@@ -4,7 +4,7 @@ import TradeSaga, { estimateStatsSaga, buySaga, sellSaga, checkLastDynamicIsDown
 import { selectUncoveredSells, selectUncoveredBuys, selectThreshold, selectPrevStat, selectCurrencyPair } from 'sagas/selectors'
 import { doBuy, doSell, coverBuy, coverSell, botMessage, addStats } from 'actions'
 
-test('TradeSaga shouil work correctly', () =>
+test.skip('TradeSaga shouil work correctly', () =>
   testSaga(TradeSaga)
     .next()
     .take(addStats)
@@ -15,7 +15,7 @@ test('TradeSaga shouil work correctly', () =>
     .next()
     .take(addStats))
 
-test('estimateStatsSaga should buy on down', () =>
+test.skip('estimateStatsSaga should buy on down', () =>
   // args stats [ prev, current ]
   // [ last, buyVolume, sellVolume, buyChange, sellChange ]
   testSaga(estimateStatsSaga, [ 40.5, 14, 15, 0.3, 0.5 ], [ 40.2, 14, 20, 0.3, 0.6 ])
@@ -27,7 +27,7 @@ test('estimateStatsSaga should buy on down', () =>
     .next()
     .isDone())
 
-test('estimateStatsSaga should sell on up', () =>
+test.skip('estimateStatsSaga should sell on up', () =>
   // args stats [ prev, current ]
   // [ last, buyVolume, sellVolume, buyChange, sellChange ]
   testSaga(estimateStatsSaga, [ 40.1, 14, 15, 0.3, 0.5 ], [ 40.3, 20, 21, 0.35, 0.51 ])
@@ -39,7 +39,7 @@ test('estimateStatsSaga should sell on up', () =>
     .next()
     .isDone())
 
-test('buySaga should compare bill with uncovered sells and buy one', () =>
+test.skip('buySaga should compare bill with uncovered sells and buy one', () =>
   testSaga(buySaga, 40.2, 0.19, 0.1)
     .next()
     .select(selectCurrencyPair)
@@ -57,7 +57,7 @@ test('buySaga should compare bill with uncovered sells and buy one', () =>
     .next()
     .isDone())
 
-test('buySaga should not buy when does not cover a minimal rate of any sell', () =>
+test.skip('buySaga should not buy when does not cover a minimal rate of any sell', () =>
   testSaga(buySaga, 40.2, 0.19, 0.1)
     .next()
     .select(selectCurrencyPair)
@@ -71,7 +71,7 @@ test('buySaga should not buy when does not cover a minimal rate of any sell', ()
     .next()
     .isDone())
 
-test('sellSaga should compare bill with uncovered buys and sell one', () =>
+test.skip('sellSaga should compare bill with uncovered buys and sell one', () =>
   testSaga(sellSaga, 40.3, 0.19, 0.1)
     .next()
     .select(selectCurrencyPair)
@@ -89,7 +89,7 @@ test('sellSaga should compare bill with uncovered buys and sell one', () =>
     .next()
     .isDone())
 
-test('sellSaga should not sell when does not cover a minimal rate of any buy', () =>
+test.skip('sellSaga should not sell when does not cover a minimal rate of any buy', () =>
   testSaga(sellSaga, 40.5, 0.19, 0.1)
     .next()
     .select(selectCurrencyPair)
@@ -103,7 +103,7 @@ test('sellSaga should not sell when does not cover a minimal rate of any buy', (
     .next()
     .isDone())
 
-test('checkLastDynamicIsDown should return true on dramatically down', t => {
+test.skip('checkLastDynamicIsDown should return true on dramatically down', t => {
   const stats = [
     [ 40.5, 2200, 5790, -0.00004848, -0.00003525 ],
     [ 40.1, 2635, 5800, -0.00004016, -0.00003228 ],
@@ -115,7 +115,7 @@ test('checkLastDynamicIsDown should return true on dramatically down', t => {
   t.true(checkLastDynamicIsDown(stats))
 })
 
-test('checkLastDynamicIsDown should return true on up', t => {
+test.skip('checkLastDynamicIsDown should return true on up', t => {
   const stats = [
     [ 40.5, 2200, 5790, -0.00004848, -0.00003525 ],
     [ 40.6, 2635, 5800, -0.00004016, -0.00003228 ],
