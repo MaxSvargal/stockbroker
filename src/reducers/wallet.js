@@ -1,6 +1,6 @@
 import { createReducer } from 'redux-act'
 import { CURRENT_PAIR } from 'const'
-import { botMessage, setCurrency, setCurrencyPair, addStats, setFreeCurrencies, setThreshold, updateWallet } from 'actions'
+import { botMessage, setCurrency, setCurrencyPair, addStats, setFreeCurrencies, setThreshold, updateWallet, addEstimateRatio } from 'actions'
 import { time } from 'reducers/helpers'
 
 export const wallet = createReducer({
@@ -31,6 +31,10 @@ export const currentPair = createReducer({
 
 export const stats = createReducer({
   [addStats]: (state, data) => [ ...state, data ]
+}, [])
+
+export const statsEstimate = createReducer({
+  [addEstimateRatio]: (state, data) => [ ...state, data ]
 }, [])
 
 export const botMessages = createReducer({

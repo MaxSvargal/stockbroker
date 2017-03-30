@@ -1,31 +1,65 @@
 import test from 'ava'
 import testSaga from 'redux-saga-test-plan'
 import TradeSaga, { estimateStatsSaga, buySaga, sellSaga, checkLastDynamicIsDown } from 'sagas/trade'
-import { selectUncoveredSells, selectUncoveredBuys, selectThreshold, selectPrevStat, selectCurrencyPair } from 'sagas/selectors'
+import { selectLastTenStats, selectUncoveredSells, selectUncoveredBuys, selectThreshold, selectCurrencyPair } from 'sagas/selectors'
 import { doBuy, doSell, coverBuy, coverSell, botMessage, addStats } from 'actions'
 
-test.skip('TradeSaga shouil work correctly', () =>
+test('buySaga should work correctly', () =>
+  testSaga(buySaga, 0.05, 0.01)
+    .next()
+    .select(selectUncoveredSells)
+    .next([ [ 0, 0.045, 2, -1, 0 ], [ 0, 0.062, 3, -1, 0 ] ])
+    .put(doBuy([ 0.05, 3, 1 ])))
+
+test('sellSaga should work correctly', () =>
+  testSaga(sellSaga, 0.05, 0.01)
+    .next()
+    .select(selectUncoveredBuys)
+    .next([ [ 0, 0.045, 2, -1, 0 ], [ 0, 0.035, 3, -1, 0 ] ])
+    .put(doSell([ 0.05, 3, 1 ])))
+
+test('sellSaga should work on real data correctly', () =>
+  testSaga(sellSaga, 0.04993999, 0.0001)
+    .next()
+    .select(selectUncoveredBuys)
+    .next([ [ 0, 0.0498, 0.2, -1, 0 ] ])
+    .put(doSell([ 0.04993999, 0.2, 0 ])))
+
+
+test.skip('TradeSaga should work correctly', () =>
   testSaga(TradeSaga)
     .next()
     .take(addStats)
-    .next({ payload: [ 0.5, 5, 3, 0.06, 0.08 ] })
-    .select(selectPrevStat)
-    .next([ 0.4, 5, 4, 0.06, 0.09 ])
-    .fork(estimateStatsSaga, [ 0.4, 5, 4, 0.06, 0.09 ], [ 0.5, 5, 3, 0.06, 0.08 ])
+    .next()
+    .select(selectLastTenStats)
+    .next([ [], [], [], [], [], [], [], [], [], [] ])
+    .fork(estimateStatsSaga, [ [], [], [], [], [], [], [], [], [], [] ])
     .next()
     .take(addStats))
 
-test.skip('estimateStatsSaga should buy on down', () =>
-  // args stats [ prev, current ]
-  // [ last, buyVolume, sellVolume, buyChange, sellChange ]
-  testSaga(estimateStatsSaga, [ 40.5, 14, 15, 0.3, 0.5 ], [ 40.2, 14, 20, 0.3, 0.6 ])
+test.skip('estimateStatsSaga should buy on down', () => {
+  const stats = [
+    [ 0.56, 6, 3, 0.9875, 0.8612 ],
+    [ 0.55, 7, 4, 0.9885, 0.8611 ],
+    [ 0.54, 7, 6, 0.9885, 0.8609 ],
+    [ 0.55, 8, 6, 0.9891, 0.8607 ],
+    [ 0.56, 9, 6, 0.9895, 0.8611 ],
+    [ 0.54, 9, 7, 0.9895, 0.8612 ],
+    [ 0.53, 9, 8, 0.9896, 0.8613 ],
+    [ 0.52, 9, 9, 0.9897, 0.8611 ],
+    [ 0.51, 9, 10, 0.9898, 0.8610 ],
+    [ 0.52, 10, 11, 0.9899, 0.8609 ]
+  ]
+
+  testSaga(estimateStatsSaga, stats)
     .next()
     // value of minimum profit is 0.19 coins
     .select(selectThreshold)
     .next(0.19)
     .fork(buySaga, 40.2, 0.19)
     .next()
-    .isDone())
+    .isDone()
+})
 
 test.skip('estimateStatsSaga should sell on up', () =>
   // args stats [ prev, current ]

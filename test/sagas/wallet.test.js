@@ -27,7 +27,7 @@ test('getWallet should request currencies from poloniex immediately', () =>
     .next()
     .isDone())
 
-test('calculateFreeValues should set free currencies', () =>
+test.skip('calculateFreeValues should set free currencies', () =>
   testSaga(calculateFreeValues)
     .next()
     .take(setCurrency)

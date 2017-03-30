@@ -5,51 +5,20 @@ import { selectSellsLastTime, selectBuysLastTime, selectCurrencyPair } from 'sag
 import { addStats } from 'actions'
 import { TEN_MINUTES } from 'const'
 
-test('generateStatsSaga should calculate statistics on buy up, sell down', () => {
-  const buy = [ [ 0, 0.4, 1 ], [ 2, 0.5, 2 ], [ 4, 0.6, 2 ] ]
-  const sell = [ [ 1, 0.3, 1 ], [ 3, 0.4, 1 ], [ 5, 0.5, 1 ] ]
-  // [ buyVolume, sellVolume, buyChange, sellChange ]
-  const totals = [ 0.5, 5, 3, 0.06666666666666665, 0.08333333333333336 ]
+test('generateStatsSaga should store statistics', () => {
+  const buys = [ [ 0, 0.4, 1 ], [ 2, 0.5, 2 ], [ 4, 0.6, 2 ], [ 6, 0.9, 1 ] ]
+  const sells = [ [ 1, 0.3, 1 ], [ 3, 0.4, 1 ], [ 5, 0.5, 1 ] ]
+  const totals = [ 0.56, 0.9875, 0.861111111111111 ]
 
   testSaga(generateStatsSaga)
     .next()
-    .select(selectSellsLastTime, TEN_MINUTES)
-    .next(sell)
-    .select(selectBuysLastTime, TEN_MINUTES)
-    .next(buy)
     .select(selectCurrencyPair)
-    .next({ last: 0.5 })
+    .next({ last: '0.56' })
+    .select(selectBuysLastTime, TEN_MINUTES)
+    .next(buys)
+    .select(selectSellsLastTime, TEN_MINUTES)
+    .next(sells)
     .put(addStats(totals))
-})
-
-test('generateStatsSaga should calculate statistics on sell up (dumping down)', () => {
-  const buy = [ [ 0, 0.4, 3 ], [ 2, 0.4, 2 ], [ 4, 0.4, 1 ] ]
-  const sell = [ [ 1, 0.3, 2 ], [ 3, 0.2, 3 ], [ 5, 0.1, 4 ] ]
-  const totals = [ 0.1, 6, 9, 0, -0.16666666666666663 ]
-
-  testSaga(generateStatsSaga)
     .next()
-    .select(selectSellsLastTime, TEN_MINUTES)
-    .next(sell)
-    .select(selectBuysLastTime, TEN_MINUTES)
-    .next(buy)
-    .select(selectCurrencyPair)
-    .next({ last: 0.1 })
-    .put(addStats(totals))
-})
-
-test('generateStatsSaga should calculate statistics on buy up (dumping up)', () => {
-  const buy = [ [ 0, 0.5, 5 ], [ 2, 0.6, 5 ], [ 4, 0.7, 5 ] ]
-  const sell = [ [ 1, 0.3, 3 ], [ 3, 0.6, 3 ], [ 5, 0.7, 3 ] ]
-  const totals = [ 0.7, 15, 9, 0.055555555555555546, 0.16666666666666666 ]
-
-  testSaga(generateStatsSaga)
-    .next()
-    .select(selectSellsLastTime, TEN_MINUTES)
-    .next(sell)
-    .select(selectBuysLastTime, TEN_MINUTES)
-    .next(buy)
-    .select(selectCurrencyPair)
-    .next({ last: 0.7 })
-    .put(addStats(totals))
+    .isDone()
 })

@@ -27,9 +27,8 @@ export const selectUncoveredSells = state =>
 export const selectUncoveredBuys = state =>
   state.myBuys.reduce((prev, curr) => curr[4] === 0 ? [ ...prev, curr ] : prev, [])
 
-
-export const selectPrevStat = state =>
-  state.stats[state.stats.length - 2]
-
-export const selectLastTenStat = state =>
+export const selectLastTenStats = state =>
   state.stats.slice(state.stats.length - 11, state.stats.length - 1)
+
+export const selectEstimateRatios = state =>
+  state.statsEstimate.slice(state.statsEstimate.length - 11, state.statsEstimate.length - 1)

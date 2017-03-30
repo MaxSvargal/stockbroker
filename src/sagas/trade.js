@@ -1,86 +1,42 @@
-import { take, select, fork, put, race } from 'redux-saga/effects'
-import { addStats, doBuy, doSell, botMessage, buySuccess, buyFailure, sellSuccess, sellFailure } from 'actions'
-import { selectPrevStat, selectUncoveredSells, selectUncoveredBuys, selectThreshold, selectCurrencyPair, selectLastTenStat } from 'sagas/selectors'
+import { take, select, put, race } from 'redux-saga/effects'
+import { cropNumber } from 'utils'
+import { doBuy, doSell, botMessage, buySuccess, buyFailure, sellSuccess, sellFailure } from 'actions'
+import { selectUncoveredSells, selectUncoveredBuys } from 'sagas/selectors'
 
-export const checkLastDynamicIsDown = stats =>
-  stats.slice(0, 10).reverse().reduce((prev, curr) =>
-    (curr[4] < prev[0][4] ? [ curr, prev[1] + 1 ] : [ curr, prev[1] ]),
-    [ [ 0, 0, 0, 0, 0 ], 0 ])[1] >= 7
-
-export const checkLastDynamicIsUp = stats =>
-  stats.slice(0, 10).reverse().reduce((prev, curr) =>
-    (curr[3] > prev[0][3] ? [ curr, prev[1] + 1 ] : [ curr, prev[1] ]),
-    [ [ 0, 0, 0, 0, 0 ], 0 ])[1] >= 7
-
+/* eslint require-yield: 0 */
 export default function* TradeSaga() {
-  while (true) {
-    const { payload } = yield take(addStats)
-    const prevStat = yield select(selectPrevStat)
-    const lastTenStat = yield select(selectLastTenStat)
-    if (lastTenStat.length > 0 && prevStat && payload) {
-      // TODO: prevStat, stat не нужны
-      yield fork(estimateStatsSaga, lastTenStat, prevStat, payload)
-    }
-  }
-}
-
-export function* estimateStatsSaga(lastTenStat, prevStat, stat) {
-  const hold = yield select(selectThreshold)
-
-  // TODO: учитывать прогрессию, а не только последнюю статистику
-  // определить когда курс постоянно снижается и тормозить покупки
-  // на примере последних десяти статистик
-  const isUp = prevStat[1] < stat[1] && prevStat[3] < stat[3]
-  const isDown = prevStat[2] < stat[2] && prevStat[4] < stat[4]
-
-  // [ Number(last), buyVolume, sellVolume, buyChange, sellChange ]
-  // console.log({ isUp }, prevStat[1] < stat[1], prevStat[3] < stat[3], prevStat[3], stat[3])
-  // console.log({ isDown }, prevStat[2] < stat[2], prevStat[4] < stat[4], prevStat[4], stat[4])
-
-  const dynamicIsDown = checkLastDynamicIsDown(lastTenStat)
-  const dynamicIsUp = checkLastDynamicIsUp(lastTenStat)
-
-  // если падение стабильно долгое несколько подряд, то ждать дна и при подъёме продолжать покупать
-
-  if (dynamicIsDown) yield put(botMessage('Резкое падение курса, покупки приостановлены'))
-  else if (isDown) yield fork(buySaga, stat[0], hold)
-
-  if (dynamicIsUp) yield put(botMessage('Резкий скачок курса, продажи приостановлены'))
-  else if (isUp) yield fork(sellSaga, stat[0], hold)
-
-  // if (!isUp && !isDown) yield put(botMessage('Стагнация, господа.'))
+  false
 }
 
 export function* buySaga(rate, hold) {
+  // брать самый объёмный чанк
   const searchMinimalSellIndex = (arr, byRate) => {
-    const moreThenBuy = arr.map(v => v[1]).reduce((prev, curr) =>
+    const lessThenBuy = arr.map(v => v[1]).reduce((prev, curr) =>
       (curr > byRate + hold ? [ ...prev, curr ] : prev), [])
-    const minRate = Math.min(...moreThenBuy)
+    const minRate = Math.min(...lessThenBuy)
     const valIndex = arr.findIndex(v => v[1] === minRate)
     const valVolume = arr[valIndex] && arr[valIndex][2]
     return [ valIndex, minRate, valVolume ]
   }
 
-  const { lowestAsk } = yield select(selectCurrencyPair)
-  const fullRate = Number(lowestAsk) + 0.00000001
   const sells = yield select(selectUncoveredSells)
-  const [ coverIndex, coverRate, coverValue ] = searchMinimalSellIndex(sells, fullRate)
+  const [ coverIndex, coverRate, coverValue ] = searchMinimalSellIndex(sells, rate)
 
   if (coverIndex !== -1) {
     const fee = coverValue * 0.25
-    const profit = (coverRate - fullRate) * (coverValue - fee)
+    const profit = cropNumber((coverRate - rate) * (coverValue - fee))
 
-    yield put(doBuy([ fullRate, coverValue, coverIndex ]))
+    yield put(doBuy([ rate, coverValue, coverIndex ]))
 
     const { success, failure } = yield race({
       success: take(buySuccess),
       failure: take(buyFailure)
     })
 
-    if (success) yield put(botMessage(`Куплено за ${fullRate}, покрыто ${coverRate}, объём ${coverValue}, прибыль ${profit}`))
+    if (success) yield put(botMessage(`Куплено за ${rate}, покрыто ${coverRate}, объём ${coverValue}, прибыль ${profit}`))
     else if (failure) yield put(botMessage(`Покупка не удалась. Ошибка: ${failure.payload[2]}`))
   } else {
-    yield put(botMessage(`Покупка за ${fullRate} не покрывает ни одной предыдущей продажи`))
+    yield put(botMessage(`Покупка за ${rate} не покрывает ни одной предыдущей продажи`))
   }
 }
 
@@ -94,25 +50,23 @@ export function* sellSaga(rate, hold) {
     return [ valIndex, minRate, valVolume ]
   }
 
-  const { highestBid } = yield select(selectCurrencyPair)
-  const fullRate = Number(highestBid) - 0.00000001
   const buys = yield select(selectUncoveredBuys)
-  const [ coverIndex, coverRate, coverValue ] = searchMinimalBuyIndex(buys, fullRate)
+  const [ coverIndex, coverRate, coverValue ] = searchMinimalBuyIndex(buys, rate)
 
   if (coverIndex !== -1) {
     const fee = coverValue * 0.25
-    const profit = (fullRate - coverRate) * (coverValue - fee)
+    const profit = cropNumber((rate - coverRate) * (coverValue - fee))
 
-    yield put(doSell([ fullRate, coverValue, coverIndex ]))
+    yield put(doSell([ rate, coverValue, coverIndex ]))
 
     const { success, failure } = yield race({
       success: take(sellSuccess),
       failure: take(sellFailure)
     })
 
-    if (success) yield put(botMessage(`Продано за ${fullRate}, покрыто ${coverRate}, объём ${coverValue}, прибыль: ${profit}`))
+    if (success) yield put(botMessage(`Продано за ${rate}, покрыто ${coverRate}, объём ${coverValue}, прибыль: ${profit}`))
     else if (failure) yield put(botMessage(`Продажа не удалась. Ошибка: ${failure.payload[2]}`))
   } else {
-    yield put(botMessage(`Продажа за ${fullRate} не покрывает ни одной предыдущей покупки`))
+    yield put(botMessage(`Продажа за ${rate} не покрывает ни одной предыдущей покупки`))
   }
 }

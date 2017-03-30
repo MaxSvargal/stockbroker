@@ -1,6 +1,7 @@
 import { createAction } from 'redux-act'
 
 export const addBuyChunks = createAction('ADD_BUY_CHUNKS')
+export const addEstimateRatio = createAction('ADD_ESTIMATE_RATIO')
 export const addChunkedCurrency = createAction('ADD_CHUNKED_CURRENCY')
 export const addSellChunks = createAction('ADD_SELL_CHUNKS')
 export const addStats = createAction('ADD_STATS')
