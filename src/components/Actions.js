@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import debounce from 'debounce'
 import BigNumber from 'bignumber.js'
-import { cropNumber } from 'utils'
+// import { cropNumber } from 'utils'
 import { hh, h2, div, input, label, span, button } from 'react-hyperscript-helpers'
 import { setThreshold, sendSells, sendBuys, removeOpenBuys, removeOpenSells } from 'actions'
 
@@ -62,27 +62,27 @@ class Settings extends Component {
     this.flashBackground()
   }
 
-  calculateSells() {
-    const { sellAmount, sellChunks } = this.refers
-    this.setState({
-      sellChunkAmount: new BigNumber(sellAmount.value || 0)
-        .div(sellChunks.value || 0)
-        .toFixed(8)
-    })
-  }
-
   calculateBuys() {
-    const { buyAmount, buyChunks, buyRate } = this.refers
+    const { buyAmount, buyChunks } = this.refers
     this.setState({
       buyChunkAmount: new BigNumber(buyAmount.value || 0)
-        .div(buyRate.value || 0)
         .div(buyChunks.value || 0)
         .toFixed(8)
     })
   }
 
+  calculateSells() {
+    const { sellAmount, sellRate, sellChunks } = this.refers
+    this.setState({
+      sellChunkAmount: new BigNumber(sellAmount.value || 0)
+        .div(sellChunks.value || 0)
+        .div(sellRate.value || 0)
+        .toFixed(8)
+    })
+  }
+
   render() {
-    const { pairNames, currency, freeCurrencies, threshold, wallet } = this.props
+    const { pairNames, currency /* , freeCurrencies */, threshold, wallet } = this.props
     const isWalletIsset = !!(wallet[pairNames[0]] || wallet[pairNames[1]])
     const isCurrencyIsset = !!(currency && currency.highestBid)
     const styles = this.getStyles()
@@ -92,28 +92,28 @@ class Settings extends Component {
     div({ style: styles.root(this.state.flashBg) }, [
       div({ style: styles.box }, [
 
-        div({ style: styles.row }, [
-          div({ style: styles.col }, [
-            label({ style: styles.label }, 'Валюта'),
-            div({ style: styles.info }, pairNames[0]),
-            div({ style: styles.info }, pairNames[1])
-          ]),
-          div({ style: styles.col }, [
-            label({ style: styles.label }, 'На счету'),
-            div({ style: styles.info }, wallet[pairNames[0]]),
-            div({ style: styles.info }, wallet[pairNames[1]])
-          ]),
-          div({ style: styles.col }, [
-            label({ style: styles.label }, 'Доступно'),
-            div({ style: styles.info }, freeCurrencies[0]),
-            div({ style: styles.info }, freeCurrencies[1])
-          ]),
-          div({ style: styles.col }, [
-            label({ style: styles.label }, 'В чанках'),
-            div({ style: styles.info }, cropNumber(wallet[pairNames[0]] - freeCurrencies[0])),
-            div({ style: styles.info }, cropNumber(wallet[pairNames[1]] - freeCurrencies[1]))
-          ])
-        ]),
+        // div({ style: styles.row }, [
+        //   div({ style: styles.col }, [
+        //     label({ style: styles.label }, 'Валюта'),
+        //     div({ style: styles.info }, pairNames[0]),
+        //     div({ style: styles.info }, pairNames[1])
+        //   ]),
+        //   div({ style: styles.col }, [
+        //     label({ style: styles.label }, 'На счету'),
+        //     div({ style: styles.info }, wallet[pairNames[0]]),
+        //     div({ style: styles.info }, wallet[pairNames[1]])
+        //   ]),
+        //   div({ style: styles.col }, [
+        //     label({ style: styles.label }, 'Доступно'),
+        //     div({ style: styles.info }, freeCurrencies[0]),
+        //     div({ style: styles.info }, freeCurrencies[1])
+        //   ]),
+        //   div({ style: styles.col }, [
+        //     label({ style: styles.label }, 'В чанках'),
+        //     div({ style: styles.info }, cropNumber(wallet[pairNames[0]] - freeCurrencies[0])),
+        //     div({ style: styles.info }, cropNumber(wallet[pairNames[1]] - freeCurrencies[1]))
+        //   ])
+        // ]),
 
         div({ style: styles.row }, [
           div({ style: styles.col }, [
@@ -128,7 +128,7 @@ class Settings extends Component {
         ]),
 
         div({ style: styles.row }, [
-          h2({ style: styles.title }, `Создать продажи (задача купить ${pairNames[1]})`)
+          h2({ style: styles.title }, `Создать покупки (задача продать ${pairNames[1]})`)
         ]),
         div({ style: styles.row }, [
           div({ style: styles.col }, [
@@ -137,56 +137,6 @@ class Settings extends Component {
               type: 'number',
               style: styles.input,
               defaultValue: wallet[pairNames[1]],
-              ref: ref => (this.refers.sellAmount = ref),
-              onChange: e => this.calculateSells(e)
-            })
-          ]),
-          div({ style: styles.col }, [
-            label({ style: styles.label }, 'Чанков для продажи'),
-            input({
-              type: 'number',
-              style: styles.input,
-              defaultValue: 0,
-              ref: ref => (this.refers.sellChunks = ref),
-              onChange: e => this.calculateSells(e)
-            })
-          ]),
-          div({ style: styles.col }, [
-            label({ style: styles.label }, 'Цена продажи'),
-            input({
-              type: 'number',
-              style: styles.input,
-              defaultValue: currency && currency.highestBid,
-              ref: ref => (this.refers.sellRate = ref),
-              onChange: e => this.calculateSells(e)
-            })
-          ]),
-          div({ style: styles.col }, [
-            label({ style: styles.label }, `${pairNames[1]} в чанке`),
-            span({
-              type: 'number',
-              style: styles.output },
-              this.state.sellChunkAmount
-            )
-          ]),
-          div({ style: styles.col }, [
-            button({
-              style: styles.createBtn,
-              onClick: this.sendSells
-            }, 'Создать')
-          ])
-        ]),
-
-        div({ style: styles.row }, [
-          h2({ style: styles.title }, `Создать покупки (задача продать ${pairNames[1]})`)
-        ]),
-        div({ style: styles.row }, [
-          div({ style: styles.col }, [
-            label({ style: styles.label }, `Объём ${pairNames[0]}`),
-            input({
-              type: 'number',
-              style: styles.input,
-              defaultValue: wallet[pairNames[0]],
               ref: ref => (this.refers.buyAmount = ref),
               onChange: e => this.calculateBuys(e)
             })
@@ -206,7 +156,7 @@ class Settings extends Component {
             input({
               type: 'number',
               style: styles.input,
-              defaultValue: currency && currency.lowestAsk,
+              defaultValue: currency && currency.highestBid,
               ref: ref => (this.refers.buyRate = ref),
               onChange: e => this.calculateBuys(e)
             })
@@ -214,6 +164,7 @@ class Settings extends Component {
           div({ style: styles.col }, [
             label({ style: styles.label }, `${pairNames[1]} в чанке`),
             span({
+              type: 'number',
               style: styles.output },
               this.state.buyChunkAmount
             )
@@ -222,6 +173,55 @@ class Settings extends Component {
             button({
               style: styles.createBtn,
               onClick: this.sendBuys
+            }, 'Создать')
+          ])
+        ]),
+
+        div({ style: styles.row }, [
+          h2({ style: styles.title }, `Создать продажи (задача купить ${pairNames[1]})`)
+        ]),
+        div({ style: styles.row }, [
+          div({ style: styles.col }, [
+            label({ style: styles.label }, `Объём ${pairNames[0]}`),
+            input({
+              type: 'number',
+              style: styles.input,
+              defaultValue: wallet[pairNames[0]],
+              ref: ref => (this.refers.sellAmount = ref),
+              onChange: e => this.calculateSells(e)
+            })
+          ]),
+          div({ style: styles.col }, [
+            label({ style: styles.label }, 'Чанков для продажи'),
+            input({
+              type: 'number',
+              style: styles.input,
+              defaultValue: 0,
+              ref: ref => (this.refers.sellChunks = ref),
+              onChange: e => this.calculateSells(e)
+            })
+          ]),
+          div({ style: styles.col }, [
+            label({ style: styles.label }, 'Цена продажи'),
+            input({
+              type: 'number',
+              style: styles.input,
+              defaultValue: currency && currency.lowestAsk,
+              ref: ref => (this.refers.sellRate = ref),
+              onChange: e => this.calculateSells(e)
+            })
+          ]),
+          div({ style: styles.col }, [
+            label({ style: styles.label }, `${pairNames[1]} в чанке`),
+            span({
+              style: styles.output },
+              this.state.sellChunkAmount
+            )
+          ]),
+          div({ style: styles.col }, [
+            button({
+              style: styles.createBtn,
+              onClick: this.sendSells
             }, 'Создать')
           ])
         ]),
