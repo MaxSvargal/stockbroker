@@ -1,5 +1,5 @@
 import { select, put, fork, take, throttle } from 'redux-saga/effects'
-import { setCurrency, addStats, addEstimateRatio } from 'actions'
+import { setCurrency, addStats, addEstimateRatio, setCurrentFinalResult } from 'actions'
 import BigNumber from 'bignumber.js'
 import { cropNumber } from 'utils'
 import { TEN_MINUTES } from 'const'
@@ -74,12 +74,14 @@ export function* conclusionStatsSaga() {
       yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
     }
 
-    console.log({ result })
+    yield put(setCurrentFinalResult(result))
+
     if (lastResult >= 9 && result <= 9) console.log('Идём на спад, продаём', highestBid)
     if (lastResult >= 2 && result <= 1) console.log('Скоро упадём, продаём?', highestBid)
 
     if (lastResult <= -9 && result <= -8) console.log('Идём вверх, покупаем', lowestAsk)
     if (lastResult <= -2 && result >= 0) console.log('Скоро поднимемся, можно купить', lowestAsk)
+
     lastResult = result
   }
 }

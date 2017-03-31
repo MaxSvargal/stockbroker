@@ -1,8 +1,8 @@
 import { createAction } from 'redux-act'
 
 export const addBuyChunks = createAction('ADD_BUY_CHUNKS')
-export const addEstimateRatio = createAction('ADD_ESTIMATE_RATIO')
 export const addChunkedCurrency = createAction('ADD_CHUNKED_CURRENCY')
+export const addEstimateRatio = createAction('ADD_ESTIMATE_RATIO')
 export const addSellChunks = createAction('ADD_SELL_CHUNKS')
 export const addStats = createAction('ADD_STATS')
 export const botMessage = createAction('BOT_MESSAGE')
@@ -23,6 +23,7 @@ export const sendBuys = createAction('SEND_BUYS')
 export const sendSells = createAction('SEND_SELLS')
 export const setCurrency = createAction('SET_CURRENCY')
 export const setCurrencyPair = createAction('SET_CURRENCY_PAIR')
+export const setCurrentFinalResult = createAction('SET_CURRENT_FINAL_RESULT')
 export const setFreeCurrencies = createAction('SET_FREE_CURRENCIES')
 export const setThreshold = createAction('SET_THRESHOLD')
 export const setTrends = createAction('SET_TRENDS')

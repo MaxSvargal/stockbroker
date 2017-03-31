@@ -1,7 +1,8 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
 import { hh, h1, div, input } from 'react-hyperscript-helpers'
-import { CURRENT_PAIR } from 'const'
+
+import FinalCurrentResult from 'components/FinalCurrentResult'
 
 const audio = new Audio('Tink.m4a')
 
@@ -42,12 +43,13 @@ class CurrencyStats extends Component {
   }
 
   render() {
-    const { data } = this.props
+    const { data, currentPair } = this.props
     const { outputValue } = this.state
     const styles = this.getStyles()
 
     return div({ style: styles.root }, [
-      h1({ style: styles.h1 }, CURRENT_PAIR),
+      FinalCurrentResult(),
+      h1({ style: styles.h1 }, currentPair),
       data ?
         div([
           div({ style: styles.watcher }, [
@@ -66,14 +68,14 @@ class CurrencyStats extends Component {
             }),
             div({ style: styles.x }, 'x'),
             div({ style: styles.bigger }, data.last),
-            outputValue > 0 && div({ style: styles.total }, `= ${outputValue} ${CURRENT_PAIR.split('_')[0]}`)
+            outputValue > 0 && div({ style: styles.total }, `= ${outputValue} ${currentPair.split('_')[0]}`)
           ]),
           div([ 'Спрос: ', data.lowestAsk ]),
           div([ 'Предложение: ', data.highestBid ]),
           div([ 'Высшая цена за 24 часа: ', data.hrHigh ]),
           div([ 'Низшая цена за 24 часа: ', data.hrLow ]),
           div([ 'Сдвиг: ', data.percentChange, '%' ]),
-          div([ 'Объём: ', data.baseVolume ])
+          div([ 'Объём: ', data.baseVolume ]),
         ])
       :
         div('Ожидание обновления курса...')
@@ -142,7 +144,7 @@ class CurrencyStats extends Component {
   }
 }
 
-const mapStateToProps = ({ currencies }) =>
-  ({ data: currencies[CURRENT_PAIR] })
+const mapStateToProps = ({ currencies, currentPair }) =>
+  ({ data: currencies[currentPair], currentPair })
 
 export default hh(connect(mapStateToProps)(CurrencyStats))
