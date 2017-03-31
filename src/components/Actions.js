@@ -2,12 +2,10 @@ import { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import debounce from 'debounce'
-import BigNumber from 'bignumber.js'
-// import { cropNumber } from 'utils'
-import { hh, h2, div, input, label, span, button } from 'react-hyperscript-helpers'
+import { hh, div, input, label, button } from 'react-hyperscript-helpers'
 import { setThreshold, sendSells, sendBuys, removeOpenBuys, removeOpenSells } from 'actions'
 
-const assign = (from, to) => Object.assign({}, from, to)
+import ChunksAddForm from 'components/ChunksAddForm'
 
 class Settings extends Component {
   constructor(props) {
@@ -16,7 +14,8 @@ class Settings extends Component {
     this.state = {
       sellChunkAmount: 0,
       buyChunkAmount: 0,
-      flashBg: false
+      flashBg: false,
+      showBuyForm: true
     }
     this.sendSells = this.sendSells.bind(this)
     this.sendBuys = this.sendBuys.bind(this)
@@ -44,41 +43,14 @@ class Settings extends Component {
     this.flashBackground()
   }
 
-  sendSells() {
-    this.props.sendSells({
-      rate: Number(this.refers.sellRate.value),
-      amount: Number(this.state.sellChunkAmount),
-      chunksNum: Number(this.refers.sellChunks.value)
-    })
+  sendSells(data) {
+    this.props.sendSells(data)
     this.flashBackground()
   }
 
-  sendBuys() {
-    this.props.sendBuys({
-      rate: Number(this.refers.buyRate.value),
-      amount: Number(this.state.buyChunkAmount),
-      chunksNum: Number(this.refers.buyChunks.value)
-    })
+  sendBuys(data) {
+    this.props.sendBuys(data)
     this.flashBackground()
-  }
-
-  calculateBuys() {
-    const { buyAmount, buyChunks } = this.refers
-    this.setState({
-      buyChunkAmount: new BigNumber(buyAmount.value || 0)
-        .div(buyChunks.value || 0)
-        .toFixed(8)
-    })
-  }
-
-  calculateSells() {
-    const { sellAmount, sellRate, sellChunks } = this.refers
-    this.setState({
-      sellChunkAmount: new BigNumber(sellAmount.value || 0)
-        .div(sellChunks.value || 0)
-        .div(sellRate.value || 0)
-        .toFixed(8)
-    })
   }
 
   render() {
@@ -115,6 +87,13 @@ class Settings extends Component {
         //   ])
         // ]),
 
+        ChunksAddForm({
+          pairNames,
+          rate: currency && currency.highestBid,
+          amount: wallet[pairNames[1]],
+          onCreateBuy: this.sendBuys,
+          onCreateSell: this.sendSells
+        }),
         div({ style: styles.row }, [
           div({ style: styles.col }, [
             label({ style: styles.label }, 'Порог прибыли'),
@@ -124,114 +103,14 @@ class Settings extends Component {
               defaultValue: threshold,
               onChange: e => this.onThresholdChange(e)
             })
-          ])
-        ]),
-
-        div({ style: styles.row }, [
-          h2({ style: styles.title }, `Создать покупки (задача продать ${pairNames[1]})`)
-        ]),
-        div({ style: styles.row }, [
-          div({ style: styles.col }, [
-            label({ style: styles.label }, `Объём ${pairNames[1]}`),
-            input({
-              type: 'number',
-              style: styles.input,
-              defaultValue: wallet[pairNames[1]],
-              ref: ref => (this.refers.buyAmount = ref),
-              onChange: e => this.calculateBuys(e)
-            })
           ]),
           div({ style: styles.col }, [
-            label({ style: styles.label }, 'Чанков для покупки'),
-            input({
-              type: 'number',
-              style: styles.input,
-              defaultValue: 0,
-              ref: ref => (this.refers.buyChunks = ref),
-              onChange: e => this.calculateBuys(e)
-            })
-          ]),
-          div({ style: styles.col }, [
-            label({ style: styles.label }, 'Цена покупки'),
-            input({
-              type: 'number',
-              style: styles.input,
-              defaultValue: currency && currency.highestBid,
-              ref: ref => (this.refers.buyRate = ref),
-              onChange: e => this.calculateBuys(e)
-            })
-          ]),
-          div({ style: styles.col }, [
-            label({ style: styles.label }, `${pairNames[1]} в чанке`),
-            span({
-              type: 'number',
-              style: styles.output },
-              this.state.buyChunkAmount
-            )
-          ]),
-          div({ style: styles.col }, [
-            button({
-              style: styles.createBtn,
-              onClick: this.sendBuys
-            }, 'Создать')
-          ])
-        ]),
-
-        div({ style: styles.row }, [
-          h2({ style: styles.title }, `Создать продажи (задача купить ${pairNames[1]})`)
-        ]),
-        div({ style: styles.row }, [
-          div({ style: styles.col }, [
-            label({ style: styles.label }, `Объём ${pairNames[0]}`),
-            input({
-              type: 'number',
-              style: styles.input,
-              defaultValue: wallet[pairNames[0]],
-              ref: ref => (this.refers.sellAmount = ref),
-              onChange: e => this.calculateSells(e)
-            })
-          ]),
-          div({ style: styles.col }, [
-            label({ style: styles.label }, 'Чанков для продажи'),
-            input({
-              type: 'number',
-              style: styles.input,
-              defaultValue: 0,
-              ref: ref => (this.refers.sellChunks = ref),
-              onChange: e => this.calculateSells(e)
-            })
-          ]),
-          div({ style: styles.col }, [
-            label({ style: styles.label }, 'Цена продажи'),
-            input({
-              type: 'number',
-              style: styles.input,
-              defaultValue: currency && currency.lowestAsk,
-              ref: ref => (this.refers.sellRate = ref),
-              onChange: e => this.calculateSells(e)
-            })
-          ]),
-          div({ style: styles.col }, [
-            label({ style: styles.label }, `${pairNames[1]} в чанке`),
-            span({
-              style: styles.output },
-              this.state.sellChunkAmount
-            )
-          ]),
-          div({ style: styles.col }, [
-            button({
-              style: styles.createBtn,
-              onClick: this.sendSells
-            }, 'Создать')
-          ])
-        ]),
-
-        div({ style: styles.row }, [
-          div({ style: assign(styles.col, styles.controls) }, [
             button({
               style: styles.removeBtn,
               onClick: this.removeOpenSells
-            }, 'Удалить открытые продажи'),
+            }, 'Удалить открытые продажи')
+          ]),
+          div({ style: styles.col }, [
             button({
               style: styles.removeBtn,
               onClick: this.removeOpenBuys
@@ -246,7 +125,7 @@ class Settings extends Component {
     return {
       root: animateState => ({
         width: '100vw',
-        height: '100vh',
+        height: '94vh',
         background: animateState ? '#30db7d' : '#282c34',
         display: 'flex',
         justifyContent: 'center',
@@ -275,42 +154,18 @@ class Settings extends Component {
       },
       row: {
         display: 'flex',
-        flexWrap: 'wrap',
-        margin: '0 .5rem',
-        padding: '0.5rem 0.5rem'
+        justifyContent: 'center'
       },
       col: {
         margin: '.5rem'
-      },
-      controls: {
-        display: 'flex',
-        justifyContent: 'flex-end',
-        paddingTop: '2rem'
-      },
-      output: {
-        fontSize: '2rem',
-        display: 'inline-block',
-        minWidth: '12rem'
-      },
-      createBtn: {
-        background: '#54a9eb',
-        color: '#fff',
-        border: 0,
-        fontSize: '1.2rem',
-        padding: '.45rem 1rem',
-        margin: '2rem 0'
       },
       removeBtn: {
         background: '#de6a70',
         color: '#fff',
         border: 0,
-        fontSize: '1.1rem',
-        padding: '.45rem 1rem',
-        margin: '0 .5rem'
-      },
-      title: {
-        margin: '0 .5rem',
-        color: '#cf9a6b'
+        fontSize: '.9rem',
+        padding: '.65rem 1rem',
+        margin: '2rem .2rem 0 .2rem'
       }
     }
   }
