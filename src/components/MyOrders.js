@@ -45,10 +45,10 @@ class MyOrders extends Component {
         ])
       ]),
       div({ style: styles.map }, [
-        div({ style: { color: '#3c6a8e' } }, 'Открытая покупка | '),
-        div({ style: { color: '#8e6e3c' } }, '| Открытая продажа'),
-        div({ style: { color: '#4b4f58' } }, '| Закрытая покупка'),
-        div({ style: { color: '#3e362f' } }, '| Закрытая продажа'),
+        div({ style: { color: '#3c6a8e' } }, '● Открытая покупка'),
+        div({ style: { color: '#8e6e3c' } }, '● Открытая продажа'),
+        div({ style: { color: '#4b4f58' } }, '● Закрытая покупка'),
+        div({ style: { color: '#3e362f' } }, '● Закрытая продажа'),
       ])
     ])
   }
@@ -77,6 +77,7 @@ class MyOrders extends Component {
       }),
       map: {
         display: 'flex',
+        justifyContent: 'space-between',
         padding: '0 5vw'
       }
     }

@@ -5,16 +5,16 @@ import Table from 'components/Table'
 
 class TradeTable extends Component {
   render() {
+    const { data, currentPair } = this.props
+    const pairNames = currentPair.split('_')
+
     return div({ style: { overflowY: 'scroll', height: '87vh' } }, [
-      Table({
-        data: this.props.data,
-        headers: [ 'Date', 'Price USDT', 'Amount ETH', 'Total USDT' ]
-      })
+      Table({ data, headers: [ 'Date', `Price ${pairNames[0]}`, `Amount ${pairNames[1]}`, `Total ${pairNames[0]}` ] })
     ])
   }
 }
 
-const mapStateToProps = ({ buy, sell }) => {
+const mapStateToProps = ({ buy, sell, currentPair }) => {
   const partOfSells = sell
     .slice(sell.length - 150, sell.length - 1)
     .map(v => Object.defineProperty(v, 'type', { value: 'sell', enumerable: false }))
@@ -25,7 +25,7 @@ const mapStateToProps = ({ buy, sell }) => {
 
   const mergedArrays = [ ...partOfSells, ...partOfBuys ].sort().reverse()
 
-  return { data: mergedArrays }
+  return { data: mergedArrays, currentPair }
 }
 
 export default hh(connect(mapStateToProps)(TradeTable))
