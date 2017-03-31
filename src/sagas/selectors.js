@@ -22,10 +22,10 @@ export const selectBuysLastTime = (state, time) => {
 }
 
 export const selectUncoveredSells = state =>
-  state.mySells.reduce((prev, curr) => curr[4] === 0 ? [ ...prev, curr ] : prev, [])
+  state.mySells.filter(v => v[4] === 0)
 
 export const selectUncoveredBuys = state =>
-  state.myBuys.reduce((prev, curr) => curr[4] === 0 ? [ ...prev, curr ] : prev, [])
+  state.myBuys.filter(v => v[4] === 0)
 
 export const selectLastTenStats = state =>
   state.stats.slice(state.stats.length - 11, state.stats.length - 1)

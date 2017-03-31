@@ -71,7 +71,6 @@ export function* conclusionStatsSaga() {
     }
 
     if ((lastResult <= -9 && result <= -8) || (lastResult <= -2 && result >= 0)) {
-      console.log('fork buySaga', cropNumber(Number(lowestAsk) - 0.00000001))
       yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
     }
 

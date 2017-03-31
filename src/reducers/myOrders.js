@@ -1,23 +1,35 @@
+/* eslint no-unused-vars: 0 */
 import { createReducer } from 'redux-act'
 import { time } from 'reducers/helpers'
 import { buySuccess, sellSuccess, addBuyChunks, addSellChunks, sellFailure, buyFailure, removeOpenSells, removeOpenBuys } from 'actions'
 
 export const myBuys = createReducer({
-  [buySuccess]: (state, [ rate, amount, coverIndex, orderNumber ]) => {
-    const cover = (v, i) => i === coverIndex ? [ ...v.slice(0, 3), orderNumber, 1 ] : v
-    const newEntity = [ time(), rate, amount, 0, 0 ]
-    return [ ...state.map(cover), newEntity ]
-  },
+  [buySuccess]: (state, [ rate, amount, coverIndex, orderNumber ]) =>
+    [ ...state, [ time(), rate, amount, 0, 0 ] ],
+
+  [sellSuccess]: (state, [ rate, amount, coverIndex, orderNumber ]) => [
+    ...state
+      .filter(v => v[4] === 0)
+      .map((v, i) => i === coverIndex ? [ ...v.slice(0, 3), orderNumber, 1 ] : v),
+    ...state.filter(v => v[4] !== 0)
+  ].sort(),
+
   [addBuyChunks]: (state, data) => [ ...state, ...data.map(v => [ time(), ...v, -1, 0 ]) ],
   [removeOpenBuys]: (state) => state.filter(v => v[4] !== 0)
 }, [])
 
+// TODO: хранить транзакции в виде объектов с уникальными id
 export const mySells = createReducer({
-  [sellSuccess]: (state, [ rate, amount, coverIndex, orderNumber ]) => {
-    const cover = (v, i) => i === coverIndex ? [ ...v.slice(0, 3), orderNumber, 1 ] : v
-    const newEntity = [ time(), rate, amount, 0, 0 ]
-    return [ ...state.map(cover), newEntity ]
-  },
+  [sellSuccess]: (state, [ rate, amount, coverIndex, orderNumber ]) =>
+    [ ...state, [ time(), rate, amount, 0, 0 ] ],
+
+  [buySuccess]: (state, [ rate, amount, coverIndex, orderNumber ]) => [
+    ...state
+      .filter(v => v[4] === 0)
+      .map((v, i) => i === coverIndex ? [ ...v.slice(0, 3), orderNumber, 1 ] : v),
+    ...state.filter(v => v[4] !== 0)
+  ].sort(),
+
   [addSellChunks]: (state, data) => [ ...state, ...data.map(v => [ time(), ...v, -1, 0 ]) ],
   [removeOpenSells]: (state) => state.filter(v => v[4] !== 0)
 }, [])
