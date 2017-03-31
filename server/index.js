@@ -1,29 +1,37 @@
-const webpack = require('webpack')
-const path = require('path')
-const fs = require('fs')
-const child_process = require('child_process')
-const config = require('../webpack.config.server')
+import express from 'express'
+import http from 'http'
+import path from 'path'
+import PouchDB from 'pouchdb'
+// import WebSocket from 'ws'
 
-webpack(config, (err, stats) => {
-  if (err || stats.hasErrors()) {
-    console.error(err || stats.compilation.errors)
-  } else {
-    console.log('Build done')
-    const execPath = path.resolve(config.output.path, config.output.filename)
-    const proc = child_process.spawn('node', [ execPath ])
+import { createStore, applyMiddleware, compose } from 'redux'
+import { persistentStore, persistentReducer } from 'redux-pouchdb'
+import createSagaMiddleware from 'redux-saga'
+import rootReducer from 'reducers'
+import rootSaga from 'sagas'
 
-    // write logs on file
+const changeHandler = doc => console.log(doc);
 
-    proc.stdout.on('data', (data) => {
-      console.log(`${data}`)
-    })
+const db = new PouchDB('./server/db/stockbroker.alpha', { adapter: 'leveldb' })
+const app = express()
+const sagaMiddleware = createSagaMiddleware()
+const middlewares = applyMiddleware(sagaMiddleware)
+const persist = persistentStore(db, changeHandler)
+const createStoreWithMiddleware = compose(persist, middlewares)(createStore)
+const store = createStoreWithMiddleware(persistentReducer(rootReducer), compose())
 
-    proc.stderr.on('data', (data) => {
-      console.log(`Error: ${data}`)
-    })
+sagaMiddleware.run(rootSaga)
 
-    proc.on('close', (code) => {
-      console.log(`Child process exited with code ${code}`)
-    })
-  }
-})
+app.use('/', express.static(path.join(__dirname, './dist')))
+
+const server = http.createServer(app)
+
+// const wss = new WebSocket.Server({ server })
+//
+// wss.on('connection', ws => {
+//   ws.on('message', message =>
+//     console.log('received: %s', message))
+//   ws.send('something')
+// })
+
+server.listen(3000, () => console.log('Listening on %d', server.address().port))

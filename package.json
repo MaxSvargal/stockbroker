@@ -1,6 +1,6 @@
 {
   "name": "stockbroker",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "main": "index.js",
   "author": "MaxSvargal",
   "license": "MIT",
@@ -8,11 +8,10 @@
     "test": "ACCOUNT=me NODE_ENV=test NODE_PATH=src nyc ava",
     "test:watch": "npm test -- --watch",
     "coverage": "nyc report --reporter=lcov --reporter=text-lcov | coveralls",
-    "start": "ACCOUNT=me node ./server/index.js",
+    "start": "ACCOUNT=me NODE_PATH=./src NODE_ENV=production webpack --config=./webpack.config.server.js && node ./server/dist/bundle.js",
     "build:me": "ACCOUNT=me webpack --config=./webpack.config.production.js",
     "build:pahan": "ACCOUNT=pahan webpack --config=./webpack.config.production.js",
-    "dev": "ACCOUNT=me webpack-dev-server --config=./webpack.config.js --inline --hot --open",
-    "db": "rethinkdb"
+    "dev": "ACCOUNT=me webpack-dev-server --config=./webpack.config.js --inline --hot --open"
   },
   "ava": {
     "require": [
@@ -32,8 +31,11 @@
     "debounce": "^1.0.0",
     "deep-equal": "^1.0.1",
     "express": "^4.15.2",
+    "leveldown": "^1.6.0",
+    "levelup": "^1.3.5",
     "node-fetch": "^1.6.3",
     "nonce": "^1.0.4",
+    "pouchdb": "^6.1.2",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-hyperscript-helpers": "^1.2.0",
@@ -45,6 +47,7 @@
     "redux": "^3.6.0",
     "redux-act": "^1.1.1",
     "redux-localstorage": "^0.4.1",
+    "redux-pouchdb": "^0.1.1",
     "redux-replicate": "^3.0.5",
     "redux-replicate-fs": "^3.0.1",
     "redux-replicate-localforage": "^3.0.2",
@@ -75,6 +78,7 @@
     "sinon": "^2.1.0",
     "webpack": "^2.2.1",
     "webpack-chunk-hash": "^0.4.0",
-    "webpack-dev-server": "^2.4.2"
+    "webpack-dev-server": "^2.4.2",
+    "webpack-node-externals": "^1.5.4"
   }
 }
