@@ -7,11 +7,17 @@ const accountConfig = require(path.resolve(__dirname, 'accounts', `${process.env
 module.exports = {
   target: 'node',
   devtool: 'source-map',
-  entry: path.resolve(__dirname, 'server/index'),
+  entry: path.resolve(__dirname, 'server/worker'),
   output: {
     path: path.resolve(__dirname, 'server/dist'),
+    publicPath: path.resolve(__dirname, 'server'),
     filename: 'bundle.js',
     libraryTarget: 'commonjs'
+  },
+  context: __dirname,
+  node: {
+    __filename: true,
+    __dirname: true
   },
   externals: [
     nodeExternals()
