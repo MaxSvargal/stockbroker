@@ -1,14 +1,8 @@
 coverage
 node_modules
-server/build/*
 .tmp
 .DS_Store
 .env
 .c9
 .nyc_output
-dist/*
-server/db/*
-server/dist/bundle.js
-server/dist/bundle.js.map
-rethinkdb_data
-accounts
+server/accounts/*

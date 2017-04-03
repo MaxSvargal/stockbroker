@@ -699,7 +699,7 @@ babel-plugin-transform-es2015-function-name@^6.9.0:
     babel-runtime "^6.22.0"
     babel-types "^6.22.0"
 
-babel-plugin-transform-es2015-modules-commonjs@^6.18.0, babel-plugin-transform-es2015-modules-commonjs@^6.24.0:
+babel-plugin-transform-es2015-modules-commonjs@^6.18.0:
   version "6.24.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-transform-es2015-modules-commonjs/-/babel-plugin-transform-es2015-modules-commonjs-6.24.0.tgz#e921aefb72c2cc26cb03d107626156413222134f"
   dependencies:
@@ -963,10 +963,6 @@ block-stream@*:
   resolved "https://registry.yarnpkg.com/block-stream/-/block-stream-0.0.9.tgz#13ebfe778a03205cfe03751481ebb4b3300c126a"
   dependencies:
     inherits "~2.0.0"
-
-"bluebird@>= 2.3.2 < 3":
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-2.11.0.tgz#534b9033c022c9579c56ba3b3e5a5caafbb650e1"
 
 bluebird@^3.0.0, bluebird@^3.4.7:
   version "3.5.0"
@@ -5298,12 +5294,6 @@ restore-cursor@^2.0.0:
     onetime "^2.0.0"
     signal-exit "^3.0.2"
 
-rethinkdb@^2.3.3:
-  version "2.3.3"
-  resolved "https://registry.yarnpkg.com/rethinkdb/-/rethinkdb-2.3.3.tgz#3dc6586e22fa1dabee0d254e64bd0e379fad2f72"
-  dependencies:
-    bluebird ">= 2.3.2 < 3"
-
 right-align@^0.1.1:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/right-align/-/right-align-0.1.3.tgz#61339b722fe6a3515689210d24e14c96148613ef"
@@ -5387,13 +5377,6 @@ sc-channel@1.0.x, sc-channel@~1.0.6:
   dependencies:
     sc-emitter "1.x.x"
 
-sc-cluster-broker-client@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/sc-cluster-broker-client/-/sc-cluster-broker-client-1.0.5.tgz#14b8b76e9499bdf6f0d05ce82239b32b736a60c6"
-  dependencies:
-    socketcluster-client "5.x.x"
-    uuid "3.0.1"
-
 sc-domain@1.x.x, sc-domain@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/sc-domain/-/sc-domain-1.0.1.tgz#aa402509b879ba76012e9732dc1d07f653b834bc"
@@ -5419,10 +5402,6 @@ sc-errors@~1.1.0:
 sc-formatter@3.0.x, sc-formatter@~3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/sc-formatter/-/sc-formatter-3.0.0.tgz#c91b1fe56c260abd5a6a2e6af98c724bc7998a38"
-
-sc-framework-health-check@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/sc-framework-health-check/-/sc-framework-health-check-1.0.0.tgz#6c0bbfb2c2876b5b990a35c91691c1808282d479"
 
 sc-hasher@1.x.x:
   version "1.0.0"
@@ -5492,7 +5471,7 @@ serve-index@^1.7.2:
     mime-types "~2.1.11"
     parseurl "~1.3.1"
 
-serve-static@1.12.1, serve-static@^1.12.1:
+serve-static@1.12.1:
   version "1.12.1"
   resolved "https://registry.yarnpkg.com/serve-static/-/serve-static-1.12.1.tgz#7443a965e3ced647aceb5639fa06bf4d1bbe0039"
   dependencies:
@@ -5590,7 +5569,7 @@ sntp@1.x.x:
   dependencies:
     hoek "2.x.x"
 
-socketcluster-client@5.x.x, socketcluster-client@^5.3.0:
+socketcluster-client@^5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/socketcluster-client/-/socketcluster-client-5.3.0.tgz#3491f5e7319a9361c54de6f718582b7ffec1fed1"
   dependencies:
