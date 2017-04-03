@@ -12,7 +12,7 @@ module.exports = {
   devtool: 'source-map',
   entry: path.resolve(__dirname, 'src/server/worker'),
   output: {
-    path: path.resolve(__dirname, 'src/server/dist'),
+    path: path.resolve(__dirname, 'server/dist'),
     publicPath: path.resolve(__dirname, './'),
     filename: 'worker_bundle.js',
     libraryTarget: 'commonjs'

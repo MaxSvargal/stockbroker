@@ -7,7 +7,7 @@ import { setThreshold, sendSells, sendBuys, removeOpenBuys, removeOpenSells } fr
 
 import ChunksAddForm from './ChunksAddForm'
 
-class Settings extends Component {
+class Actions extends Component {
   constructor(props) {
     super(props)
     this.refers = {}
@@ -22,6 +22,10 @@ class Settings extends Component {
     this.removeOpenSells = this.removeOpenSells.bind(this)
     this.removeOpenBuys = this.removeOpenBuys.bind(this)
     this.changeThreshold = debounce(props.setThreshold, 500)
+  }
+
+  shouldComponentUpdate(props) {
+    return props.currency.highestBid !== this.props.currency.highestBid
   }
 
   onThresholdChange(e) {
@@ -58,7 +62,6 @@ class Settings extends Component {
     const isWalletIsset = !!(wallet[pairNames[0]] || wallet[pairNames[1]])
     const isCurrencyIsset = !!(currency && currency.highestBid)
     const styles = this.getStyles()
-    console.log({ isWalletIsset, isCurrencyIsset });
 
     return !(isWalletIsset && isCurrencyIsset) ?
     div({ style: styles.loading }, 'Получение баланса...') :
@@ -172,7 +175,7 @@ class Settings extends Component {
   }
 }
 
-Settings.propTypes = {
+Actions.propTypes = {
   threshold: PropTypes.number,
   currency: PropTypes.object,
   wallet: PropTypes.object
@@ -191,4 +194,4 @@ const dispatchToProps = {
   setThreshold, sendSells, sendBuys, removeOpenBuys, removeOpenSells
 }
 
-export default hh(withRouter(connect(mapStateToProps, dispatchToProps)(Settings)))
+export default hh(withRouter(connect(mapStateToProps, dispatchToProps)(Actions)))

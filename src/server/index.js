@@ -15,6 +15,6 @@ module.export = webpack(webpackConfig).run((err, stats) => {
     // generated automatically if using the Heroku deploy button
     authKey: process.env.AUTH_KEY,
     // this process respawns automatically on crash
-    workerController: path.resolve(__dirname, 'dist/worker_bundle.js'),
+    workerController: path.resolve(__dirname, '../../server/dist/worker_bundle.js'),
   })
 })

@@ -4,10 +4,11 @@ import poloniexPublicSaga from './poloniex-public'
 import statsSaga from './stats'
 import tradeSaga from './trade'
 import walletSaga from './wallet'
+import clientActions from './clientActions'
 
-export default function* root() {
+export default scServer => function* root() {
   yield [
-    // fork(poloniexPrivateSaga),
+    fork(clientActions, scServer),
     fork(poloniexPublicSaga),
     fork(statsSaga),
     fork(tradeSaga),

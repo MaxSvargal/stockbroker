@@ -21,6 +21,6 @@ export default scServer => {
   const createStoreWithMiddleware = compose(persist, middlewares)(createStore)
   const store = createStoreWithMiddleware(persistentReducer(rootReducer))
 
-  sagaMiddleware.run(rootSaga)
+  sagaMiddleware.run(rootSaga(scServer))
   return store
 }
