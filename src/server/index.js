@@ -9,7 +9,7 @@ module.export = webpack(webpackConfig).run((err, stats) => {
     // depending on the Heroku dyno this may vary
     workers: Number(process.env.WEB_CONCURRENCY) || 1,
     // heroku sets the port used on the intranet
-    port: process.env.PORT || 5000,
+    port: process.env.PORT || 80,
     // everything goes through redux stores
     allowClientPublish: false,
     // generated automatically if using the Heroku deploy button
