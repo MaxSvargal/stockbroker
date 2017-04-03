@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "server": "ACCOUNT=me node ./src/server/index.js",
+    "forever": "ACCOUNT=me PORT=8080 forever start --killSignal=SIGTERM ./src/server/index.js -w 2 -s 2",
     "build:me": "ACCOUNT=me webpack --config=./webpack.config.client.prod.js",
     "build:pahan": "ACCOUNT=pahan webpack --config=./webpack.config.client.prod.js",
     "start": "npm run build:me && npm run server",
