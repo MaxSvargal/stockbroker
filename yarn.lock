@@ -920,6 +920,10 @@ base64url@2.0.0, base64url@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/base64url/-/base64url-2.0.0.tgz#eac16e03ea1438eff9423d69baa36262ed1f70bb"
 
+basic-auth@^1.0.4:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/basic-auth/-/basic-auth-1.1.0.tgz#45221ee429f7ee1e5035be3f51533f1cdfd29884"
+
 batch@0.5.3:
   version "0.5.3"
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.5.3.tgz#3f3414f380321743bfc1042f9a83ff1d5824d464"
@@ -2259,6 +2263,12 @@ expand-template@^1.0.0, expand-template@^1.0.2:
 expirymanager@0.9.x:
   version "0.9.3"
   resolved "https://registry.yarnpkg.com/expirymanager/-/expirymanager-0.9.3.tgz#e5f6b3ba00d8d76cf63311c2b71d7dfc9bde3e4f"
+
+express-basic-auth@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/express-basic-auth/-/express-basic-auth-1.0.1.tgz#72b97850f1eed625aecf668e2bc58edccaf08a52"
+  dependencies:
+    basic-auth "^1.0.4"
 
 express@^4.13.3, express@^4.15.2:
   version "4.15.2"
