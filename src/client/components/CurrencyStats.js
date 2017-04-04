@@ -1,149 +1,83 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
-import { hh, h1, div, input } from 'react-hyperscript-helpers'
+import { hh, h1, h2, div, span } from 'react-hyperscript-helpers'
 
 import FinalCurrentResult from './FinalCurrentResult'
 
-// const audio = new Audio('Tink.m4a')
-
 class CurrencyStats extends Component {
-  constructor(props) {
-    super(props)
-    this.inputRef = null
-    this.state = {
-      outputValue: '',
-      watchValue: ''
-    }
-    this.handleKeyPress = this.handleKeyPress.bind(this)
-    this.handleWatcherKeyPress = this.handleWatcherKeyPress.bind(this)
-  }
-
-  handleKeyPress(e) {
-    this.setState({
-      outputValue: (e.target.value * this.props.data.last).toFixed(8)
-    })
-  }
-
-  handleWatcherKeyPress(e) {
-    this.setState({
-      watchValue: e.target.value
-    })
-  }
 
   componentWillReceiveProps(nextProps) {
-    // const { watchValue } = this.state
-    // const watchValueNumber = Number(watchValue)
-    // if (nextProps.data.last >= watchValueNumber && watchValueNumber !== 0) {
-    //   audio && audio.play()
-    // }
-
-    document && nextProps.data && (document.title = nextProps.data.last)
-    this.inputRef && this.handleKeyPress({ target: { value: this.inputRef.value } })
+    /* eslint class-methods-use-this: 0 */
+    document && nextProps.currency && (document.title = nextProps.currency.last)
   }
 
   render() {
-    const { data, currentPair } = this.props
-    const { outputValue } = this.state
+    const { currency, currentPair } = this.props
     const styles = this.getStyles()
 
-    return div({ style: styles.root }, [
-      FinalCurrentResult(),
-      h1({ style: styles.h1 }, currentPair),
-      data ?
-        div([
-          div({ style: styles.watcher }, [
-            input({
-              style: styles.inputWatcher,
-              onKeyUp: this.handleWatcherKeyPress,
-              ref: (c => (this.watcherRef = c))
-            }),
-            div('- уведомление при курсе')
+    return !currency ? div('Ожидание обновления курса...') :
+      div({ style: styles.root }, [
+        div({ style: styles.row }, [
+          div([
+            h1({ style: styles.h1 }, [
+              span(currentPair),
+              span({ style: styles.finalCurrent }, [ FinalCurrentResult() ]),
+            ]),
+            h2({ style: styles.h2 }, currency.last)
           ]),
-          div({ style: styles.course }, [
-            input({
-              style: styles.input,
-              onKeyUp: this.handleKeyPress,
-              ref: (c => (this.inputRef = c))
-            }),
-            div({ style: styles.x }, 'x'),
-            div({ style: styles.bigger }, data.last),
-            outputValue > 0 && div({ style: styles.total }, `= ${outputValue} ${currentPair.split('_')[0]}`)
-          ]),
-          div([ 'Спрос: ', data.lowestAsk ]),
-          div([ 'Предложение: ', data.highestBid ]),
-          div([ 'Высшая цена за 24 часа: ', data.hrHigh ]),
-          div([ 'Низшая цена за 24 часа: ', data.hrLow ]),
-          div([ 'Сдвиг: ', data.percentChange, '%' ]),
-          div([ 'Объём: ', data.baseVolume ]),
+          div({ style: styles.info }, [
+            div({ style: styles.bigInfo }, [
+              div({ style: styles.ask }, [ currency.lowestAsk, ' cпрос' ]),
+              div({ style: styles.bid }, [ currency.highestBid, ' предложение' ])
+            ]),
+            div([ currency.hrLow, '/', currency.hrHigh, ' за сутки' ]),
+            div([ 'Сдвиг: ', currency.percentChange, '%' ]),
+            div([ 'Объём: ', currency.baseVolume ]),
+          ])
         ])
-      :
-        div('Ожидание обновления курса...')
-    ])
+      ])
   }
 
   getStyles() {
     return {
       root: {
-        fontSize: '1.1rem',
-        lineHeight: '1.6rem',
-        fontWeight: 'bold',
-        marginBottom: '2rem'
+        lineHeight: '1.8rem'
+      },
+      row: {
+        display: 'flex',
+        justifyContent: 'space-between'
       },
       h1: {
-        fontSize: '3rem',
+        fontSize: '3.5rem',
         margin: '1rem 0 2.5rem 0'
       },
-      bigger: {
-        fontSize: '3.6rem',
-        margin: '2.5rem 0',
+      h2: {
+        fontSize: '4rem',
+        margin: '3.5rem 0',
         color: '#e352c9'
       },
-      course: {
-        display: 'flex'
+      finalCurrent: {
+        display: 'inline-block',
+        position: 'relative'
       },
-      input: {
-        width: '7rem',
-        height: '2.8rem',
-        marginTop: '1.75rem',
-        background: '#144b44',
-        color: '#fff',
-        border: 0,
+      info: {
+        minWidth: '19rem'
+      },
+      bigInfo: {
         fontWeight: 'bold',
-        fontSize: '1.4rem'
+        fontSize: '1.1rem'
       },
-      inputWatcher: {
-        border: 0,
-        width: '7rem',
-        marginRight: '.8rem',
-        background: '#144b44',
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: '1.2rem'
+      ask: {
+        color: '#cf9a69'
       },
-      watcher: {
-        display: 'flex'
-      },
-      x: {
-        display: 'flex',
-        width: '2rem',
-        height: '3rem',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: '1.75rem',
-        fontSize: '2rem',
-        color: '#24a292'
-      },
-      total: {
-        fontSize: '1.6rem',
-        marginTop: '5rem',
-        marginLeft: '-16rem',
-        color: '#24a292'
+      bid: {
+        color: '#67aee6'
       }
     }
   }
 }
 
 const mapStateToProps = ({ currencies, currentPair }) =>
-  ({ data: currencies[currentPair], currentPair })
+  ({ currency: currencies[currentPair], currentPair })
 
 export default hh(connect(mapStateToProps)(CurrencyStats))

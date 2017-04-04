@@ -10,7 +10,7 @@
     "forever:me": "ACCOUNT=me PORT=8080 forever start --killSignal=SIGTERM ./src/server/index.js -w 2 -s 2",
     "build": "webpack --config=./webpack.config.client.prod.js",
     "start": "npm run build:me && npm run server:me",
-    "dev": "webpack-dev-server --config=./webpack.config.client.dev.js --inline --hot --open",
+    "dev": "ACCOUNT=me PORT=8081 CURRENCY_PAIR=BTC_ETH DB_PATH=./server/db/dev node ./src/server/dev-index.js",
     "test": "ACCOUNT=me NODE_ENV=test NODE_PATH=src nyc ava",
     "test:watch": "npm test -- --watch",
     "coverage": "nyc report --reporter=lcov --reporter=text-lcov | coveralls"
@@ -27,7 +27,6 @@
   },
   "dependencies": {
     "autobahn": "^0.11.2",
-    "babili-webpack-plugin": "^0.0.11",
     "bignumber.js": "^4.0.0",
     "crypto-js": "^3.1.9-1",
     "debounce": "^1.0.0",
@@ -44,26 +43,20 @@
     "react-dom": "^15.4.2",
     "react-hyperscript-helpers": "^1.2.0",
     "react-redux": "^5.0.3",
-    "react-redux-provide": "^7.0.0-rc.21",
     "react-router": "v4.0.0-beta.7",
     "react-router-dom": "v4.0.0-beta.7",
     "react-throttle-render": "^2.0.0",
     "redux": "^3.6.0",
     "redux-act": "^1.1.1",
-    "redux-localstorage": "^0.4.1",
     "redux-pouchdb": "^0.1.1",
-    "redux-replicate": "^3.0.5",
-    "redux-replicate-fs": "^3.0.1",
-    "redux-replicate-localforage": "^3.0.2",
     "redux-saga": "^0.14.3",
-    "sc-hot-reboot": "^1.0.0",
     "socketcluster": "^5.9.1",
     "socketcluster-client": "^5.3.0",
-    "source-map-support": "^0.4.14",
-    "ws": "^2.2.2"
+    "source-map-support": "^0.4.14"
   },
   "devDependencies": {
     "ava": "^0.18.2",
+    "babili-webpack-plugin": "^0.0.11",
     "chai": "^3.5.0",
     "chunk-manifest-webpack-plugin": "^1.0.0",
     "coveralls": "^2.12.0",
@@ -73,16 +66,17 @@
     "eslint-loader": "^1.6.3",
     "eslint-plugin-ava": "^4.2.0",
     "eslint-plugin-import": "^2.2.0",
-    "html-webpack-plugin": "^2.28.0",
     "nyc": "^10.1.2",
     "react-hot-loader": "v3.0.0-beta.6",
     "redux-ava": "^2.2.0",
     "redux-mock-store": "^1.2.2",
     "redux-saga-test-plan": "^2.2.1",
+    "sc-hot-reboot": "^1.0.0",
     "sinon": "^2.1.0",
     "webpack": "^2.2.1",
     "webpack-chunk-hash": "^0.4.0",
-    "webpack-dev-server": "^2.4.2",
-    "webpack-node-externals": "^1.5.4"
+    "webpack-node-externals": "^1.5.4",
+    "webpack-dev-middleware": "^1.10.1",
+    "webpack-hot-middleware": "^2.18.0"
   }
 }

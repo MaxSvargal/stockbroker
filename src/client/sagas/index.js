@@ -3,7 +3,9 @@ import { fork, call, take, put } from 'redux-saga/effects'
 import socketCluster from 'socketcluster-client'
 import { setThreshold, sendSells, sendBuys, removeOpenBuys, removeOpenSells } from 'shared/actions'
 
-const socket = socketCluster.connect({ port: window.location.port })
+const port = process.env.NODE_ENV === 'development' ? 8081 : window.location.port
+
+const socket = socketCluster.connect({ port })
 
 const changeStateChannel = () => eventChannel(emitter => {
   const channel = socket.subscribe('update')

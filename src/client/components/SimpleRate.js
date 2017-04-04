@@ -19,9 +19,9 @@ class SimpleRate extends Component {
         textAlign: 'center'
       },
       last: {
-        fontSize: '4.5rem',
+        fontSize: '6rem',
         lineHeight: '3rem',
-        margin: '1rem 0 2.5rem 0',
+        margin: '0 0 3rem 0',
         color: '#e352c9'
       }
     }

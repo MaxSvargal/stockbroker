@@ -1,7 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
 const SocketCluster = require('socketcluster').SocketCluster
-const webpackConfig = require('../../webpack.config.server.prod')
+const webpackConfig = require('../../webpack.config.server.dev')
 
 module.export = webpack(webpackConfig).run((err, stats) => {
   if (err || stats.compilation.errors.length > 0) console.error(err || stats.compilation.errors)

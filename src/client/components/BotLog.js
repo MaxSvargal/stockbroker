@@ -19,11 +19,7 @@ class BotLog extends Component {
     return {
       root: {
         fontSize: '1.1rem',
-        lineHeight: '1.4rem',
-        // minWidth: '45vw',
-        // maxWidth: '55vw',
-        // height: '43.5vh',
-        // overflow: 'scroll'
+        lineHeight: '1.4rem'
       },
       item: (index, str) => ({
         padding: '.25rem 0',

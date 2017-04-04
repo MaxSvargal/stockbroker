@@ -1,5 +1,5 @@
 import { Component, PropTypes } from 'react'
-import { hh, table, tbody, tr, td, th, div } from 'react-hyperscript-helpers'
+import { hh, table, tbody, tr, td, th } from 'react-hyperscript-helpers'
 import throttle from 'react-throttle-render'
 import deepEqual from 'deep-equal'
 
@@ -19,35 +19,30 @@ class Table extends Component {
   }
 
   render() {
-    const { data, title, headers } = this.props
+    const { data, headers } = this.props
     const styles = this.getStyles()
 
-    return div({ style: styles.root }, [
-      div({ style: styles.title }, title),
-      table({ style: styles.table }, [
-        tbody({ style: styles.tbody }, [
-          tr({ style: styles.tr }, headers.map(header =>
-            th({ style: styles.th }, header))),
+    return table({ style: styles.table }, [
+      tbody({ style: styles.tbody }, [
+        tr({ style: styles.tr }, headers.map(header =>
+          th({ style: styles.th }, header))),
 
-          data.map((item, i) =>
-            tr({ key: i, style: styles.coloredTypedRow(item.type) }, [
-              td(item[0] && formatDate(item[0])),
-              item.map(((col, j) =>
-                j > 0 && td({ key: j, style: styles.td }, col)))
-            ]))
-        ])
+        data.map((item, i) =>
+          tr({ key: i, style: styles.coloredTypedRow(item.type) }, [
+            td(item[0] && formatDate(item[0])),
+            item.map(((col, j) =>
+              j > 0 && td({ key: j, style: styles.td }, col)))
+          ]))
       ])
     ])
   }
 
   getStyles() {
     return {
-      root: {
-      },
       table: {
+        width: '100%'
       },
       thead: {
-
       },
       th: {
         background: '#152126',
@@ -55,14 +50,6 @@ class Table extends Component {
       },
       td: {
         padding: '.1rem .5rem'
-      },
-      tbody: {
-        display: 'block'
-      },
-      title: {
-        fontSize: '1.2rem',
-        fontWeight: 'bold',
-        color: '#f6f8b7'
       },
       coloredTypedRow: type => {
         switch (type) {

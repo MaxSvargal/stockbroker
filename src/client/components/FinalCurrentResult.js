@@ -16,12 +16,12 @@ class FinalCurrentResult extends Component {
   getStyles() {
     return {
       root: {
-        position: 'absolute',
-        marginLeft: '14rem',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        position: 'absolute',
+        margin: '-1.6rem 0 0 1rem',
         paddingTop: '0.15rem',
         height: '2rem'
       },

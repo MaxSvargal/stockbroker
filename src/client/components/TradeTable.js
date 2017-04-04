@@ -1,16 +1,13 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
-import { hh, div } from 'react-hyperscript-helpers'
+import { hh } from 'react-hyperscript-helpers'
 import Table from './Table'
 
 class TradeTable extends Component {
   render() {
     const { data, currentPair } = this.props
     const pairNames = currentPair.split('_')
-
-    return div({ style: { overflowY: 'scroll', height: '87vh' } }, [
-      Table({ data, headers: [ 'Date', `Price ${pairNames[0]}`, `Amount ${pairNames[1]}`, `Total ${pairNames[0]}` ] })
-    ])
+    return Table({ data, headers: [ 'Date', `Price ${pairNames[0]}`, `Amount ${pairNames[1]}`, `Total ${pairNames[0]}` ] })
   }
 }
 

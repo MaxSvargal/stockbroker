@@ -18,7 +18,7 @@ class FullMode extends Component {
             BotLog()
           ])
         ]),
-        div({ style: styles.trade }, [
+        div({ style: styles.tradeBox }, [
           TradeTable()
         ])
       ])
@@ -37,24 +37,27 @@ class FullMode extends Component {
       },
       column: {
         display: 'flex',
+        flexWrap: 'wrap',
         justifyContent: 'space-around',
         padding: '1vh 2.5vw'
       },
       currency: {
-        minWidth: '40vw'
+        minWidth: '60vw',
+        margin: '2rem 0'
       },
-      trade: {
-        minWidth: '35vw',
-        maxWidth: '100vw',
-        display: 'flex',
-        justifyContent: 'flex-end',
-        marginTop: '1rem'
+      tradeBox: {
+        minWidth: '32vw',
+        maxWidth: '80vw',
+        marginTop: '1rem',
+        overflow: 'auto',
+        height: '88vh'
       },
       botLogBox: {
-        minWidth: '42vw',
-        maxWidth: '55vw',
-        height: 'calc(83vh - 345px)',
-        overflow: 'scroll'
+        minWidth: '32vw',
+        height: 'calc(85vh - 180px)',
+        overflow: 'auto',
+        minHeight: '30vh',
+        maxHeight: '76vh'
       }
     }
   }
