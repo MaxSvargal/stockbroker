@@ -5,8 +5,8 @@
   "author": "MaxSvargal",
   "license": "MIT",
   "scripts": {
-    "server:me": "ACCOUNT=me PORT=8081 CURRENCY_PAIR=BTC_ETH node ./src/server/index.js",
-    "server:pahan": "ACCOUNT=pahan PORT=8080 CURRENCY_PAIR=BTC_DASH node ./src/server/index.js",
+    "server:me": "ACCOUNT=me PORT=8081 CURRENCY_PAIR=BTC_ETH DB_PATH=./server/db/me_btc_eth node ./src/server/index.js",
+    "server:pahan": "ACCOUNT=pahan PORT=8080 CURRENCY_PAIR=BTC_DASH DB_PATH=./server/db/pahan_btc_dash node ./src/server/index.js",
     "forever:me": "ACCOUNT=me PORT=8080 forever start --killSignal=SIGTERM ./src/server/index.js -w 2 -s 2",
     "build": "webpack --config=./webpack.config.client.prod.js",
     "start": "npm run build:me && npm run server:me",

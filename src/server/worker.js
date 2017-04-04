@@ -3,13 +3,15 @@ import PouchDB from 'pouchdb'
 import createStore from './store'
 import handleRender from './renderer'
 
+const { DB_PATH } = process.env
+
 /* eslint import/prefer-default-export: 0 */
 export const run = worker => {
   console.log('Worker PID:', process.pid)
 
   const { httpServer, scServer } = worker
   const app = express()
-  const pouchDB = new PouchDB('./server/db/stockbroker.alpha', { adapter: 'leveldb' })
+  const pouchDB = new PouchDB(DB_PATH, { adapter: 'leveldb' })
   const store = createStore(scServer, pouchDB)
 
   app.use(express.static('public', { maxAge: 10000 }))
