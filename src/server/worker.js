@@ -1,5 +1,5 @@
 import express from 'express'
-// import basicAuth from 'express-basic-auth'
+import PouchDB from 'pouchdb'
 import createStore from './store'
 import handleRender from './renderer'
 
@@ -9,10 +9,10 @@ export const run = worker => {
 
   const { httpServer, scServer } = worker
   const app = express()
-  const store = createStore(scServer)
+  const pouchDB = new PouchDB('./server/db/stockbroker.alpha', { adapter: 'leveldb' })
+  const store = createStore(scServer, pouchDB)
 
-  // app.use(basicAuth({ users: { stockbroker: 'toptrader88' } }))
-  app.use(express.static('public', { maxAge: 1000 }))
+  app.use(express.static('public', { maxAge: 10000 }))
   app.use(handleRender(store))
 
   httpServer.on('request', app)
