@@ -33,7 +33,8 @@ module.exports = {
       'process.env': {
         NODE_ENV: JSON.stringify('production'),
         BROWSER: JSON.stringify(false),
-        ACCOUNT: JSON.stringify(accountConfig)
+        ACCOUNT: JSON.stringify(accountConfig),
+        CURRENCY_PAIR: JSON.stringify(process.env.CURRENCY_PAIR)
       }
     }),
     new webpack.BannerPlugin({

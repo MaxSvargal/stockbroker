@@ -11,17 +11,11 @@ export default (scServer, pouchDB) => {
     next(action)
   }
 
-  const persistStoreMiddleware = () => next => action => {
-    // pouchDB
-    next(action)
-  }
-
   const sagaMiddleware = createSagaMiddleware()
-  const middlewares = applyMiddleware(sagaMiddleware, actionCatchMiddleware, persistStoreMiddleware)
-  const preloadedState = pouchDB.allDocs({ include_docs: true }).then(res => {
-    const docs = res.rows.map(row => row.doc)
-    console.log({ docs })
-  })
+  const middlewares = applyMiddleware(sagaMiddleware, actionCatchMiddleware)
+  // const preloadedState = pouchDB.allDocs({ include_docs: true }).then(res => {
+  //   const docs = res.rows.map(row => row.doc)
+  // })
   const persist = persistentStore(pouchDB)
   const createStoreWithMiddleware = compose(persist, middlewares)(createStore)
   const store = createStoreWithMiddleware(rootReducer)

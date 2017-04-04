@@ -1,7 +1,6 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
 import { hh, div } from 'react-hyperscript-helpers'
-import { CURRENT_PAIR } from 'const'
 
 class SimpleRate extends Component {
   render() {
@@ -29,7 +28,7 @@ class SimpleRate extends Component {
   }
 }
 
-const mapStateToProps = ({ currencies }) =>
-  ({ currency: currencies[CURRENT_PAIR] })
+const mapStateToProps = ({ currencies, currentPair }) =>
+  ({ currency: currencies[currentPair] })
 
 export default hh(connect(mapStateToProps)(SimpleRate))

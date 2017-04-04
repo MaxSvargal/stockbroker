@@ -37,7 +37,7 @@ class CurrencyStats extends Component {
     //   audio && audio.play()
     // }
 
-    document && (document.title = nextProps.data.last)
+    document && nextProps.data && (document.title = nextProps.data.last)
     this.inputRef && this.handleKeyPress({ target: { value: this.inputRef.value } })
   }
 

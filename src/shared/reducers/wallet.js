@@ -2,8 +2,6 @@ import { createReducer } from 'redux-act'
 import { botMessage, setCurrency, setCurrencyPair, addStats, setFreeCurrencies, setThreshold, updateWallet, addEstimateRatio, setCurrentFinalResult } from '../actions'
 import { time } from './helpers'
 
-const { ACCOUNT: { pair } } = process.env
-
 export const wallet = createReducer({
   [updateWallet]: (state, data) =>
     Object.keys(data).reduce((prev, key) =>
@@ -27,8 +25,8 @@ export const threshold = createReducer({
 }, 0.0001)
 
 export const currentPair = createReducer({
-  [setCurrencyPair]: state => state
-}, pair)
+  [setCurrencyPair]: (state, value) => value
+}, '')
 
 export const stats = createReducer({
   [addStats]: (state, data) => [ ...state, data ]

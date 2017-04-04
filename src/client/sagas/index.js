@@ -3,7 +3,7 @@ import { fork, call, take, put } from 'redux-saga/effects'
 import socketCluster from 'socketcluster-client'
 import { setThreshold, sendSells, sendBuys, removeOpenBuys, removeOpenSells } from 'shared/actions'
 
-const socket = socketCluster.connect({ port: 8080 })
+const socket = socketCluster.connect({ port: window.location.port })
 
 const changeStateChannel = () => eventChannel(emitter => {
   const channel = socket.subscribe('update')
@@ -30,7 +30,6 @@ function* watchForActions() {
   while (true) {
     const actions = [ setThreshold, sendSells, sendBuys, removeOpenBuys, removeOpenSells ]
     const action = yield take(actions)
-    console.log('take', action)
     socket.emit('actions', action, err => err && console.error(err))
   }
 }

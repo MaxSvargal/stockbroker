@@ -5,12 +5,12 @@
   "author": "MaxSvargal",
   "license": "MIT",
   "scripts": {
-    "server": "ACCOUNT=me node ./src/server/index.js",
-    "forever": "ACCOUNT=me PORT=8080 forever start --killSignal=SIGTERM ./src/server/index.js -w 2 -s 2",
-    "build:me": "ACCOUNT=me webpack --config=./webpack.config.client.prod.js",
-    "build:pahan": "ACCOUNT=pahan webpack --config=./webpack.config.client.prod.js",
-    "start": "npm run build:me && npm run server",
-    "dev": "ACCOUNT=me webpack-dev-server --config=./webpack.config.client.dev.js --inline --hot --open",
+    "server:me": "ACCOUNT=me PORT=8081 CURRENCY_PAIR=BTC_ETH node ./src/server/index.js",
+    "server:pahan": "ACCOUNT=pahan PORT=8080 CURRENCY_PAIR=BTC_DASH node ./src/server/index.js",
+    "forever:me": "ACCOUNT=me PORT=8080 forever start --killSignal=SIGTERM ./src/server/index.js -w 2 -s 2",
+    "build": "webpack --config=./webpack.config.client.prod.js",
+    "start": "npm run build:me && npm run server:me",
+    "dev": "webpack-dev-server --config=./webpack.config.client.dev.js --inline --hot --open",
     "test": "ACCOUNT=me NODE_ENV=test NODE_PATH=src nyc ava",
     "test:watch": "npm test -- --watch",
     "coverage": "nyc report --reporter=lcov --reporter=text-lcov | coveralls"

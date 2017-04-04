@@ -1,9 +1,9 @@
-const { ACCOUNT: { pair } } = process.env
+const { CURRENCY_PAIR } = process.env
 
 export const USDT_ETH = 'USDT_ETH'
 export const USDT_BTC = 'USDT_BTC'
 export const BTC_ETH = 'BTC_ETH'
-export const CURRENT_PAIR = pair
+export const CURRENT_PAIR = CURRENCY_PAIR
 export const FIVE_MINUTES = 1000 * 60 * 5
 export const TEN_MINUTES = 1000 * 60 * 10
 export const TWENTY_MINUTES = 1000 * 60 * 20
