@@ -24,7 +24,6 @@ class ChunksAddForm extends Component {
     const currencyTotalAmount = new BigNumber(0)
       .plus(rate.value || 1)
       .times(amount.value || 1)
-      .times(chunks.value || 1)
       .toFixed(8)
 
     const currencyChunkAmount = new BigNumber(0)
