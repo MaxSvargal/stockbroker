@@ -27,10 +27,10 @@ export const selectBuyForCover = ({ transactions }, rate) => {
     .filter(key =>
       transactions[key].active === true &&
       transactions[key].type === 'buy' &&
-      transactions[key].rate > rate)
-  return matches.length > 1 ?
+      transactions[key].rate < rate)
+  return matches.length >= 1 ?
     matches.reduce((prev, curr) =>
-      transactions[curr].rate > transactions[prev].rate &&
+      transactions[curr].rate < transactions[prev].rate &&
       transactions[curr].amount >= transactions[prev].amount ?
         curr : prev) :
     false
@@ -41,8 +41,8 @@ export const selectSellForCover = ({ transactions }, rate) => {
     .filter(key =>
       transactions[key].active === true &&
       transactions[key].type === 'sell' &&
-      transactions[key].rate < rate)
-  return matches.length > 1 ?
+      transactions[key].rate > rate)
+  return matches.length >= 1 ?
     matches.reduce((prev, curr) =>
       transactions[curr].rate < transactions[prev].rate &&
       transactions[curr].amount >= transactions[prev].amount ?
