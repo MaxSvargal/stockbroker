@@ -152,13 +152,13 @@ class ChunksAddForm extends Component {
         color: '#fff',
         border: 0,
         fontSize: '1.2rem',
-        padding: '1rem 3rem',
-        margin: '4rem 1rem'
+        padding: '.8rem 2rem',
+        margin: '.5rem 1rem'
       },
       actionsRow: {
         display: 'flex',
-        minWidth: '55vw',
-        justifyContent: 'space-between'
+        flexDirection: 'column',
+        justifyContent: 'center'
       }
     }
   }
