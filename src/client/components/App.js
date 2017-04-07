@@ -4,7 +4,7 @@ import { NavLink, Route, Switch } from 'react-router-dom'
 
 import SimpleMode from './SimpleMode'
 import FullMode from './FullMode'
-import Actions from './Actions'
+import Preferences from './Preferences'
 import Transactions from './Transactions'
 
 class App extends Component {
@@ -16,13 +16,13 @@ class App extends Component {
         h(NavLink, { to: '/', style: styles.link, exact: true, activeStyle: styles.activeLink }, [ span('Минимум') ]),
         h(NavLink, { to: '/full', style: styles.link, activeStyle: styles.activeLink }, [ span('Отслеживание') ]),
         h(NavLink, { to: '/transactions', style: styles.link, activeStyle: styles.activeLink }, [ span('Транзакции') ]),
-        h(NavLink, { to: '/actions', style: styles.link, activeStyle: styles.activeLink }, [ span('Действия') ])
+        h(NavLink, { to: '/preferences', style: styles.link, activeStyle: styles.activeLink }, [ span('Настройки') ])
       ]),
       h(Switch, [
         h(Route, { exact: true, path: '/', component: SimpleMode }),
         h(Route, { path: '/full', component: FullMode }),
         h(Route, { path: '/transactions', component: Transactions }),
-        h(Route, { path: '/actions', component: Actions })
+        h(Route, { path: '/preferences', component: Preferences })
       ])
     ])
   }

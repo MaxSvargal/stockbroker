@@ -126,7 +126,7 @@ class ChunksAddForm extends Component {
     return {
       label: {
         display: 'block',
-        padding: '2rem 0 1rem'
+        padding: '1rem 0'
       },
       input: {
         fontSize: '1.2rem',
@@ -136,11 +136,10 @@ class ChunksAddForm extends Component {
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'center',
-        margin: '0 .5rem',
-        padding: '0.5rem 0.5rem'
+        padding: '0 0 1rem 0'
       },
       col: {
-        margin: '.5rem'
+        margin: '0 .5rem'
       },
       output: {
         fontSize: '2rem',

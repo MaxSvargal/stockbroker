@@ -5,9 +5,7 @@ import debounce from 'debounce'
 import { hh, div, input, label } from 'react-hyperscript-helpers'
 import { setThreshold } from 'shared/actions'
 
-import ChunksAddForm from './ChunksAddForm'
-
-class Actions extends Component {
+class Preferences extends Component {
   constructor(props) {
     super(props)
     this.refers = {}
@@ -77,7 +75,6 @@ class Actions extends Component {
         //   ])
         // ]),
 
-        ChunksAddForm(),
         div({ style: styles.row }, [
           div({ style: styles.col }, [
             label({ style: styles.label }, 'Порог прибыли'),
@@ -143,7 +140,7 @@ class Actions extends Component {
   }
 }
 
-Actions.propTypes = {
+Preferences.propTypes = {
   threshold: PropTypes.number,
   currency: PropTypes.object,
   wallet: PropTypes.object
@@ -157,4 +154,4 @@ const mapStateToProps = ({ threshold, currencies, currentPair, freeCurrencies, w
   wallet
 })
 
-export default hh(withRouter(connect(mapStateToProps, { setThreshold })(Actions)))
+export default hh(withRouter(connect(mapStateToProps, { setThreshold })(Preferences)))
