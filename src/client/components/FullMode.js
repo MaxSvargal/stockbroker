@@ -39,7 +39,7 @@ class FullMode extends Component {
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'space-around',
-        padding: '1vh 2.5vw'
+        padding: '1vh 0'
       },
       currency: {
         minWidth: '60vw',

@@ -11,7 +11,7 @@ export const run = worker => {
 
   const { httpServer, scServer } = worker
   const app = express()
-  const pouchDB = new PouchDB(DB_PATH, { adapter: 'leveldb' })
+  const pouchDB = new PouchDB(DB_PATH, { adapter: 'leveldb', revs_limit: 1, auto_compaction: true })
   const store = createStore(scServer, pouchDB)
 
   app.use(express.static('public', { maxAge: 10000 }))

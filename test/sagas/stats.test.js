@@ -1,8 +1,8 @@
 import test from 'ava'
 import testSaga from 'redux-saga-test-plan'
-import { generateStatsSaga } from 'sagas/stats'
-import { selectSellsLastTime, selectBuysLastTime, selectCurrencyPair } from 'sagas/selectors'
-import { addStats } from 'actions'
+import { generateStatsSaga } from 'server/sagas/stats'
+import { selectSellsLastTime, selectBuysLastTime, selectCurrencyProps } from 'server/sagas/selectors'
+import { addStats } from 'shared/actions'
 import { TEN_MINUTES } from 'const'
 
 test('generateStatsSaga should store statistics', () => {
@@ -12,7 +12,7 @@ test('generateStatsSaga should store statistics', () => {
 
   testSaga(generateStatsSaga)
     .next()
-    .select(selectCurrencyPair)
+    .select(selectCurrencyProps)
     .next({ last: '0.56' })
     .select(selectBuysLastTime, TEN_MINUTES)
     .next(buys)

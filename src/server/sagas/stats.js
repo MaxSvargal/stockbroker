@@ -1,28 +1,30 @@
 import { select, put, fork, take, throttle } from 'redux-saga/effects'
-import { setCurrency, addStats, addEstimateRatio, setCurrentFinalResult } from 'shared/actions'
-import BigNumber from 'bignumber.js'
+import { setCurrency, addStats, addEstimateRatio, setCurrentFinalResult, botMessage } from 'shared/actions'
 import { cropNumber } from 'server/utils'
 import { TEN_MINUTES } from 'const'
-import { selectSellsLastTime, selectBuysLastTime, selectCurrencyPair, selectEstimateRatios, selectLastTenStats, selectThreshold } from './selectors'
 import { buySaga, sellSaga } from './trade'
+import {
+  selectSellsLastTime, selectBuysLastTime, selectCurrencyProps,
+  selectEstimateRatios, selectLastTenStats, selectThreshold
+} from './selectors'
 
 const getRate = i => i[1]
-const getSumm = (a, b) => a + b
-const bigToNumber = bn => bn.toNumber()
+const getSumm = (a, b) => cropNumber(a + b)
+
 const calcRelativeDynamic = (prev, curr, index) =>
   index === 1 ?
-    [ [ new BigNumber(curr).div(prev) ], curr ] :
-    [ [ ...prev[0], new BigNumber(curr).div(prev[1]) ], curr ]
+    [ [ cropNumber(curr / prev) ], curr ] :
+    [ [ ...prev[0], cropNumber(curr / prev[1]) ], curr ]
 
 const getRateChange = arr => arr
   .map(getRate)
   .reduce(calcRelativeDynamic)[0]
-  .map(bigToNumber)
+  // .map(bigToNumber)
   .reduce(getSumm) / arr.length
 
 
 export function* generateStatsSaga() {
-  const { last } = yield select(selectCurrencyPair)
+  const { last } = yield select(selectCurrencyProps)
   const buys = yield select(selectBuysLastTime, TEN_MINUTES)
   const sells = yield select(selectSellsLastTime, TEN_MINUTES)
 
@@ -58,7 +60,7 @@ export function* conclusionStatsSaga() {
 
   while (true) {
     yield take(addEstimateRatio)
-    const { lowestAsk, highestBid } = yield select(selectCurrencyPair)
+    const { lowestAsk, highestBid } = yield select(selectCurrencyProps)
     const hold = yield select(selectThreshold)
     const estimates = yield select(selectEstimateRatios)
     const result = estimates.reduce((prev, curr) =>
@@ -66,28 +68,34 @@ export function* conclusionStatsSaga() {
       [ 0, 0 ]
     )[1]
 
-    if ((lastResult >= 9 && result <= 9) || (lastResult >= 2 && result <= 1)) {
+    // (lastResult >= 2 && result <= 1)
+    if (lastResult >= 9 && result <= 9) {
       yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), hold)
     }
 
-    if ((lastResult <= -9 && result <= -8) || (lastResult <= -2 && result >= 0)) {
+    // (lastResult <= -2 && result >= 0)
+    if (lastResult <= -9 && result <= -8) {
       yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
     }
 
     yield put(setCurrentFinalResult(result))
 
-    if (lastResult >= 9 && result <= 9) console.log('Идём на спад, продаём', highestBid)
-    if (lastResult >= 2 && result <= 1) console.log('Скоро упадём, продаём?', highestBid)
-
-    if (lastResult <= -9 && result <= -8) console.log('Идём вверх, покупаем', lowestAsk)
-    if (lastResult <= -2 && result >= 0) console.log('Скоро поднимемся, можно купить', lowestAsk)
-
     lastResult = result
+  }
+}
+
+export function* logBotMessages() {
+  while (true) {
+    const { payload } = yield take(botMessage)
+    console.log(payload)
   }
 }
 
 export default function* StatsSaga() {
   yield throttle(5000, setCurrency, generateStatsSaga)
-  yield fork(estimateStatsSaga)
-  yield fork(conclusionStatsSaga)
+  yield [
+    fork(estimateStatsSaga),
+    fork(conclusionStatsSaga),
+    fork(logBotMessages)
+  ]
 }

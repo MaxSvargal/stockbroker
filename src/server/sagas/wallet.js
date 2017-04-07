@@ -1,31 +1,18 @@
-import { call, take, put, select, fork, race } from 'redux-saga/effects'
+import { call, take, put, select, fork } from 'redux-saga/effects'
 import Poloniex from 'server/services/poloniex'
-import { cropNumber } from 'server/utils'
-import { CURRENT_PAIR } from 'const'
+
+import { selectCurrencyPair, selectCurrencyPairSplited } from 'server/sagas/selectors'
 
 import {
-  selectWallet,
-  selectCurrentPair,
-  selectCurrencyPair,
-  selectUncoveredSells,
-  selectUncoveredBuys
-} from 'server/sagas/selectors'
-
-import {
-  addBuyChunks,
-  addChunkedCurrency,
-  addSellChunks,
+  addChunks,
   botMessage,
   buyFailure,
   buySuccess,
   doBuy,
   doSell,
+  requestNewChunks,
   sellFailure,
   sellSuccess,
-  sendBuys,
-  sendSells,
-  setCurrency,
-  setFreeCurrencies,
   updateWallet
 } from 'shared/actions'
 
@@ -33,50 +20,29 @@ const { ACCOUNT: { key, secret } } = process.env
 export const poloniex = new Poloniex({ key, secret })
 
 export function* watchForNewChunks() {
-  const makeChunks = (rate, amount, chunksNum) => {
-    /* eslint no-plusplus: 0 */
-    let quantity = chunksNum
-    const chunks = []
-    while (quantity--) chunks.push([ rate, amount ])
-    return chunks
-  }
-
   while (true) {
-    const { sellChunks, buyChunks } = yield race({
-      sellChunks: take(sendSells),
-      buyChunks: take(sendBuys)
-    })
+    const { payload: { type, num, rate, amount } } = yield take(requestNewChunks)
+    const [ , currency ] = yield select(selectCurrencyPairSplited)
 
-    const [ firstCurrency, secondCurrency ] = yield select(selectCurrentPair)
-
-    if (sellChunks) {
-      const { rate, amount, chunksNum } = sellChunks.payload
-      const chunksToSell = makeChunks(rate, amount, chunksNum)
-
-      yield put(addSellChunks(chunksToSell))
-      yield put(addChunkedCurrency([ firstCurrency, amount * chunksNum ]))
-      yield put(botMessage(`Созданы продажи в количестве ${chunksNum} частей по ${amount} ${secondCurrency}`))
-    } else if (buyChunks) {
-      const { rate, amount, chunksNum } = buyChunks.payload
-      const chunksToBuy = makeChunks(rate, amount, chunksNum)
-
-      yield put(addBuyChunks(chunksToBuy))
-      yield put(addChunkedCurrency([ secondCurrency, amount * chunksNum ]))
-      yield put(botMessage(`Созданы покупки в количестве ${chunksNum} частей по ${amount} ${secondCurrency}`))
-    }
+    yield put(addChunks({ type, num, rate, amount }))
+    yield put(botMessage(`
+      Созданы ${type === 'buy' ? 'покупки' : 'продажи'} в количестве ${num} частей по ${amount} ${currency}
+    `))
   }
 }
 
 export function* doBuySaga() {
   while (true) {
     try {
-      const { payload: [ rate, amount, coverIndex ] } = yield take(doBuy)
-      const options = { command: 'buy', currencyPair: CURRENT_PAIR, rate, amount }
+      const { payload: { rate, amount, profit, coverId } } = yield take(doBuy)
+      const currencyPair = yield select(selectCurrencyPair)
+      const options = { command: 'buy', currencyPair, rate, amount }
       const { response, error } = yield call(poloniex.privateRequest, options)
+      const orderNumber = response && response.orderNumber
 
-      response && response.orderNumber ?
-        yield put(buySuccess([ rate, amount, coverIndex, response.orderNumber ])) :
-        yield put(buyFailure([ rate, amount, error || response.error ]))
+      orderNumber ?
+        yield put(buySuccess({ rate, amount, profit, coverId, orderNumber })) :
+        yield put(buyFailure({ rate, amount, coverId, error: error || response.error }))
     } catch (err) {
       console.log({ err })
     }
@@ -86,13 +52,15 @@ export function* doBuySaga() {
 export function* doSellSaga() {
   while (true) {
     try {
-      const { payload: [ rate, amount, coverIndex ] } = yield take(doSell)
-      const options = { command: 'sell', currencyPair: CURRENT_PAIR, rate, amount }
+      const { payload: { rate, amount, profit, coverId } } = yield take(doSell)
+      const currencyPair = yield select(selectCurrencyPair)
+      const options = { command: 'sell', currencyPair, rate, amount }
       const { response, error } = yield call(poloniex.privateRequest, options)
+      const orderNumber = response && response.orderNumber
 
-      response && response.orderNumber ?
-        yield put(sellSuccess([ rate, amount, coverIndex, response.orderNumber ])) :
-        yield put(sellFailure([ rate, amount, error || response.error ]))
+      orderNumber ?
+        yield put(sellSuccess({ rate, amount, profit, coverId, orderNumber })) :
+        yield put(sellFailure({ rate, amount, coverId, error: error || response.error }))
     } catch (err) {
       console.log({ err })
     }
@@ -104,28 +72,29 @@ export function* getWallet() {
   yield put(updateWallet(response))
 }
 
-export function* calculateFreeValues() {
-  while (true) {
-    yield take([ setCurrency, sendBuys, sendSells ])
-
-    const [ firstCurrency, secondCurrency ] = yield select(selectCurrentPair)
-    const { last } = yield select(selectCurrencyPair)
-    const wallet = yield select(selectWallet)
-    const uncoveredSells = yield select(selectUncoveredSells)
-    const uncoveredBuys = yield select(selectUncoveredBuys)
-
-    const volumeOfSellChunks = uncoveredSells.reduce((prev, curr) =>
-      (curr[4] === 0 ? prev + curr[2] : prev), 0)
-
-    const volumeOfBuyChunks = uncoveredBuys.reduce((prev, curr) =>
-      (curr[4] === 0 ? prev + curr[2] : prev), 0)
-
-    const firstFreeVolume = cropNumber((wallet[firstCurrency] - volumeOfSellChunks) * last)
-    const secondFreeVolume = cropNumber(wallet[secondCurrency] - volumeOfBuyChunks)
-
-    yield put(setFreeCurrencies([ firstFreeVolume, secondFreeVolume ]))
-  }
-}
+// TODO
+// export function* calculateFreeValues() {
+//   while (true) {
+//     yield take([ setCurrency, sendBuys, sendSells ])
+//
+//     const [ firstCurrency, secondCurrency ] = yield select(selectCurrentPair)
+//     const { last } = yield select(selectCurrencyPair)
+//     const wallet = yield select(selectWallet)
+//     const uncoveredSells = yield select(selectUncoveredSells)
+//     const uncoveredBuys = yield select(selectUncoveredBuys)
+//
+//     const volumeOfSellChunks = uncoveredSells.reduce((prev, curr) =>
+//       (curr[4] === 0 ? prev + curr[2] : prev), 0)
+//
+//     const volumeOfBuyChunks = uncoveredBuys.reduce((prev, curr) =>
+//       (curr[4] === 0 ? prev + curr[2] : prev), 0)
+//
+//     const firstFreeVolume = cropNumber((wallet[firstCurrency] - volumeOfSellChunks) * last)
+//     const secondFreeVolume = cropNumber(wallet[secondCurrency] - volumeOfBuyChunks)
+//
+//     yield put(setFreeCurrencies([ firstFreeVolume, secondFreeVolume ]))
+//   }
+// }
 
 export default function* walletSaga() {
   yield [

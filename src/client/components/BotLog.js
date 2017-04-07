@@ -22,9 +22,9 @@ class BotLog extends Component {
         lineHeight: '1.4rem'
       },
       item: (index, str) => ({
-        padding: '.25rem 0',
-        borderBottom: '1px solid #3b4048',
-        background: index % 2 ? 'transparent' : '#343940',
+        padding: '.25rem .5rem',
+        borderTop: '1px solid rgba(0, 0, 0, .5)',
+        background: index % 2 ? 'transparent' : 'rgba(0, 0, 0, .2)',
         fontWeight: checkStringContain(str, [ 'Куплено', 'Продано', 'Ошибка' ]) ? 'bold' : 'normal',
         color: (str.search('Куплено') !== -1 && '#f8fcf5') ||
           (str.search('Продано') !== -1 && '#fcf7f5') ||

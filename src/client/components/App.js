@@ -5,7 +5,7 @@ import { NavLink, Route, Switch } from 'react-router-dom'
 import SimpleMode from './SimpleMode'
 import FullMode from './FullMode'
 import Actions from './Actions'
-import MyOrders from './MyOrders'
+import Transactions from './Transactions'
 
 class App extends Component {
   render() {
@@ -15,13 +15,13 @@ class App extends Component {
       div({ style: styles.linksBox }, [
         h(NavLink, { to: '/', style: styles.link, exact: true, activeStyle: styles.activeLink }, [ span('Минимум') ]),
         h(NavLink, { to: '/full', style: styles.link, activeStyle: styles.activeLink }, [ span('Отслеживание') ]),
-        h(NavLink, { to: '/orders', style: styles.link, activeStyle: styles.activeLink }, [ span('Транзакции') ]),
+        h(NavLink, { to: '/transactions', style: styles.link, activeStyle: styles.activeLink }, [ span('Транзакции') ]),
         h(NavLink, { to: '/actions', style: styles.link, activeStyle: styles.activeLink }, [ span('Действия') ])
       ]),
       h(Switch, [
         h(Route, { exact: true, path: '/', component: SimpleMode }),
         h(Route, { path: '/full', component: FullMode }),
-        h(Route, { path: '/orders', component: MyOrders }),
+        h(Route, { path: '/transactions', component: Transactions }),
         h(Route, { path: '/actions', component: Actions })
       ])
     ])
@@ -41,7 +41,9 @@ class App extends Component {
         display: 'flex',
         justifyContent: 'center',
         background: '#303030',
-        borderBottom: '1px solid #0e0f10'
+        borderBottom: '1px solid #0e0f10',
+        position: 'relative',
+        zIndex: 3
       },
       link: {
         display: 'inline-block',

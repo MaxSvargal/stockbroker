@@ -2,8 +2,8 @@ import { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import debounce from 'debounce'
-import { hh, div, input, label, button } from 'react-hyperscript-helpers'
-import { setThreshold, sendSells, sendBuys, removeOpenBuys, removeOpenSells } from 'shared/actions'
+import { hh, div, input, label } from 'react-hyperscript-helpers'
+import { setThreshold } from 'shared/actions'
 
 import ChunksAddForm from './ChunksAddForm'
 
@@ -17,10 +17,6 @@ class Actions extends Component {
       flashBg: false,
       showBuyForm: true
     }
-    this.sendSells = this.sendSells.bind(this)
-    this.sendBuys = this.sendBuys.bind(this)
-    this.removeOpenSells = this.removeOpenSells.bind(this)
-    this.removeOpenBuys = this.removeOpenBuys.bind(this)
     this.changeThreshold = debounce(props.setThreshold, 500)
   }
 
@@ -37,28 +33,18 @@ class Actions extends Component {
     setTimeout(() => this.setState({ flashBg: false }), 200)
   }
 
-  removeOpenSells() {
-    this.props.removeOpenSells()
-    this.flashBackground()
-  }
-
-  removeOpenBuys() {
-    this.props.removeOpenBuys()
-    this.flashBackground()
-  }
-
   sendSells(data) {
-    this.props.sendSells(data)
+    this.props.addChunks(data)
     this.flashBackground()
   }
 
   sendBuys(data) {
-    this.props.sendBuys(data)
+    this.props.addChunks(data)
     this.flashBackground()
   }
 
   render() {
-    const { pairNames, currency /* , freeCurrencies */, threshold, wallet } = this.props
+    const { pairNames, currency, threshold, wallet } = this.props
     const isWalletIsset = !!(wallet[pairNames[0]] || wallet[pairNames[1]])
     const isCurrencyIsset = !!(currency && currency.highestBid)
     const styles = this.getStyles()
@@ -91,13 +77,7 @@ class Actions extends Component {
         //   ])
         // ]),
 
-        ChunksAddForm({
-          pairNames,
-          rate: currency && currency.highestBid,
-          amount: wallet[pairNames[1]],
-          onCreateBuy: this.sendBuys,
-          onCreateSell: this.sendSells
-        }),
+        ChunksAddForm(),
         div({ style: styles.row }, [
           div({ style: styles.col }, [
             label({ style: styles.label }, 'Порог прибыли'),
@@ -107,18 +87,6 @@ class Actions extends Component {
               defaultValue: threshold,
               onChange: e => this.onThresholdChange(e)
             })
-          ]),
-          div({ style: styles.col }, [
-            button({
-              style: styles.removeBtn,
-              onClick: this.removeOpenSells
-            }, 'Удалить открытые продажи')
-          ]),
-          div({ style: styles.col }, [
-            button({
-              style: styles.removeBtn,
-              onClick: this.removeOpenBuys
-            }, 'Удалить открытые покупки')
           ])
         ])
       ])
@@ -181,17 +149,12 @@ Actions.propTypes = {
   wallet: PropTypes.object
 }
 
-const mapStateToProps = ({ threshold, currencies, currentPair, freeCurrencies, wallet }) =>
-  ({
-    pairNames: currentPair.split('_'),
-    currency: currencies[currentPair],
-    freeCurrencies,
-    threshold,
-    wallet
-  })
+const mapStateToProps = ({ threshold, currencies, currentPair, freeCurrencies, wallet }) => ({
+  pairNames: currentPair.split('_'),
+  currency: currencies[currentPair],
+  freeCurrencies,
+  threshold,
+  wallet
+})
 
-const dispatchToProps = {
-  setThreshold, sendSells, sendBuys, removeOpenBuys, removeOpenSells
-}
-
-export default hh(withRouter(connect(mapStateToProps, dispatchToProps)(Actions)))
+export default hh(withRouter(connect(mapStateToProps, { setThreshold })(Actions)))

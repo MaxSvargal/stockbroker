@@ -4,9 +4,9 @@ import { hh, div } from 'react-hyperscript-helpers'
 
 class FinalCurrentResult extends Component {
   render() {
-    const { finalCurrentResult } = this.props
-    const isPositive = finalCurrentResult >= 0
-    const chars = [ ...new Array(Math.abs(finalCurrentResult / 2)) ]
+    const { statsResult } = this.props
+    const isPositive = statsResult >= 0
+    const chars = [ ...new Array(Math.abs(statsResult / 2)) ]
     const styles = this.getStyles()
 
     return div({ style: styles.root },
@@ -35,5 +35,5 @@ class FinalCurrentResult extends Component {
   }
 }
 
-const mapStateToProps = ({ finalCurrentResult }) => ({ finalCurrentResult })
+const mapStateToProps = ({ statsResult }) => ({ statsResult })
 export default hh(connect(mapStateToProps)(FinalCurrentResult))

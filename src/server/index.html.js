@@ -2,7 +2,7 @@ const renderFullPage = (html, preloadedState) => `
   <!doctype html>
   <html>
     <head>
-      <title>Redux Universal Example</title>
+      <title>StockBrockerBot</title>
     </head>
     <body style="margin:0">
       <div id="root">${html}</div>

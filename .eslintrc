@@ -27,7 +27,8 @@
     "no-unused-expressions": 0,
     "no-use-before-define": "off",
     "no-constant-condition": ["error", { "checkLoops": false }],
-    "semi": [1, "never"]
+    "semi": [1, "never"],
+    "max-len": [1, 110]
   },
   "plugins": [
     "ava",

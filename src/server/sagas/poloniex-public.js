@@ -3,6 +3,7 @@ import { eventChannel } from 'redux-saga'
 import PoloniexWSS from 'server/services/poloniex.wss'
 import { orderBookModify, orderBookRemove, newTrade, setCurrency, setCurrencyPair } from 'shared/actions'
 
+// TODO: get from store
 const { CURRENCY_PAIR } = process.env
 
 const channel = (session, topic) => eventChannel(emitter => {

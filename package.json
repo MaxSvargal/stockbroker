@@ -8,10 +8,10 @@
     "server:me": "ACCOUNT=me PORT=8081 CURRENCY_PAIR=BTC_ETH DB_PATH=./server/db/me_btc_eth node ./src/server/index.js",
     "server:pahan": "ACCOUNT=pahan PORT=8080 CURRENCY_PAIR=BTC_DASH DB_PATH=./server/db/pahan_btc_dash node ./src/server/index.js",
     "forever:me": "forever start -c \"npm run server:me\" ./ --killSignal=SIGTERM -w 2 -s 2",
-    "forever:pahan": "forever start -c \"npm run server:pahan\" --killSignal=SIGTERM -w 2 -s 2",
+    "forever:pahan": "forever start -c \"npm run server:pahan\" ./ --killSignal=SIGTERM -w 2 -s 2",
     "build": "webpack --config=./webpack.config.client.prod.js",
     "start": "npm run build:me && npm run server:me",
-    "dev": "ACCOUNT=me PORT=8081 CURRENCY_PAIR=BTC_ETH DB_PATH=./server/db/dev node ./src/server/dev-index.js",
+    "dev": "ACCOUNT=me PORT=8081 CURRENCY_PAIR=BTC_ETH DB_PATH=./server/db/dev node ./src/server/dev-index.js --inspect-workers",
     "test": "ACCOUNT=me NODE_ENV=test NODE_PATH=src nyc ava",
     "test:watch": "npm test -- --watch",
     "coverage": "nyc report --reporter=lcov --reporter=text-lcov | coveralls"
@@ -51,6 +51,7 @@
     "redux-act": "^1.1.1",
     "redux-pouchdb": "^0.1.1",
     "redux-saga": "^0.14.3",
+    "shortid": "^2.2.8",
     "socketcluster": "^5.9.1",
     "socketcluster-client": "^5.3.0",
     "source-map-support": "^0.4.14"
@@ -76,8 +77,8 @@
     "sinon": "^2.1.0",
     "webpack": "^2.2.1",
     "webpack-chunk-hash": "^0.4.0",
-    "webpack-node-externals": "^1.5.4",
     "webpack-dev-middleware": "^1.10.1",
-    "webpack-hot-middleware": "^2.18.0"
+    "webpack-hot-middleware": "^2.18.0",
+    "webpack-node-externals": "^1.5.4"
   }
 }

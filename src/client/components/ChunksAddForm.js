@@ -1,4 +1,6 @@
 import { Component } from 'react'
+import { connect } from 'react-redux'
+import { requestNewChunks } from 'shared/actions'
 import { hh, div, input, label, span, button } from 'react-hyperscript-helpers'
 import BigNumber from 'bignumber.js'
 
@@ -36,24 +38,26 @@ class ChunksAddForm extends Component {
 
   onCreateBuy() {
     const { rate, chunks } = this.refers
-    this.props.onCreateBuy({
+    this.props.requestNewChunks({
+      type: 'buy',
       rate: Number(rate.value),
       amount: Number(this.state.chunkAmount),
-      chunksNum: Number(chunks.value)
+      num: Number(chunks.value)
     })
   }
 
   onCreateSell() {
     const { rate, chunks } = this.refers
-    this.props.onCreateSell({
+    this.props.requestNewChunks({
+      type: 'sell',
       rate: Number(rate.value),
       amount: Number(this.state.chunkAmount),
-      chunksNum: Number(chunks.value)
+      num: Number(chunks.value)
     })
   }
 
   render() {
-    const { pairNames, rate, amount } = this.props
+    const { amount, rate, pairNames } = this.props
     const styles = this.getStyles()
 
     return div({ style: styles.row }, [
@@ -160,4 +164,10 @@ class ChunksAddForm extends Component {
   }
 }
 
-export default hh(ChunksAddForm)
+const mapStateToProps = ({ currencies, currentPair, wallet }) => ({
+  pairNames: currentPair.split('_'),
+  amount: wallet[currentPair.split('_')[1]],
+  rate: currencies[currentPair] && currencies[currentPair].last
+})
+
+export default hh(connect(mapStateToProps, { requestNewChunks })(ChunksAddForm))
