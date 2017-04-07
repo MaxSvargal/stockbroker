@@ -21,7 +21,7 @@ export function* buySaga(rate, hold) {
 
 export function* sellSaga(rate, hold) {
   const transactions = yield select(selectTransactions)
-  const rateWithHold = cropNumber(rate + hold)
+  const rateWithHold = cropNumber(rate - hold)
   const coverId = yield select(selectBuyForCover, rateWithHold)
   if (!coverId) return yield put(botMessage(`Продажа за ${rateWithHold} не покрывает ни одной предыдущей покупки`))
 
