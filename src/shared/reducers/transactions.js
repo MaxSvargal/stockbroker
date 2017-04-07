@@ -19,8 +19,11 @@ import { time } from './helpers'
 /* eslint import/prefer-default-export: 0 */
 export const transactions = createReducer({
   [buySuccess]: (state, { rate, amount, profit, coverId, orderNumber }) => {
-    const coveredSell = Object.assign({},
-      state[Object.keys(state).find(k => k === coverId)], { orderNumber, updated: time(), active: false })
+    const coveredSell = {
+      [state.coverId]: Object.assign({},
+        state[Object.keys(state).find(k => k === coverId)],
+        { orderNumber, updated: time(), active: false })
+    }
     const newBuy = {
       [shortid.generate()]: { rate, amount, profit, coverId, created: time(), type: 'buy', active: true }
     }
@@ -28,8 +31,11 @@ export const transactions = createReducer({
   },
 
   [sellSuccess]: (state, { rate, amount, profit, coverId, orderNumber }) => {
-    const coveredBuy = Object.assign({},
-      state[Object.keys(state).find(k => k === coverId)], { orderNumber, updated: time(), active: false })
+    const coveredBuy = {
+      [state.coverId]: Object.assign({},
+        state[Object.keys(state).find(k => k === coverId)],
+        { orderNumber, updated: time(), active: false })
+    }
     const newSell = {
       [shortid.generate()]: { rate, amount, profit, coverId, created: time(), type: 'sell', active: true }
     }
