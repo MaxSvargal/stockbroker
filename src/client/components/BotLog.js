@@ -8,27 +8,28 @@ const checkStringContain = (input, arr) =>
 
 class BotLog extends Component {
   render() {
-    const { data } = this.props
+    const { data, textColor } = this.props
     const styles = this.getStyles()
 
     return div({ style: styles.root }, data.map((item, index) =>
-      div({ style: styles.item(index, item[1]) }, `${formatDate(item[0])} ${item[1]}`)))
+      div({ style: styles.item(index, item[1], textColor) }, `${formatDate(item[0])} ${item[1]}`)))
   }
 
   getStyles() {
     return {
       root: {
         fontSize: '1.1rem',
-        lineHeight: '1.4rem'
+        lineHeight: '1.4rem',
       },
-      item: (index, str) => ({
+      item: (index, str, textColor) => ({
         padding: '.25rem .5rem',
-        borderTop: '1px solid rgba(0, 0, 0, .5)',
-        background: index % 2 ? 'transparent' : 'rgba(0, 0, 0, .2)',
+        borderTop: '1px solid rgba(0, 0, 0, .25)',
+        background: index % 2 ? 'transparent' : 'rgba(0, 0, 0, .15)',
         fontWeight: checkStringContain(str, [ 'Куплено', 'Продано', 'Ошибка' ]) ? 'bold' : 'normal',
-        color: (str.search('Куплено') !== -1 && '#f8fcf5') ||
-          (str.search('Продано') !== -1 && '#fcf7f5') ||
+        color: (str.search('Куплено') !== -1 && '#97c47e') ||
+          (str.search('Продано') !== -1 && '#de6a76') ||
           (str.search('Ошибка') !== -1 && '#ef3435') ||
+          textColor ||
           '#fff'
       })
     }

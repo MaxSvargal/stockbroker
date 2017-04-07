@@ -14,7 +14,7 @@ class SimpleMode extends Component {
       div({ style: styles.content }, [
         div({ style: styles.rate(statsResult) }, currency && currency.last),
         div({ style: styles.botLogBox }, [
-          BotLog()
+          BotLog({ textColor: statsResult >= 2 ? '#1d1034' : '#ffaf7c' })
         ])
       ])
     ])

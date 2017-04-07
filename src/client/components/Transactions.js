@@ -1,6 +1,8 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
-import { hh, div, table, tbody, tr, th, td } from 'react-hyperscript-helpers'
+import { hh, div, table, tbody, tr, th, td, button } from 'react-hyperscript-helpers'
+import { removeChunk } from 'shared/actions'
+
 import ChunksAddForm from './ChunksAddForm'
 
 const formatDate = time => {
@@ -32,7 +34,13 @@ class Transactions extends Component {
             tr({ style: styles.coloredTypedRow(type, active), key: id }, [
               td({ style: styles.col }, formatDate(updated || created)),
               td({ style: styles.col }, rate),
-              td({ style: styles.col }, amount)
+              td({ style: styles.col }, amount),
+              td({ style: { width: '3rem' } }, [
+                active && button({
+                  style: styles.removeBtn,
+                  onClick: () => this.props.removeChunk(id)
+                }, 'Удалить')
+              ])
             ]))
         ])
       ]),
@@ -89,10 +97,16 @@ class Transactions extends Component {
         display: 'flex',
         justifyContent: 'space-between',
         padding: '0 5vw'
+      },
+      removeBtn: {
+        background: '#6c2b35',
+        border: 0,
+        color: '#fff',
+        padding: '0.25rem .5rem'
       }
     }
   }
 }
 
 const mapStateToProps = ({ transactions }) => ({ transactions })
-export default hh(connect(mapStateToProps)(Transactions))
+export default hh(connect(mapStateToProps, { removeChunk })(Transactions))
