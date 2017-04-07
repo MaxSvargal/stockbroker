@@ -1,7 +1,7 @@
 import { select, put, fork, take, throttle } from 'redux-saga/effects'
 import { setCurrency, addStats, addEstimateRatio, setCurrentFinalResult, botMessage } from 'shared/actions'
 import { cropNumber } from 'server/utils'
-import { MINUTE } from 'const'
+import { FIVE_MINUTES } from 'const'
 import { buySaga, sellSaga } from './trade'
 import {
   selectSellsLastTime, selectBuysLastTime, selectCurrencyProps,
@@ -25,8 +25,8 @@ const getRateChange = arr => arr
 
 export function* generateStatsSaga() {
   const { last } = yield select(selectCurrencyProps)
-  const buys = yield select(selectBuysLastTime, MINUTE)
-  const sells = yield select(selectSellsLastTime, MINUTE)
+  const buys = yield select(selectBuysLastTime, FIVE_MINUTES)
+  const sells = yield select(selectSellsLastTime, FIVE_MINUTES)
 
   if (buys.length >= 2 && sells.length >= 2) {
     // увеличивается - курс поднимают, чем выше, тем активнее поднимают
@@ -69,12 +69,12 @@ export function* conclusionStatsSaga() {
     )[1]
 
     // (lastResult >= 2 && result <= 1)
-    if (lastResult >= 9 && result <= 9) {
+    if (lastResult >= 10 && result <= 8) {
       yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), hold)
     }
 
     // (lastResult <= -2 && result >= 0)
-    if (lastResult <= -9 && result <= -8) {
+    if (lastResult <= -10 && result >= -8) {
       yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
     }
 
