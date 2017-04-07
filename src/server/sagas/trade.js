@@ -26,7 +26,7 @@ export function* sellSaga(rate, hold) {
   if (!coverId) return yield put(botMessage(`Продажа за ${rateWithHold} не покрывает ни одной предыдущей покупки`))
 
   const covered = transactions[coverId]
-  const profit = cropNumber((covered.rate - rate) * (covered.amount - (covered.amount * 0.25)))
+  const profit = cropNumber((rate - covered.rate) * (covered.amount - (covered.amount * 0.25)))
 
   yield put(doSell({ rate, amount: covered.amount, profit, coverId }))
   const response = yield race({ success: take(sellSuccess), failure: take(sellFailure) })
