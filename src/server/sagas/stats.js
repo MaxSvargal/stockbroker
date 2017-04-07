@@ -56,31 +56,31 @@ export function* estimateStatsSaga() {
 }
 
 export function* conclusionStatsSaga() {
-  let lastResult
+  let prevResult
 
   while (true) {
     yield take(addEstimateRatio)
     const { lowestAsk, highestBid } = yield select(selectCurrencyProps)
     const hold = yield select(selectThreshold)
     const estimates = yield select(selectEstimateRatios)
-    const result = estimates.reduce((prev, curr) =>
-      (prev[0] <= curr ? [ curr, prev[1] + 1 ] : [ curr, prev[1] - 1 ]),
-      [ 0, 0 ]
-    )[1]
+    if (estimates.length >= 2) {
+      const result = estimates.reduce((prev, curr) =>
+        (prev[0] < curr ? [ curr, prev[1] + 1 ] : [ curr, prev[1] - 1 ]),
+        [ 0, 0 ]
+      )[1]
 
-    // (lastResult >= 2 && result <= 1)
-    if (lastResult >= 10 && result <= 8) {
-      yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), hold)
+      if (prevResult >= 10 && result <= 8) {
+        yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), hold)
+      }
+
+      if (prevResult <= -8 && result >= -6) {
+        yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
+      }
+
+      yield put(setCurrentFinalResult(result))
+
+      prevResult = result
     }
-
-    // (lastResult <= -2 && result >= 0)
-    if (lastResult <= -10 && result >= -8) {
-      yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
-    }
-
-    yield put(setCurrentFinalResult(result))
-
-    lastResult = result
   }
 }
 
