@@ -22,10 +22,10 @@ export const transactions = createReducer({
     const coveredSell = {
       [state.coverId]: Object.assign({},
         state[Object.keys(state).find(k => k === coverId)],
-        { orderNumber, updated: time(), active: false })
+        { orderNumber, profit, updated: time(), active: false })
     }
     const newBuy = {
-      [shortid.generate()]: { rate, amount, profit, coverId, created: time(), type: 'buy', active: true }
+      [shortid.generate()]: { rate, amount, coverId, created: time(), type: 'buy', active: true }
     }
     return Object.assign({}, state, coveredSell, newBuy)
   },
@@ -34,10 +34,10 @@ export const transactions = createReducer({
     const coveredBuy = {
       [state.coverId]: Object.assign({},
         state[Object.keys(state).find(k => k === coverId)],
-        { orderNumber, updated: time(), active: false })
+        { orderNumber, profit, updated: time(), active: false })
     }
     const newSell = {
-      [shortid.generate()]: { rate, amount, profit, coverId, created: time(), type: 'sell', active: true }
+      [shortid.generate()]: { rate, amount, coverId, created: time(), type: 'sell', active: true }
     }
     return Object.assign({}, state, coveredBuy, newSell)
   },
