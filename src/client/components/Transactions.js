@@ -1,6 +1,7 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
 import { hh, div, table, tbody, tr, th, td } from 'react-hyperscript-helpers'
+import ChunksAddForm from './ChunksAddForm'
 
 const formatDate = time => {
   const date = new Date(time)
@@ -21,6 +22,7 @@ class Transactions extends Component {
       .sort((a, b) => a.created < b.created)
 
     return div([
+      ChunksAddForm(),
       table({ style: styles.table }, [
         tbody({ style: styles.tbody }, [
           tr({ style: styles.tr }, headers.map(header =>

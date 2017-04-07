@@ -4,7 +4,7 @@ import { hh, div } from 'react-hyperscript-helpers'
 
 class FinalCurrentResult extends Component {
   render() {
-    const { statsResult } = this.props
+    const { statsResult = 0 } = this.props
     const isPositive = statsResult >= 0
     const chars = [ ...new Array(Math.abs(statsResult / 2)) ]
     const styles = this.getStyles()
