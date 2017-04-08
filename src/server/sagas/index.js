@@ -6,9 +6,9 @@ import clientActions from './clientActions'
 
 export default scServer => function* root() {
   yield [
-    fork(clientActions, scServer),
+    fork(walletSaga),
     fork(poloniexPublicSaga),
     fork(statsSaga),
-    fork(walletSaga)
+    fork(clientActions, scServer)
   ]
 }
