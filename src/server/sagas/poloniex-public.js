@@ -1,24 +1,26 @@
-import { call, take, put, fork } from 'redux-saga/effects'
-import { eventChannel } from 'redux-saga'
+import { call, take, put, fork, select, cancelled } from 'redux-saga/effects'
+import { eventChannel, END } from 'redux-saga'
 import PoloniexWSS from 'server/services/poloniex.wss'
 import { orderBookModify, orderBookRemove, newTrade, setCurrency, setCurrencyPair } from 'shared/actions'
-
-// TODO: get from store
-const { CURRENCY_PAIR } = process.env
+import { selectCurrencyPair } from './selectors'
 
 const channel = (session, topic) => eventChannel(emitter => {
   const sub = session.subscribe(topic, emitter)
+  /* eslint no-underscore-dangle: 0 */
+  /* eslint no-param-reassign: 0 */
+  session._socket.onclose = () => emitter(END)
   return () => session.unsubscribe(sub)
 })
 
 /* eslint no-unused-vars: 1 */
 function* channelUsdtDash(session) {
+  const currencyPair = yield select(selectCurrencyPair)
+  yield put(setCurrencyPair(currencyPair))
+  const chan = yield call(channel, session, currencyPair)
+
   try {
-    // const currencyPair = yield select(selectCurrentPair)
-    yield put(setCurrencyPair(CURRENCY_PAIR))
-    const currChan = yield call(channel, session, CURRENCY_PAIR)
     while (true) {
-      const data = yield take(currChan)
+      const data = yield take(chan)
       /* eslint no-restricted-syntax: 0 */
       for (const item of data) {
         if (item.data.type === 'sell' || item.data.type === 'buy') {
@@ -38,27 +40,31 @@ function* channelUsdtDash(session) {
         }
       }
     }
-  } catch (err) {
-    console.log(err)
+  } finally {
+    console.log('Poloniex connection closed for currency channel.')
+    if (yield cancelled()) chan.close()
+    yield fork(poloniexPublicSaga)
   }
 }
 
 function* channelTicker(session) {
-  try {
-    const chanTicker = yield call(channel, session, 'ticker')
-    let lastTickerValue = 0
+  const chan = yield call(channel, session, 'ticker')
+  const currencyPair = yield select(selectCurrencyPair)
+  let lastTickerValue = 0
 
+  try {
     while (true) {
-      const data = yield take(chanTicker)
-      if (data[0] === CURRENCY_PAIR) {
+      const data = yield take(chan)
+      if (data[0] === currencyPair) {
         if (data[1] !== lastTickerValue) {
           yield put(setCurrency(data))
         }
         lastTickerValue = data[1]
       }
     }
-  } catch (err) {
-    console.log(err)
+  } finally {
+    console.log('Poloniex connection closed for ticker.')
+    if (yield cancelled()) chan.close()
   }
 }
 
@@ -70,10 +76,6 @@ function* bootstrap(session) {
 }
 
 export default function* poloniexPublicSaga() {
-  try {
-    const session = yield call(PoloniexWSS)
-    yield fork(bootstrap, session)
-  } catch (err) {
-    console.log('WSS Disconnected')
-  }
+  const session = yield call(PoloniexWSS)
+  yield fork(bootstrap, session)
 }
