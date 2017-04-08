@@ -14,6 +14,8 @@ module.export = webpack(webpackConfig).run((err, stats) => {
     allowClientPublish: false,
     // generated automatically if using the Heroku deploy button
     authKey: process.env.AUTH_KEY,
+    // it receives a SIGUSR2 signal (instead of just the workers).
+    killMasterOnSignal: true,
     // this process respawns automatically on crash
     workerController: path.resolve(__dirname, '../../server/dist/worker_bundle.js'),
   })

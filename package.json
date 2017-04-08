@@ -5,13 +5,13 @@
   "author": "MaxSvargal",
   "license": "MIT",
   "scripts": {
-    "server:me": "ACCOUNT=me PORT=8081 CURRENCY_PAIR=BTC_ETH DB_PATH=./server/db/me_btc_eth node ./src/server/index.js",
-    "server:pahan": "ACCOUNT=pahan PORT=8080 CURRENCY_PAIR=BTC_DASH DB_PATH=./server/db/pahan_btc_dash node ./src/server/index.js",
-    "forever:me": "forever start -c \"npm run server:me\" ./ --killSignal=SIGTERM -w 2 -s 2",
-    "forever:pahan": "forever start -c \"npm run server:pahan\" ./ --killSignal=SIGTERM -w 2 -s 2",
+    "server:me:btc-eth": "ACCOUNT=me PORT=8081 CURRENCY_PAIR=BTC_ETH DB_PATH=./server/db/me_btc_eth forever start ./src/server/index.js --killSignal=SIGTERM",
+    "server:me:btc-xmr": "ACCOUNT=me PORT=8083 CURRENCY_PAIR=BTC_XMR DB_PATH=./server/db/me_btc_xmr forever start ./src/server/index.js --killSignal=SIGTERM",
+    "server:pahan:btc-dash": "ACCOUNT=pahan PORT=8080 CURRENCY_PAIR=BTC_DASH DB_PATH=./server/db/pahan_btc_dash forever start ./src/server/index.js --killSignal=SIGTERM",
+    "server:pahan:xmr-dash": "ACCOUNT=pahan PORT=8082 CURRENCY_PAIR=XMR_DASH DB_PATH=./server/db/pahan_xmr_dash forever start ./src/server/index.js --killSignal=SIGTERM",
     "build": "webpack --config=./webpack.config.client.prod.js",
     "start": "npm run build:me && npm run server:me",
-    "dev": "ACCOUNT=me PORT=8081 CURRENCY_PAIR=BTC_ETH DB_PATH=./server/db/dev node ./src/server/dev-index.js --inspect-workers",
+    "dev": "ACCOUNT=me PORT=8081 CURRENCY_PAIR=BTC_ETH DB_PATH=./server/db/dev node ./src/server/dev-index.js -w 2 -b 2 --inspect-workers",
     "test": "ACCOUNT=me NODE_ENV=test NODE_PATH=src nyc ava",
     "test:watch": "npm test -- --watch",
     "coverage": "nyc report --reporter=lcov --reporter=text-lcov | coveralls"
