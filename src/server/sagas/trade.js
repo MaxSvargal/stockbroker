@@ -15,6 +15,8 @@ export function* buySaga(rate, hold) {
   yield put(doBuy({ rate, amount: covered.amount, profit, coverId }))
   const response = yield race({ success: take(buySuccess), failure: take(buyFailure) })
 
+  console.log({ response })
+
   if (response.success) yield put(botMessage(`Куплено за ${rate}, покрыто ${covered.rate}, объём ${covered.amount}, прибыль ${profit}`))
   else if (response.failure) yield put(botMessage(`Покупка не удалась. Ошибка: ${response.failure.error}`))
 }
@@ -30,6 +32,8 @@ export function* sellSaga(rate, hold) {
 
   yield put(doSell({ rate, amount: covered.amount, profit, coverId }))
   const response = yield race({ success: take(sellSuccess), failure: take(sellFailure) })
+
+  console.log({ response })
 
   if (response.success) yield put(botMessage(`Продано за ${rate}, покрыто ${covered.rate}, объём ${covered.amount}, прибыль: ${profit}`))
   else if (response.failure) yield put(botMessage(`Продажа не удалась. Ошибка: ${response.failure.error}`))
