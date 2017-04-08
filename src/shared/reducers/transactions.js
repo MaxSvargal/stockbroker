@@ -20,7 +20,7 @@ import { time } from './helpers'
 export const transactions = createReducer({
   [buySuccess]: (state, { rate, amount, profit, coverId, orderNumber }) => {
     const coveredSell = {
-      [state.coverId]: Object.assign({},
+      [coverId]: Object.assign({},
         state[Object.keys(state).find(k => k === coverId)],
         { orderNumber, profit, updated: time(), active: false })
     }
@@ -32,7 +32,7 @@ export const transactions = createReducer({
 
   [sellSuccess]: (state, { rate, amount, profit, coverId, orderNumber }) => {
     const coveredBuy = {
-      [state.coverId]: Object.assign({},
+      [coverId]: Object.assign({},
         state[Object.keys(state).find(k => k === coverId)],
         { orderNumber, profit, updated: time(), active: false })
     }
