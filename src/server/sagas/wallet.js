@@ -42,7 +42,7 @@ export function* doBuySaga() {
 
       orderNumber ?
         yield put(buySuccess({ rate, amount, profit, coverId, orderNumber })) :
-        yield put(buyFailure({ rate, amount, coverId, error: error || response.payload.error }))
+        yield put(buyFailure({ rate, amount, coverId, error: error || (response && response.error) }))
     } catch (err) {
       console.log({ err })
     }
@@ -60,7 +60,7 @@ export function* doSellSaga() {
 
       orderNumber ?
         yield put(sellSuccess({ rate, amount, profit, coverId, orderNumber })) :
-        yield put(sellFailure({ rate, amount, coverId, error: error || response.payload.error }))
+        yield put(sellFailure({ rate, amount, coverId, error: error || (response && response.error) }))
     } catch (err) {
       console.log({ err })
     }
