@@ -12,9 +12,9 @@ class SimpleMode extends Component {
     return div({ style: styles.root }, [
       div({ style: styles.bgIndicator(statsResult) }),
       div({ style: styles.content }, [
-        div({ style: styles.rate(statsResult) }, currency && currency.last),
+        div({ style: styles.rate }, currency && currency.last),
         div({ style: styles.botLogBox }, [
-          BotLog({ textColor: statsResult >= 2 ? '#1d1034' : '#ffaf7c' })
+          BotLog({ textColor: '#fff' })
         ])
       ])
     ])
@@ -46,29 +46,26 @@ class SimpleMode extends Component {
         height: '100vh',
         transition: 'background 5s ease-in',
         background: (() =>
-          (result === -10 && '#3a1c71') ||
-          (result === -8 && '#422071') ||
-          (result === -6 && '#5e2f73') ||
-          (result === -4 && '#783c73') ||
-          (result === -2 && '#914974') ||
-          (result === 0 && '#b35b76') ||
-          (result === 2 && '#c96677') ||
-          (result === 4 && '#db7477') ||
-          (result === 6 && '#e68579') ||
-          (result === 8 && '#ed9279') ||
-          (result === 10 && '#ffaf7c'))()
+          (result === -10 && '#4a8fdf') ||
+          (result === -8 && '#508edd') ||
+          (result === -6 && '#5e8bd9') ||
+          (result === -4 && '#6c89d5') ||
+          (result === -2 && '#7c85d0') ||
+          (result === 0 && '#8f81ca') ||
+          (result === 2 && '#a07ec4') ||
+          (result === 4 && '#b27abf') ||
+          (result === 6 && '#c177ba') ||
+          (result === 8 && '#c875b8') ||
+          (result === 10 && '#d573b4'))()
       }),
-      rate: result => ({
+      rate: {
         fontSize: '7rem',
         lineHeight: '3rem',
         margin: '3rem 0 5rem 0',
         textAlign: 'center',
         transition: 'color 5s ease-in',
-        color: (() =>
-          (result >= 2 && '#3a1c71') ||
-          (result < 2 && '#ffaf7c')
-        )()
-      })
+        color: '#fff'
+      }
     }
   }
 }

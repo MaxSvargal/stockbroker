@@ -26,10 +26,10 @@ class BotLog extends Component {
         borderTop: '1px solid rgba(0, 0, 0, .25)',
         background: index % 2 ? 'transparent' : 'rgba(0, 0, 0, .15)',
         fontWeight: checkStringContain(str, [ 'Куплено', 'Продано', 'Ошибка' ]) ? 'bold' : 'normal',
-        color: (str.search('Куплено') !== -1 && '#97c47e') ||
+        color: textColor ||
+          (str.search('Куплено') !== -1 && '#97c47e') ||
           (str.search('Продано') !== -1 && '#de6a76') ||
           (str.search('Ошибка') !== -1 && '#ef3435') ||
-          textColor ||
           '#fff'
       })
     }
