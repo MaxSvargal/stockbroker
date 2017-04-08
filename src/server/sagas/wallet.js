@@ -1,8 +1,6 @@
 import { call, take, put, select, fork } from 'redux-saga/effects'
 import Poloniex from 'server/services/poloniex'
-
 import { selectCurrencyPair, selectCurrencyPairSplited } from 'server/sagas/selectors'
-
 import {
   addChunks,
   botMessage,
@@ -13,11 +11,16 @@ import {
   requestNewChunks,
   sellFailure,
   sellSuccess,
+  setCurrencyPair,
   updateWallet
 } from 'shared/actions'
 
-const { ACCOUNT: { key, secret } } = process.env
+const { CURRENCY_PAIR, ACCOUNT: { key, secret } } = process.env
 export const poloniex = new Poloniex({ key, secret })
+
+export function* setCurrencyPairSaga() {
+  yield put(setCurrencyPair(CURRENCY_PAIR))
+}
 
 export function* watchForNewChunks() {
   while (true) {
@@ -98,6 +101,7 @@ export function* getWallet() {
 
 export default function* walletSaga() {
   yield [
+    fork(setCurrencyPairSaga),
     fork(getWallet),
     fork(watchForNewChunks),
     // fork(calculateFreeValues),

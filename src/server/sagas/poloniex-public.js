@@ -1,7 +1,7 @@
 import { call, take, put, fork, select, cancelled } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
 import PoloniexWSS from 'server/services/poloniex.wss'
-import { orderBookModify, orderBookRemove, newTrade, setCurrency, setCurrencyPair } from 'shared/actions'
+import { orderBookModify, orderBookRemove, newTrade, setCurrency } from 'shared/actions'
 import { selectCurrencyPair } from './selectors'
 
 const channel = (session, topic) => eventChannel(emitter => {
@@ -15,7 +15,6 @@ const channel = (session, topic) => eventChannel(emitter => {
 /* eslint no-unused-vars: 1 */
 function* channelUsdtDash(session) {
   const currencyPair = yield select(selectCurrencyPair)
-  yield put(setCurrencyPair(currencyPair))
   const chan = yield call(channel, session, currencyPair)
 
   try {
@@ -48,8 +47,8 @@ function* channelUsdtDash(session) {
 }
 
 function* channelTicker(session) {
-  const chan = yield call(channel, session, 'ticker')
   const currencyPair = yield select(selectCurrencyPair)
+  const chan = yield call(channel, session, 'ticker')
   let lastTickerValue = 0
 
   try {
