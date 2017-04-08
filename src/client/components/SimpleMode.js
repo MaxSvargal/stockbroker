@@ -6,12 +6,13 @@ import BotLog from './BotLog'
 
 class SimpleMode extends Component {
   render() {
-    const { statsResult, currency } = this.props
+    const { statsResult, currentPair, currency } = this.props
     const styles = this.getStyles()
 
     return div({ style: styles.root }, [
       div({ style: styles.bgIndicator(statsResult) }),
       div({ style: styles.content }, [
+        div({ style: styles.pair }, currentPair),
         div({ style: styles.rate }, currency && currency.last),
         div({ style: styles.botLogBox }, [
           BotLog({ textColor: '#fff' })
@@ -23,7 +24,11 @@ class SimpleMode extends Component {
   getStyles() {
     return {
       root: {
-        padding: '5vh 5vw'
+        padding: '3vh 5vw',
+        height: 'calc(100vh - 43px)',
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+        position: 'relative'
       },
       content: {
         position: 'relative',
@@ -37,26 +42,15 @@ class SimpleMode extends Component {
         height: '60vh',
         overflowY: 'scroll'
       },
-      bgIndicator: result => ({
+      bgIndicator: state => ({
         position: 'absolute',
         zIndex: 1,
-        top: 0,
         left: 0,
         width: '100vw',
-        height: '100vh',
-        transition: 'background 5s ease-in',
-        background: (() =>
-          (result === -10 && '#4a8fdf') ||
-          (result === -8 && '#508edd') ||
-          (result === -6 && '#5e8bd9') ||
-          (result === -4 && '#6c89d5') ||
-          (result === -2 && '#7c85d0') ||
-          (result === 0 && '#8f81ca') ||
-          (result === 2 && '#a07ec4') ||
-          (result === 4 && '#b27abf') ||
-          (result === 6 && '#c177ba') ||
-          (result === 8 && '#c875b8') ||
-          (result === 10 && '#d573b4'))()
+        height: '200vh',
+        transition: 'top 5s',
+        top: `${(state * 5) - 68}%`,
+        background: 'linear-gradient(#ffaf7b, #d76d77, #3a1c71)'
       }),
       rate: {
         fontSize: '7rem',
@@ -65,12 +59,18 @@ class SimpleMode extends Component {
         textAlign: 'center',
         transition: 'color 5s ease-in',
         color: '#fff'
+      },
+      pair: {
+        textAlign: 'center',
+        fontSize: '2rem',
+        margin: 0,
+        fontWeight: 'bold'
       }
     }
   }
 }
 
 const mapStateToProps = ({ statsResult, currencies, currentPair }) =>
-  ({ statsResult, currency: currencies[currentPair] })
+  ({ statsResult, currentPair, currency: currencies[currentPair] })
 
 export default hh(connect(mapStateToProps)(SimpleMode))
