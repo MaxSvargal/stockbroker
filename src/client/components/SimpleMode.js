@@ -25,7 +25,7 @@ class SimpleMode extends Component {
     return {
       root: {
         padding: '3vh 5vw',
-        height: 'calc(100vh - 43px)',
+        height: 'calc(100vh - 2.5rem)',
         boxSizing: 'border-box',
         overflow: 'hidden',
         position: 'relative'
@@ -47,9 +47,9 @@ class SimpleMode extends Component {
         zIndex: 1,
         left: 0,
         width: '100vw',
-        height: '200vh',
+        height: '300vh',
         transition: 'top 5s',
-        top: `${(state * 5) - 68}%`,
+        top: `${(state * 9) - 130}vh`,
         background: 'linear-gradient(#ffaf7b, #d76d77, #3a1c71)'
       }),
       rate: {

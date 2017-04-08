@@ -43,6 +43,7 @@ class App extends Component {
         background: '#303030',
         borderBottom: '1px solid #0e0f10',
         position: 'relative',
+        height: '2.5rem',
         zIndex: 3
       },
       link: {
