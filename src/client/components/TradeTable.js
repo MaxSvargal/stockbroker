@@ -12,15 +12,13 @@ class TradeTable extends Component {
 }
 
 const mapStateToProps = ({ buy, sell, currentPair }) => {
-  const partOfSells = sell
-    .slice(sell.length - 250, sell.length - 1)
-    .map(v => Object.defineProperty(v, 'type', { value: 'sell', enumerable: false }))
+  const partOfSells = sell.map(v =>
+    Object.defineProperty(v, 'type', { value: 'sell', enumerable: false }))
 
-  const partOfBuys = buy
-    .slice(buy.length - 250, buy.length - 1)
-    .map(v => Object.defineProperty(v, 'type', { value: 'buy', enumerable: false }))
+  const partOfBuys = buy.map(v =>
+    Object.defineProperty(v, 'type', { value: 'buy', enumerable: false }))
 
-  const mergedArrays = [ ...partOfSells, ...partOfBuys ].sort().reverse()
+  const mergedArrays = [ ...partOfSells, ...partOfBuys ].sort((a, b) => a[0] < b[0])
 
   return { data: mergedArrays, currentPair }
 }
