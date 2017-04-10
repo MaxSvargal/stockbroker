@@ -7,7 +7,7 @@ export function* buySaga(rate, hold) {
   const transactions = yield select(selectTransactions)
   const rateWithHold = cropNumber(rate + hold)
   const coverId = yield select(selectSellForCover, rateWithHold)
-  if (!coverId) return yield put(botMessage(`Покупка за ${rateWithHold} не покрывает ни одной предыдущей продажи`))
+  if (!coverId) return yield put(botMessage(`Покупка за ${rateWithHold} не покрывает ни одной продажи`))
 
   const covered = transactions[coverId]
   const profit = cropNumber((covered.rate - rate) * (covered.amount - (covered.amount * 0.25)))
@@ -23,7 +23,7 @@ export function* sellSaga(rate, hold) {
   const transactions = yield select(selectTransactions)
   const rateWithHold = cropNumber(rate - hold)
   const coverId = yield select(selectBuyForCover, rateWithHold)
-  if (!coverId) return yield put(botMessage(`Продажа за ${rateWithHold} не покрывает ни одной предыдущей покупки`))
+  if (!coverId) return yield put(botMessage(`Продажа за ${rateWithHold} не покрывает ни одной покупки`))
 
   const covered = transactions[coverId]
   const profit = cropNumber((rate - covered.rate) * (covered.amount - (covered.amount * 0.25)))

@@ -22,7 +22,8 @@ class BotLog extends Component {
         lineHeight: '1.4rem',
       },
       item: (index, str, textColor) => ({
-        padding: '.25rem .5rem',
+        lineHeight: '2rem',
+        padding: '.5rem 1rem',
         borderTop: '1px solid rgba(0, 0, 0, .25)',
         background: index % 2 ? 'transparent' : 'rgba(0, 0, 0, .15)',
         fontWeight: checkStringContain(str, [ 'Куплено', 'Продано', 'Ошибка' ]) ? 'bold' : 'normal',
@@ -37,6 +38,6 @@ class BotLog extends Component {
 }
 
 const mapStateToProps = ({ botMessages }) =>
-  ({ data: botMessages.slice().reverse().slice(0, 200) })
+  ({ data: botMessages.slice().reverse().slice(0, 1000) })
 
 export default hh(connect(mapStateToProps)(BotLog))

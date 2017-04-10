@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import { h, hh, div, span } from 'react-hyperscript-helpers'
+import { h, hh, div, span, style } from 'react-hyperscript-helpers'
 import { NavLink, Route, Switch } from 'react-router-dom'
 
 import SimpleMode from './SimpleMode'
@@ -12,6 +12,10 @@ class App extends Component {
     const styles = this.getStyles()
 
     return div({ style: styles.root }, [
+      style(`@fontface {
+        font-family: "Courier_New";
+        src: url("Courier_New.woff") format("woff"), url("Courier_New.ttf") format("truetype");
+      }`),
       div({ style: styles.linksBox }, [
         h(NavLink, { to: '/', style: styles.link, exact: true, activeStyle: styles.activeLink }, [ span('Минимум') ]),
         h(NavLink, { to: '/full', style: styles.link, activeStyle: styles.activeLink }, [ span('Отслеживание') ]),

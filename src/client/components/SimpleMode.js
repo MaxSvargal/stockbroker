@@ -39,7 +39,7 @@ class SimpleMode extends Component {
         justifyContent: 'center',
         minWidth: '80vw',
         maxWidth: '90vw',
-        height: '60vh',
+        height: '75vh',
         overflowY: 'scroll'
       },
       bgIndicator: state => ({
@@ -53,8 +53,8 @@ class SimpleMode extends Component {
         background: 'linear-gradient(#ffaf7b, #d76d77, #3a1c71)'
       }),
       rate: {
-        fontSize: '7rem',
-        lineHeight: '3rem',
+        fontSize: '9rem',
+        lineHeight: '5rem',
         margin: '3rem 0 5rem 0',
         textAlign: 'center',
         transition: 'color 5s ease-in',
