@@ -55,15 +55,15 @@ function* channelTicker(session) {
     while (true) {
       const data = yield take(chan)
       if (data[0] === currencyPair) {
-        if (data[1] !== lastTickerValue) {
+        if (data[1] !== lastTickerValue)
           yield put(setCurrency(data))
-        }
         lastTickerValue = data[1]
       }
     }
   } finally {
     console.log('Poloniex connection closed for ticker.')
     if (yield cancelled()) chan.close()
+    yield fork(poloniexPublicSaga)
   }
 }
 
