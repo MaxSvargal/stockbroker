@@ -63,6 +63,9 @@ export function* conclusionStatsSaga() {
     const { lowestAsk, highestBid } = yield select(selectCurrencyProps)
     const hold = yield select(selectThreshold)
     const estimates = yield select(selectEstimateRatios)
+
+    console.log(estimates)
+
     if (estimates.length >= 2) {
       const result = estimates.reduce((prev, curr) =>
         (prev[0] < curr ? [ curr, prev[1] + 1 ] : [ curr, prev[1] - 1 ]),
