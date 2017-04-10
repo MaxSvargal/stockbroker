@@ -18,8 +18,7 @@ const mapStateToProps = ({ buy, sell, currentPair }) => {
   const partOfBuys = buy.map(v =>
     Object.defineProperty(v, 'type', { value: 'buy', enumerable: false }))
 
-  const mergedArrays = [ ...partOfSells, ...partOfBuys ]
-  mergedArrays.sort((a, b) => a[0] < b[0])
+  const mergedArrays = [ ...partOfSells, ...partOfBuys ].sort((a, b) => b[0] - a[0])
 
   return { data: mergedArrays, currentPair }
 }
