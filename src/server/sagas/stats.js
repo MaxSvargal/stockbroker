@@ -69,11 +69,8 @@ export function* conclusionStatsSaga() {
         [ 0, 0 ]
       )[1]
 
-      if (prevResult >= 10 && result <= 8) {
+      if ((prevResult >= 10 && result <= 8) && (prevResult <= -8 && result >= -6)) {
         yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), hold)
-      }
-
-      if (prevResult <= -8 && result >= -6) {
         yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
       }
 
