@@ -29,7 +29,7 @@ export function* watchForNewChunks() {
 
     yield put(addChunks({ type, num, rate, amount }))
     yield put(botMessage(`
-      Созданы ${type === 'buy' ? 'покупки' : 'продажи'} в количестве ${num} частей по ${amount} ${currency}
+      Созданы ${type === 'buy' ? 'покупки' : 'продажи'} за ${rate} в количестве ${num} частей по ${amount} ${currency}
     `))
   }
 }

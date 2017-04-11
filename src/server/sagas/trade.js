@@ -1,13 +1,16 @@
 import { take, select, put, race } from 'redux-saga/effects'
 import { cropNumber } from 'server/utils'
-import { doBuy, doSell, botMessage, buySuccess, buyFailure, sellSuccess, sellFailure } from 'shared/actions'
+import { doBuy, doSell, botMessage, buySuccess, buyFailure, sellSuccess, sellFailure, requestNewChunks } from 'shared/actions'
 import { selectSellForCover, selectBuyForCover, selectTransactions } from './selectors'
 
 export function* buySaga(rate, hold) {
   const transactions = yield select(selectTransactions)
   const rateWithHold = cropNumber(rate + hold)
   const coverId = yield select(selectSellForCover, rateWithHold)
-  if (!coverId) return yield put(botMessage(`Покупка за ${rateWithHold} не покрывает ни одной продажи`))
+  if (!coverId) {
+    yield put(botMessage(`Покупка за ${rateWithHold} не покрывает ни одной продажи`))
+    return yield put(requestNewChunks({ rate, amount: 0.05, num: 1, type: 'buy' }))
+  }
 
   const covered = transactions[coverId]
   const profit = cropNumber((covered.rate - rate) * (covered.amount - (covered.amount * 0.25)))
@@ -23,7 +26,10 @@ export function* sellSaga(rate, hold) {
   const transactions = yield select(selectTransactions)
   const rateWithHold = cropNumber(rate - hold)
   const coverId = yield select(selectBuyForCover, rateWithHold)
-  if (!coverId) return yield put(botMessage(`Продажа за ${rateWithHold} не покрывает ни одной покупки`))
+  if (!coverId) {
+    yield put(botMessage(`Продажа за ${rateWithHold} не покрывает ни одной покупки`))
+    return yield put(requestNewChunks({ rate, amount: 0.05, num: 1, type: 'sell' }))
+  }
 
   const covered = transactions[coverId]
   const profit = cropNumber((rate - covered.rate) * (covered.amount - (covered.amount * 0.25)))

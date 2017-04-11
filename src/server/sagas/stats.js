@@ -68,41 +68,17 @@ export function* estimateStatsSaga() {
       const lowestAsk = lastTenStats[9][3]
       const highestBid = lastTenStats[9][4]
 
-      console.log({ buysDyn, sellsDyn })
-      console.log({ lowestAsk, highestBid })
+      // console.log({ buysDyn, sellsDyn })
+      // console.log({ lowestAsk, highestBid })
 
-      // buysDyn растёт - lowestAsk уменьшается
-      // buysDyn падает - lowestAsk увеличивается
-      // buysDyn падает - курс увеличивается
-      // sellsDyn растёт - highestBid растёт
-
-      // sellsDyn растёт - цена продажи растёт, ждать пика и продавать
-      // buysDyn растёт - цена покупки растёт, ждать пика и продавать
-
-      if (sellsDyn > prevSellsDyn && buysDyn >= prevBuysDyn && sellsDyn >= 0)
+      if (sellsDyn > prevSellsDyn && buysDyn >= prevBuysDyn)
         yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), hold)
 
-      if (buysDyn < prevBuysDyn && sellsDyn <= prevSellsDyn && buysDyn <= 0)
+      if (sellsDyn < prevSellsDyn && buysDyn <= prevBuysDyn)
         yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
-
-      // if (sellsDyn > prevSellsDyn && (sellsDyn >= 5 || buysDyn <= -5 || sellsDyn >= buysDyn + 4))
-      //   yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), hold)
-      //
-      // if (buysDyn > prevBuysDyn && (buysDyn >= 5 || sellsDyn <= -5 || buysDyn >= sellsDyn + 4))
-      //   yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
 
       prevBuysDyn = buysDyn
       prevSellsDyn = sellsDyn
-
-      // if (buysDyn <= 7 && buysDyn <= buysDyn + 2) console.log('отр. покупаем за ', lastTenStats[9][3])
-
-      // TODO считать покупку по падению цены по покупке
-      // TODO считать продажу по падению цены по продаже
-      // const buyChangeFinal = lastTenStats.map(v => v[1]).reduce((a, b) => a * b)
-      // const sellChangeFinal = lastTenStats.map(v => v[2]).reduce((a, b) => a * b)
-      // const finalRatio = sellChangeFinal / buyChangeFinal
-
-      // console.log({ buyChangeFinal, sellChangeFinal })
 
       // yield put(addEstimateRatio(finalRatio))
     }
