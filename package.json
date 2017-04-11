@@ -14,6 +14,7 @@
     "server:pahan:btc-dash": "ACCOUNT=pahan PORT=8081 CURRENCY_PAIR=BTC_DASH DB_PATH=./server/db/pahan_btc_dash node ./src/server/index.js",
     "server:pahan:btc-xmr": "ACCOUNT=pahan PORT=8082 CURRENCY_PAIR=BTC_XMR DB_PATH=./server/db/pahan_btc_zmr node ./src/server/index.js",
     "server:pahan:btc-zec": "ACCOUNT=pahan PORT=8083 CURRENCY_PAIR=BTC_ZEC DB_PATH=./server/db/pahan_btc_zec node ./src/server/index.js",
+    "server:pahan:usdt-dash": "ACCOUNT=pahan PORT=8084 CURRENCY_PAIR=USDT_DASH DB_PATH=./server/db/pahan_usdt_dash node ./src/server/index.js",
     "forever:me:btc-eth": "forever start -c \"npm run server:me:btc-eth\" ./ --killSignal=SIGTERM",
     "forever:me:btc-dash": "forever start -c \"npm run server:me:btc-dash\" ./ --killSignal=SIGTERM",
     "forever:me:btc-xmr": "forever start -c \"npm run server:me:btc-xmr\" ./ --killSignal=SIGTERM",
@@ -22,6 +23,7 @@
     "forever:pahan:btc-dash": "forever start -c \"npm run server:pahan:btc-dash\" ./ --killSignal=SIGTERM",
     "forever:pahan:btc-xmr": "forever start -c \"npm run server:pahan:btc-xmr\" ./ --killSignal=SIGTERM",
     "forever:pahan:btc-zec": "forever start -c \"npm run server:pahan:btc-zec\" ./ --killSignal=SIGTERM",
+    "forever:pahan:usdt-dash": "forever start -c \"npm run server:pahan:usdt-dash\" ./ --killSignal=SIGTERM",
     "forever:all": "npm run forever:me:btc-eth && npm run forever:me:btc-dash && npm run forever:me:btc-xmr && npm run forever:me:btc-zec && npm run forever:pahan:btc-eth && npm run forever:pahan:btc-dash && npm run forever:pahan:btc-xmr && npm run forever:pahan:btc-zec",
     "build": "webpack --config=./webpack.config.client.prod.js",
     "start": "npm run build:me && npm run server:me",
@@ -43,6 +45,7 @@
   "dependencies": {
     "autobahn": "^0.11.2",
     "bignumber.js": "^4.0.0",
+    "chokidar": "^1.6.1",
     "crypto-js": "^3.1.9-1",
     "debounce": "^1.0.0",
     "deep-equal": "^1.0.1",

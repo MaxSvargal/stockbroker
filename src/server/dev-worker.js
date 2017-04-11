@@ -13,7 +13,7 @@ export const run = worker => {
 
   const { httpServer, scServer } = worker
   const app = express()
-  const pouchDB = new PouchDB('./server/db/dev', { adapter: 'leveldb' })
+  const pouchDB = new PouchDB('./server/db/dev', { adapter: 'leveldb', revs_limit: 1, auto_compaction: true })
   const store = createStore(scServer, pouchDB)
   const compiler = webpack(webpackConfig)
 

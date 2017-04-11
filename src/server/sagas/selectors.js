@@ -55,3 +55,6 @@ export const selectLastTenStats = state =>
 
 export const selectEstimateRatios = state =>
   state.statsEstimates.slice(state.statsEstimates.length - 11, state.statsEstimates.length - 1)
+
+export const selectLastEstimateRatios = state =>
+  state.statsEstimates.slice(state.statsEstimates.length - 3, state.statsEstimates.length)

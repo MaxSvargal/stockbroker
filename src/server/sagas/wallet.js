@@ -40,7 +40,8 @@ export function* doBuySaga() {
       const { payload: { rate, amount, profit, coverId } } = yield take(doBuy)
       const currencyPair = yield select(selectCurrencyPair)
       const options = { command: 'buy', currencyPair, rate, amount }
-      const { response, error } = yield call(poloniex.privateRequest, options)
+      // const { response, error } = yield call(poloniex.privateRequest, options)
+      const { response, error } = { response: { orderNumber: 777 } }
       const orderNumber = response && response.orderNumber
 
       orderNumber ?
@@ -58,7 +59,8 @@ export function* doSellSaga() {
       const { payload: { rate, amount, profit, coverId } } = yield take(doSell)
       const currencyPair = yield select(selectCurrencyPair)
       const options = { command: 'sell', currencyPair, rate, amount }
-      const { response, error } = yield call(poloniex.privateRequest, options)
+      // const { response, error } = yield call(poloniex.privateRequest, options)
+      const { response, error } = { response: { orderNumber: 777 } }
       const orderNumber = response && response.orderNumber
 
       orderNumber ?

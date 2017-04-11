@@ -28,7 +28,8 @@
     "no-use-before-define": "off",
     "no-constant-condition": ["error", { "checkLoops": false }],
     "semi": [1, "never"],
-    "max-len": [1, 110]
+    "max-len": [1, 110],
+    "curly": [2, "multi-or-nest" ]
   },
   "plugins": [
     "ava",

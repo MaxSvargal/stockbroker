@@ -21,8 +21,5 @@ export const statsResult = createReducer({
 }, 0)
 
 export const botMessages = createReducer({
-  [botMessage]: (state, msg) =>
-    msg !== state[state.length - 1][1] ?
-      [ ...state, [ time(), msg ] ] :
-      state
+  [botMessage]: (state, msg) => [ ...state, [ time(), msg ] ]
 }, [ [ time(), 'Initiated' ] ])

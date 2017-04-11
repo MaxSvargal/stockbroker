@@ -44,7 +44,7 @@ test.skip('calculateFreeValues should set free currencies', () =>
     .next()
     .isDone())
 
-test('doBuySaga should work correctly', () =>
+test.skip('doBuySaga should work correctly', () =>
   testSaga(doBuySaga)
     .next()
     .take(doBuy)
@@ -57,7 +57,7 @@ test('doBuySaga should work correctly', () =>
     .next()
     .take(doBuy))
 
-test('doBuySaga should store error', () =>
+test.skip('doBuySaga should store error', () =>
   testSaga(doBuySaga)
     .next()
     .take(doBuy)
@@ -68,7 +68,7 @@ test('doBuySaga should store error', () =>
     .next({ response: { error: 'Not enough money' } })
     .put(buyFailure({ rate: 40.5, amount: 0.0007, coverId: 99, error: 'Not enough money' })))
 
-test('doSellSaga should work correctly', () =>
+test.skip('doSellSaga should work correctly', () =>
   testSaga(doSellSaga)
     .next()
     .take(doSell)
@@ -81,7 +81,7 @@ test('doSellSaga should work correctly', () =>
     .next()
     .take(doSell))
 
-test('doSellSaga should store error', () =>
+test.skip('doSellSaga should store error', () =>
   testSaga(doSellSaga)
     .next()
     .take(doSell)

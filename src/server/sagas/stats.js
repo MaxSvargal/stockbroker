@@ -5,7 +5,7 @@ import { FIVE_MINUTES } from 'const'
 import { buySaga, sellSaga } from './trade'
 import {
   selectSellsLastTime, selectBuysLastTime, selectCurrencyProps,
-  selectEstimateRatios, selectLastTenStats, selectThreshold
+  selectLastEstimateRatios, selectLastTenStats, selectThreshold
 } from './selectors'
 
 const getRate = i => i[1]
@@ -36,21 +36,75 @@ export function* generateStatsSaga() {
     const sellChange = getRateChange(sells)
 
     const currentRate = Number(last)
+    const lowestAsk = Number(buys[buys.length - 1][1])
+    const highestBid = Number(sells[sells.length - 1][1])
 
-    yield put(addStats([ currentRate, buyChange, sellChange ]))
+    yield put(addStats([ currentRate, buyChange, sellChange, lowestAsk, highestBid ]))
   }
 }
 
 export function* estimateStatsSaga() {
+  let prevBuysDyn
+  let prevSellsDyn
+
   while (true) {
     yield take(addStats)
     const lastTenStats = yield select(selectLastTenStats)
+    const hold = yield select(selectThreshold)
 
     if (lastTenStats.length >= 10) {
-      const buyChangeFinal = lastTenStats.map(v => v[1]).reduce((a, b) => a * b)
-      const sellChangeFinal = lastTenStats.map(v => v[2]).reduce((a, b) => a * b)
-      const finalRatio = sellChangeFinal / buyChangeFinal
-      yield put(addEstimateRatio(finalRatio))
+      const calcDynamic = arr => {
+        let result = 0
+        arr.reduce((prev, curr) => {
+          result = prev <= curr ? result + 1 : result - 1
+          return curr
+        })
+        return result
+      }
+
+      const buysDyn = calcDynamic(lastTenStats.map(v => v[1]))
+      const sellsDyn = calcDynamic(lastTenStats.map(v => v[2]))
+
+      const lowestAsk = lastTenStats[9][3]
+      const highestBid = lastTenStats[9][4]
+
+      console.log({ buysDyn, sellsDyn })
+      console.log({ lowestAsk, highestBid })
+
+      // buysDyn растёт - lowestAsk уменьшается
+      // buysDyn падает - lowestAsk увеличивается
+      // buysDyn падает - курс увеличивается
+      // sellsDyn растёт - highestBid растёт
+
+      // sellsDyn растёт - цена продажи растёт, ждать пика и продавать
+      // buysDyn растёт - цена покупки растёт, ждать пика и продавать
+
+      if (sellsDyn > prevSellsDyn && buysDyn >= prevBuysDyn && sellsDyn >= 0)
+        yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), hold)
+
+      if (buysDyn < prevBuysDyn && sellsDyn <= prevSellsDyn && buysDyn <= 0)
+        yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
+
+      // if (sellsDyn > prevSellsDyn && (sellsDyn >= 5 || buysDyn <= -5 || sellsDyn >= buysDyn + 4))
+      //   yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), hold)
+      //
+      // if (buysDyn > prevBuysDyn && (buysDyn >= 5 || sellsDyn <= -5 || buysDyn >= sellsDyn + 4))
+      //   yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
+
+      prevBuysDyn = buysDyn
+      prevSellsDyn = sellsDyn
+
+      // if (buysDyn <= 7 && buysDyn <= buysDyn + 2) console.log('отр. покупаем за ', lastTenStats[9][3])
+
+      // TODO считать покупку по падению цены по покупке
+      // TODO считать продажу по падению цены по продаже
+      // const buyChangeFinal = lastTenStats.map(v => v[1]).reduce((a, b) => a * b)
+      // const sellChangeFinal = lastTenStats.map(v => v[2]).reduce((a, b) => a * b)
+      // const finalRatio = sellChangeFinal / buyChangeFinal
+
+      // console.log({ buyChangeFinal, sellChangeFinal })
+
+      // yield put(addEstimateRatio(finalRatio))
     }
   }
 }
@@ -62,24 +116,32 @@ export function* conclusionStatsSaga() {
     yield take(addEstimateRatio)
     const { lowestAsk, highestBid } = yield select(selectCurrencyProps)
     const hold = yield select(selectThreshold)
-    const estimates = yield select(selectEstimateRatios)
+    const estimates = yield select(selectLastEstimateRatios)
 
-    console.log(estimates)
+    // console.log(estimates)
 
-    if (estimates.length >= 2) {
-      const result = estimates.reduce((prev, curr) =>
-        (prev[0] < curr ? [ curr, prev[1] + 1 ] : [ curr, prev[1] - 1 ]),
-        [ 0, 0 ]
-      )[1]
+    if (estimates.length >= 3) {
+      // const result = estimates.reduce((prev, curr, index) =>
+      //   (prev[0] < curr ? [ curr, prev[1] + 1 ] : [ curr, prev[1] - 1 ]))
 
-      if ((prevResult >= 10 && result <= 8) || (prevResult <= -8 && result >= -6)) {
-        yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), hold)
-        yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
-      }
+      // if (estimates[0] > estimates[1] && estimates[1] > estimates[2])
+      //   console.log('курс понижается', lowestAsk)
+      //
+      // if (estimates[0] < estimates[1] && estimates[1] < estimates[2])
+      //   console.log('курс повышается', highestBid)
+      //
+      // console.log(estimates[2] - estimates[1] - estimates[0])
 
-      yield put(setCurrentFinalResult(result))
+      //   yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
 
-      prevResult = result
+      // if ((prevResult >= 10 && result <= 8) || (prevResult <= -8 && result >= -6)) {
+      //   yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), hold)
+      //   yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
+      // }
+
+      // yield put(setCurrentFinalResult(result))
+
+      // prevResult = result
     }
   }
 }

@@ -11,7 +11,7 @@ const handleRender = store => (req, res) => {
 
   const html = renderToString(
     h(Provider, { store }, [
-      h(Router, { context }, [
+      h(Router, { context, location: req.url }, [
         App()
       ])
     ]))
