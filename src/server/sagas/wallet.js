@@ -28,9 +28,7 @@ export function* watchForNewChunks() {
     const [ , currency ] = yield select(selectCurrencyPairSplited)
 
     yield put(addChunks({ type, num, rate, amount }))
-    yield put(botMessage(`
-      Созданы ${type === 'buy' ? 'покупки' : 'продажи'} за ${rate} в количестве ${num} частей по ${amount} ${currency}
-    `))
+    yield put(botMessage(`Созданы ${type === 'buy' ? 'покупки' : 'продажи'} за ${rate} в количестве ${num} частей по ${amount} ${currency}`))
   }
 }
 

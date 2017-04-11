@@ -37,7 +37,9 @@ class BotLog extends Component {
   }
 }
 
-const mapStateToProps = ({ botMessages }) =>
-  ({ data: botMessages.slice(botMessages.length - 500, botMessages.length).reverse() })
+const mapStateToProps = ({ botMessages }) => {
+  console.log({ botMessages })
+  return ({ data: botMessages.slice(botMessages.length - 1000, botMessages.length).reverse() })
+}
 
 export default hh(connect(mapStateToProps)(BotLog))

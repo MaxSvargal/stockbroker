@@ -1,7 +1,7 @@
 import { eventChannel } from 'redux-saga'
 import { fork, call, take, put } from 'redux-saga/effects'
 import socketCluster from 'socketcluster-client'
-import { setThreshold, requestNewChunks, removeChunk } from 'shared/actions'
+import { setThreshold, requestNewChunks, removeChunk, sellSuccess, buySuccess } from 'shared/actions'
 
 const port = process.env.NODE_ENV === 'development' ? 8081 : window.location.port
 
@@ -15,7 +15,7 @@ const changeStateChannel = () => eventChannel(emitter => {
 
 function* serverActionsSaga() {
   const chan = yield call(changeStateChannel)
-  const filtered = [ setThreshold, requestNewChunks, removeChunk ]
+  const filtered = [ setThreshold, requestNewChunks, removeChunk, sellSuccess, buySuccess ]
   const isInFiltered = type => filtered.find(action => action.toString() === type)
 
   try {
