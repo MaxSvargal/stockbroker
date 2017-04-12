@@ -25,10 +25,10 @@ export function* setCurrencyPairSaga() {
 export function* watchForNewChunks() {
   while (true) {
     const { payload: { type, num, rate, amount } } = yield take(requestNewChunks)
-    const [ , currency ] = yield select(selectCurrencyPairSplited)
+    // const [ , currency ] = yield select(selectCurrencyPairSplited)
 
     yield put(addChunks({ type, num, rate, amount }))
-    yield put(botMessage(`Созданы ${type === 'buy' ? 'покупки' : 'продажи'} за ${rate} в количестве ${num} частей по ${amount} ${currency}`))
+    // yield put(botMessage(`Созданы ${type === 'buy' ? 'покупки' : 'продажи'} за ${rate} в количестве ${num} частей по ${amount} ${currency}`))
   }
 }
 
@@ -38,8 +38,8 @@ export function* doBuySaga() {
       const { payload: { rate, amount, profit, coverId } } = yield take(doBuy)
       const currencyPair = yield select(selectCurrencyPair)
       const options = { command: 'buy', currencyPair, rate, amount }
-      // const { response, error } = yield call(poloniex.privateRequest, options)
-      const { response, error } = { response: { orderNumber: 777 } }
+      const { response, error } = yield call(poloniex.privateRequest, options)
+      // const { response, error } = { response: { orderNumber: 777 } }
       const orderNumber = response && response.orderNumber
 
       orderNumber ?
@@ -57,8 +57,8 @@ export function* doSellSaga() {
       const { payload: { rate, amount, profit, coverId } } = yield take(doSell)
       const currencyPair = yield select(selectCurrencyPair)
       const options = { command: 'sell', currencyPair, rate, amount }
-      // const { response, error } = yield call(poloniex.privateRequest, options)
-      const { response, error } = { response: { orderNumber: 777 } }
+      const { response, error } = yield call(poloniex.privateRequest, options)
+      // const { response, error } = { response: { orderNumber: 777 } }
       const orderNumber = response && response.orderNumber
 
       orderNumber ?
