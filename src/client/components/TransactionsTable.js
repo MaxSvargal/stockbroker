@@ -22,7 +22,7 @@ class TransactionsTable extends Component {
       // NaN bug fix
       // TODO: remove after drop db
       .filter(obj => Boolean(obj.created) && !obj.removed)
-      .sort((a, b) => (a.updated || a.created) < (b.updated || b.created))
+      .sort((a, b) => b.created - a.created)
 
     return div([
       table({ style: styles.table }, [
