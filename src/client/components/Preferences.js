@@ -1,29 +1,15 @@
 import { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
-import debounce from 'debounce'
-import { hh, div, input, label } from 'react-hyperscript-helpers'
-import { setThreshold } from 'shared/actions'
+import { hh, div } from 'react-hyperscript-helpers'
+import { setProfitThreshold, setObsoleteThreshold, setAutocreatedChunkAmount } from 'shared/actions'
+
+import InputNumber from './InputNumber'
 
 class Preferences extends Component {
   constructor(props) {
     super(props)
-    this.refers = {}
-    this.state = {
-      sellChunkAmount: 0,
-      buyChunkAmount: 0,
-      flashBg: false,
-      showBuyForm: true
-    }
-    this.changeThreshold = debounce(props.setThreshold, 500)
-  }
-
-  shouldComponentUpdate(props) {
-    return props.currency.highestBid !== this.props.currency.highestBid
-  }
-
-  onThresholdChange(e) {
-    this.changeThreshold(Number(e.target.value))
+    this.state = { flashBg: false }
   }
 
   flashBackground() {
@@ -31,60 +17,37 @@ class Preferences extends Component {
     setTimeout(() => this.setState({ flashBg: false }), 200)
   }
 
-  sendSells(data) {
-    this.props.addChunks(data)
-    this.flashBackground()
-  }
-
-  sendBuys(data) {
-    this.props.addChunks(data)
-    this.flashBackground()
+  shouldComponentUpdate(props) {
+    return props.profitThreshold !== this.props.profitThreshold ||
+      props.obsoleteThreshold !== this.obsoleteThreshold ||
+      props.autocreatedChunkAmount !== this.autocreatedChunkAmount
   }
 
   render() {
-    const { pairNames, currency, threshold, wallet } = this.props
+    const { pairNames, wallet } = this.props
     const isWalletIsset = !!(wallet[pairNames[0]] || wallet[pairNames[1]])
-    const isCurrencyIsset = !!(currency && currency.highestBid)
     const styles = this.getStyles()
 
-    return !(isWalletIsset && isCurrencyIsset) ?
+    return !isWalletIsset ?
     div({ style: styles.loading }, 'Получение баланса...') :
     div({ style: styles.root(this.state.flashBg) }, [
       div({ style: styles.box }, [
-
-        // div({ style: styles.row }, [
-        //   div({ style: styles.col }, [
-        //     label({ style: styles.label }, 'Валюта'),
-        //     div({ style: styles.info }, pairNames[0]),
-        //     div({ style: styles.info }, pairNames[1])
-        //   ]),
-        //   div({ style: styles.col }, [
-        //     label({ style: styles.label }, 'На счету'),
-        //     div({ style: styles.info }, wallet[pairNames[0]]),
-        //     div({ style: styles.info }, wallet[pairNames[1]])
-        //   ]),
-        //   div({ style: styles.col }, [
-        //     label({ style: styles.label }, 'Доступно'),
-        //     div({ style: styles.info }, freeCurrencies[0]),
-        //     div({ style: styles.info }, freeCurrencies[1])
-        //   ]),
-        //   div({ style: styles.col }, [
-        //     label({ style: styles.label }, 'В чанках'),
-        //     div({ style: styles.info }, cropNumber(wallet[pairNames[0]] - freeCurrencies[0])),
-        //     div({ style: styles.info }, cropNumber(wallet[pairNames[1]] - freeCurrencies[1]))
-        //   ])
-        // ]),
-
         div({ style: styles.row }, [
-          div({ style: styles.col }, [
-            label({ style: styles.label }, 'Порог прибыли'),
-            input({
-              type: 'number',
-              style: styles.input,
-              defaultValue: threshold,
-              onChange: e => this.onThresholdChange(e)
-            })
-          ])
+          InputNumber({
+            label: 'Порог прибыли',
+            defaultValue: this.props.profitThreshold,
+            onChange: this.props.setProfitThreshold
+          }),
+          InputNumber({
+            label: 'Порог удаления устаревших чанков',
+            defaultValue: this.props.obsoleteThreshold,
+            onChange: this.props.setObsoleteThreshold
+          }),
+          InputNumber({
+            label: 'Объём чанка автоматического создания',
+            defaultValue: this.props.autocreatedChunkAmount,
+            onChange: this.props.setAutocreatedChunkAmount
+          })
         ])
       ])
     ])
@@ -113,16 +76,9 @@ class Preferences extends Component {
         justifyContent: 'center',
         alignItems: 'center'
       },
-      label: {
-        display: 'block',
-        margin: '0.5rem 0'
-      },
-      input: {
-        fontSize: '1.2rem',
-        padding: '.25rem .5rem'
-      },
       row: {
         display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center'
       },
       col: {
@@ -141,17 +97,29 @@ class Preferences extends Component {
 }
 
 Preferences.propTypes = {
-  threshold: PropTypes.number,
-  currency: PropTypes.object,
+  profitThreshold: PropTypes.number,
+  obsoleteThreshold: PropTypes.number,
+  autocreatedChunkAmount: PropTypes.number,
+  pairNames: PropTypes.array,
   wallet: PropTypes.object
 }
 
-const mapStateToProps = ({ threshold, currencies, currentPair, freeCurrencies, wallet }) => ({
+const mapStateToProps = ({
+  profitThreshold,
+  obsoleteThreshold,
+  currentPair,
+  autocreatedChunkAmount,
+  wallet
+}) => ({
   pairNames: currentPair.split('_'),
-  currency: currencies[currentPair],
-  freeCurrencies,
-  threshold,
+  profitThreshold,
+  obsoleteThreshold,
+  autocreatedChunkAmount,
   wallet
 })
 
-export default hh(withRouter(connect(mapStateToProps, { setThreshold })(Preferences)))
+const dispatchToProps = {
+  setProfitThreshold, setObsoleteThreshold, setAutocreatedChunkAmount
+}
+
+export default hh(withRouter(connect(mapStateToProps, dispatchToProps)(Preferences)))

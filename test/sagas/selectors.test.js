@@ -4,14 +4,14 @@ import * as selectors from 'server/sagas/selectors'
 test('selectBuyForCover should select manimum rate and maximum amount', t => {
   const state = {
     transactions: {
-      foo: { rate: 0.48, amount: 0.01, active: true, type: 'buy' },
-      bar: { rate: 0.47, amount: 0.02, active: true, type: 'buy' },
-      baz: { rate: 0.46, amount: 0.03, active: true, type: 'buy' },
-      qux: { rate: 0.45, amount: 0.04, active: true, type: 'buy' }
+      foo: { rate: 0.47, amount: 0.01, active: true, type: 'buy', creationMethod: 'manual' },
+      bar: { rate: 0.46, amount: 0.02, active: true, type: 'buy', creationMethod: 'manual' },
+      baz: { rate: 0.45, amount: 0.03, active: true, type: 'buy', creationMethod: 'manual' },
+      qux: { rate: 0.44, amount: 0.04, active: true, type: 'buy', creationMethod: 'hollow' }
     }
   }
   const output = selectors.selectBuyForCover(state, 0.46)
-  t.is(output, 'qux')
+  t.is(output, 'baz')
 })
 
 test('selectBuyForCover should return false when no matches', t => {
@@ -28,14 +28,15 @@ test('selectBuyForCover should return false when no matches', t => {
 test('selectSellForCover should select minimum rate and maximum amount', t => {
   const state = {
     transactions: {
-      foo: { rate: 0.47, amount: 0.01, active: true, type: 'sell' },
-      bar: { rate: 0.46, amount: 0.01, active: true, type: 'sell' },
-      baz: { rate: 0.45, amount: 0.02, active: true, type: 'sell' },
-      qux: { rate: 0.44, amount: 0.01, active: true, type: 'sell' }
+      foo: { rate: 0.47, amount: 0.01, active: true, type: 'sell', creationMethod: 'hollow' },
+      foz: { rate: 0.465, amount: 0.01, active: true, type: 'sell', creationMethod: 'manual' },
+      bar: { rate: 0.464, amount: 0.02, active: true, type: 'sell', creationMethod: 'manual' },
+      baz: { rate: 0.461, amount: 0.01, active: true, type: 'sell', creationMethod: 'hollow' },
+      qux: { rate: 0.45, amount: 0.01, active: true, type: 'sell', creationMethod: 'manual' }
     }
   }
   const output = selectors.selectSellForCover(state, 0.46)
-  t.is(output, 'foo')
+  t.is(output, 'bar')
 })
 
 

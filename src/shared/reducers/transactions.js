@@ -25,7 +25,9 @@ export const transactions = createReducer({
         { orderNumber, profit, updated: time(), active: false })
     }
     const newBuy = {
-      [shortid.generate()]: { rate, amount, coverId, created: time(), type: 'buy', active: true }
+      [shortid.generate()]: {
+        rate, amount, coverId, created: time(), type: 'buy', active: true, creationMethod: 'cover'
+      }
     }
     return Object.assign({}, state, coveredSell, newBuy)
   },
@@ -37,7 +39,9 @@ export const transactions = createReducer({
         { orderNumber, profit, updated: time(), active: false })
     }
     const newSell = {
-      [shortid.generate()]: { rate, amount, coverId, created: time(), type: 'sell', active: true }
+      [shortid.generate()]: {
+        rate, amount, coverId, created: time(), type: 'sell', active: true, creationMethod: 'cover'
+      }
     }
     return Object.assign({}, state, coveredBuy, newSell)
   },
@@ -54,11 +58,13 @@ export const transactions = createReducer({
         Object.assign({}, { rate, amount, coverId, error, created: time(), type: 'sell', active: false })
     }),
 
-  [addChunks]: (state, { type, num, rate, amount }) =>
+  [addChunks]: (state, { type, num, rate, amount, creationMethod = 'manual' }) =>
     Object.assign({},
       state,
       [ ...new Array(num) ]
-        .map(() => ({ [shortid.generate()]: { rate, amount, type, created: time(), active: true } }))
+        .map(() => ({ [shortid.generate()]: {
+          rate, amount, type, creationMethod, created: time(), active: true
+        } }))
         .reduce((prev, curr) => Object.assign({}, prev, curr), {})),
 
   [removeChunk]: (state, id) =>

@@ -8,9 +8,14 @@ export const selectCurrencyPairSplited = state => state.currentPair.split('_')
 export const selectCurrencyProps = state => state.currencies[state.currentPair]
 export const selectSells = state => state.sell
 export const selectTransactions = state => state.transactions
-export const selectThreshold = state => state.threshold
+export const selectProfitThreshold = state => state.profitThreshold
+export const selectObsoleteThreshold = state => state.obsoleteThreshold
+export const selectAutocreatedChunkAmount = state => state.autocreatedChunkAmount
 export const selectTotals = state => state.totals
 export const selectWallet = state => state.wallet
+
+export const selectLastTenStats = state =>
+  state.stats.slice(state.stats.length - 11, state.stats.length - 1)
 
 export const selectSellsLastTime = (state, time) => {
   const currTime = new Date().getTime()
@@ -28,11 +33,12 @@ export const selectBuyForCover = ({ transactions }, rate) => {
       transactions[key].active === true &&
       transactions[key].type === 'buy' &&
       transactions[key].rate < rate)
+
   return matches.length >= 1 ?
-    matches.reduce((prev, curr) =>
-      transactions[curr].rate < transactions[prev].rate &&
-      transactions[curr].amount >= transactions[prev].amount ?
-        curr : prev) :
+    matches
+      .sort((a, b) => transactions[a].amount - transactions[b].amount)
+      .sort((a, b) => transactions[b].rate - transactions[a].rate)
+      .sort(key => transactions[key].creationMethod === 'hollow')[0] :
     false
 }
 
@@ -42,19 +48,17 @@ export const selectSellForCover = ({ transactions }, rate) => {
       transactions[key].active === true &&
       transactions[key].type === 'sell' &&
       transactions[key].rate > rate)
+
   return matches.length >= 1 ?
-    matches.reduce((prev, curr) =>
-      transactions[curr].rate < transactions[prev].rate &&
-      transactions[curr].amount >= transactions[prev].amount ?
-        curr : prev) :
+    matches
+      .sort((a, b) => transactions[a].amount - transactions[b].amount)
+      .sort((a, b) => transactions[a].rate - transactions[b].rate)
+      .sort(key => transactions[key].creationMethod === 'hollow')[0] :
     false
 }
 
-export const selectLastTenStats = state =>
-  state.stats.slice(state.stats.length - 11, state.stats.length - 1)
-
-export const selectEstimateRatios = state =>
-  state.statsEstimates.slice(state.statsEstimates.length - 11, state.statsEstimates.length - 1)
-
-export const selectLastEstimateRatios = state =>
-  state.statsEstimates.slice(state.statsEstimates.length - 3, state.statsEstimates.length)
+export const selectObsoleteTransactions = ({ transactions, obsoleteThreshold }, lastRate) =>
+  Object.keys(transactions).filter(key =>
+    transactions[key].creationMethod === 'hollow' &&
+    (transactions[key].rate > lastRate + obsoleteThreshold ||
+      transactions[key].rate < lastRate - obsoleteThreshold))
