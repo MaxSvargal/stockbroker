@@ -9,7 +9,7 @@ export function* buySaga(rate, hold) {
   const coverId = yield select(selectSellForCover, rateWithHold)
   if (!coverId) {
     // yield put(botMessage(`Покупка за ${rateWithHold} не покрывает ни одной продажи`))
-    return yield put(requestNewChunks({ rate, amount: 0.004, num: 1, type: 'buy' }))
+    return yield put(requestNewChunks({ rate, amount: 0.01, num: 1, type: 'buy' }))
   }
 
   const covered = transactions[coverId]
@@ -28,7 +28,7 @@ export function* sellSaga(rate, hold) {
   const coverId = yield select(selectBuyForCover, rateWithHold)
   if (!coverId) {
     // yield put(botMessage(`Продажа за ${rateWithHold} не покрывает ни одной покупки`))
-    return yield put(requestNewChunks({ rate, amount: 0.004, num: 1, type: 'sell' }))
+    return yield put(requestNewChunks({ rate, amount: 0.01, num: 1, type: 'sell' }))
   }
 
   const covered = transactions[coverId]
