@@ -15,7 +15,7 @@ const changeStateChannel = () => eventChannel(emitter => {
 
 function* serverActionsSaga() {
   const chan = yield call(changeStateChannel)
-  const filtered = [ setThreshold, requestNewChunks, removeChunk, sellSuccess, buySuccess ]
+  const filtered = [ setThreshold, requestNewChunks, removeChunk ]
   const isInFiltered = type => filtered.find(action => action.toString() === type)
 
   try {
