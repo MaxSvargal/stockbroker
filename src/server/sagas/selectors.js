@@ -61,5 +61,5 @@ export const selectObsoleteTransactions = ({ transactions, obsoleteThreshold }, 
   Object.keys(transactions).filter(key =>
     transactions[key].creationMethod === 'hollow' &&
     transactions[key].active === true &&
-    (transactions[key].rate > lastRate + obsoleteThreshold ||
-      transactions[key].rate < lastRate - obsoleteThreshold))
+    (lastRate - transactions[key].rate > obsoleteThreshold ||
+      transactions[key].rate - lastRate > obsoleteThreshold))

@@ -50,3 +50,18 @@ test('selectSellForCover should return false when no matches', t => {
   const output = selectors.selectSellForCover(state, 0.46)
   t.is(output, false)
 })
+
+test('selectObsoleteTransactions should work correctly', t => {
+  const state = {
+    obsoleteThreshold: 0.011,
+    transactions: {
+      foo: { rate: 0.43, amount: 0.01, active: true, creationMethod: 'hollow' },
+      foz: { rate: 0.44, amount: 0.01, active: true, creationMethod: 'hollow' },
+      bar: { rate: 0.45, amount: 0.02, active: true, creationMethod: 'hollow' },
+      baz: { rate: 0.46, amount: 0.01, active: true, creationMethod: 'hollow' },
+      qux: { rate: 0.47, amount: 0.01, active: true, creationMethod: 'hollow' }
+    }
+  }
+  const output = selectors.selectObsoleteTransactions(state, 0.45)
+  t.deepEqual(output, [ 'foo', 'qux' ])
+})
