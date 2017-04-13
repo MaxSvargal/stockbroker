@@ -60,5 +60,6 @@ export const selectSellForCover = ({ transactions }, rate) => {
 export const selectObsoleteTransactions = ({ transactions, obsoleteThreshold }, lastRate) =>
   Object.keys(transactions).filter(key =>
     transactions[key].creationMethod === 'hollow' &&
+    transactions[key].active === true &&
     (transactions[key].rate > lastRate + obsoleteThreshold ||
       transactions[key].rate < lastRate - obsoleteThreshold))

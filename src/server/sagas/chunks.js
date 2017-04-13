@@ -1,5 +1,5 @@
 import { fork, take, put, select } from 'redux-saga/effects'
-import { addStats, addChunks, requestNewChunks, removeChunk } from 'shared/actions'
+import { addStats, addChunks, requestNewChunks, removeChunk, botMessage } from 'shared/actions'
 import { selectObsoleteTransactions, selectCurrencyProps, selectLastTenStats } from 'server/sagas/selectors'
 
 export function* watchForNewChunks() {
@@ -25,7 +25,8 @@ export function* clearObsoleteChunks() {
     if (isStagnate === true) {
       const { last } = yield select(selectCurrencyProps)
       const obsoleteTransactions = yield select(selectObsoleteTransactions, last)
-      obsoleteTransactions.forEach(trans => removeChunk(trans))
+      yield obsoleteTransactions.map(id => put(removeChunk(id)))
+      yield put(botMessage(`Чанки в количестве ${obsoleteTransactions.length} шт. инвалидированы`))
     }
   }
 }
