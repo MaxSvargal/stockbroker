@@ -18,7 +18,8 @@ class InputNumber extends Component {
         style: styles.input,
         defaultValue: this.props.defaultValue,
         onChange: e => this.onChange(Number(e.target.value))
-      })
+      }),
+      this.props.children && this.props.children
     ])
   }
 
@@ -26,7 +27,8 @@ class InputNumber extends Component {
     return {
       root: {
         margin: '1rem',
-        flexGrow: 1
+        flexGrow: 1,
+        position: 'relative'
       },
       label: {
         display: 'block',
@@ -36,16 +38,18 @@ class InputNumber extends Component {
       input: {
         fontSize: '1.2rem',
         padding: '.5rem 1rem',
-        width: '100%'
+        width: '100%',
+        boxSizing: 'border-box'
       }
     }
   }
 }
 
 InputNumber.propTypes = {
-  label: PropTypes.string,
-  defaultValue: PropTypes.number,
-  onChange: PropTypes.func
+  label: PropTypes.string.isRequired,
+  defaultValue: PropTypes.number.isRequired,
+  onChange: PropTypes.func.isRequired,
+  children: PropTypes.object
 }
 
 export default hh(InputNumber)

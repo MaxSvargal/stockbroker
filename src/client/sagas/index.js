@@ -1,9 +1,23 @@
 import { eventChannel } from 'redux-saga'
 import { fork, call, take, put } from 'redux-saga/effects'
 import socketCluster from 'socketcluster-client'
-import { setProfitThreshold, setObsoleteThreshold, setAutocreatedChunkAmount, requestNewChunks, removeChunk } from 'shared/actions'
+import {
+  setProfitThreshold,
+  setObsoleteThreshold,
+  setAutocreatedChunkAmount,
+  requestNewChunks,
+  removeChunk,
+  requestInvalidateChunks
+} from 'shared/actions'
 
-const actions = [ setProfitThreshold, setObsoleteThreshold, setAutocreatedChunkAmount, requestNewChunks, removeChunk ]
+const actions = [
+  setProfitThreshold,
+  setObsoleteThreshold,
+  setAutocreatedChunkAmount,
+  requestNewChunks,
+  removeChunk,
+  requestInvalidateChunks
+]
 
 const port = process.env.NODE_ENV === 'development' ? 8081 : window.location.port
 

@@ -54,6 +54,7 @@ class FullMode extends Component {
       },
       botLogBox: {
         minWidth: '32vw',
+        maxWidth: '65vw',
         height: 'calc(85vh - 180px)',
         overflow: 'auto',
         minHeight: '30vh',

@@ -2,9 +2,15 @@ import { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { hh, div } from 'react-hyperscript-helpers'
-import { setProfitThreshold, setObsoleteThreshold, setAutocreatedChunkAmount } from 'shared/actions'
+import {
+  setProfitThreshold,
+  setObsoleteThreshold,
+  setAutocreatedChunkAmount,
+  requestInvalidateChunks
+} from 'shared/actions'
 
 import InputNumber from './InputNumber'
+import FloatButton from './FloatButton'
 
 class Preferences extends Component {
   constructor(props) {
@@ -42,7 +48,12 @@ class Preferences extends Component {
             label: 'Порог удаления устаревших чанков',
             defaultValue: this.props.obsoleteThreshold,
             onChange: this.props.setObsoleteThreshold
-          }),
+          }, [
+            FloatButton({
+              label: 'Очистить сейчас',
+              onClick: this.props.requestInvalidateChunks
+            })
+          ]),
           InputNumber({
             label: 'Объём чанка автоматического создания',
             defaultValue: this.props.autocreatedChunkAmount,
@@ -119,7 +130,10 @@ const mapStateToProps = ({
 })
 
 const dispatchToProps = {
-  setProfitThreshold, setObsoleteThreshold, setAutocreatedChunkAmount
+  setProfitThreshold,
+  setObsoleteThreshold,
+  setAutocreatedChunkAmount,
+  requestInvalidateChunks
 }
 
 export default hh(withRouter(connect(mapStateToProps, dispatchToProps)(Preferences)))

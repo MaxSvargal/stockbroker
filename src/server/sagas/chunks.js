@@ -1,5 +1,5 @@
 import { fork, take, put, select } from 'redux-saga/effects'
-import { addStats, addChunks, requestNewChunks, removeChunk, botMessage } from 'shared/actions'
+import { addStats, addChunks, requestNewChunks, removeChunk, botMessage, requestInvalidateChunks } from 'shared/actions'
 import { selectObsoleteTransactions, selectCurrencyProps, selectLastTenStats } from 'server/sagas/selectors'
 
 export function* watchForNewChunks() {
@@ -13,27 +13,39 @@ export function* watchForNewChunks() {
 }
 
 export function* clearObsoleteChunks() {
+  const { last } = yield select(selectCurrencyProps)
+  const obsoleteTransactions = yield select(selectObsoleteTransactions, last)
+  yield obsoleteTransactions.map(id => put(removeChunk(id)))
+  yield put(botMessage(`Чанки в количестве ${obsoleteTransactions.length} шт. инвалидированы`))
+}
+
+export function* watchForInvalidateOfChunks() {
   while (true) {
     yield take(addStats)
     const lastTenStats = yield select(selectLastTenStats)
 
-    const isStagnate = lastTenStats.slice(lastTenStats.length - 5, lastTenStats.length)
-      .map(stat => stat[3] - stat[4])
-      .map(value => value.toFixed(5))
-      .reduce((prev, curr) => prev === curr && curr)
+    if (lastTenStats.length >= 10) {
+      const isStagnate = lastTenStats.slice(lastTenStats.length - 5, lastTenStats.length)
+        .map(stat => stat[3] - stat[4])
+        .map(value => value.toFixed(5))
+        .reduce((prev, curr) => prev === curr && curr)
 
-    if (isStagnate === true) {
-      const { last } = yield select(selectCurrencyProps)
-      const obsoleteTransactions = yield select(selectObsoleteTransactions, last)
-      yield obsoleteTransactions.map(id => put(removeChunk(id)))
-      yield put(botMessage(`Чанки в количестве ${obsoleteTransactions.length} шт. инвалидированы`))
+      if (isStagnate === true) yield fork(clearObsoleteChunks)
     }
+  }
+}
+
+export function* watchForInvalidateCommand() {
+  while (true) {
+    yield take(requestInvalidateChunks)
+    yield fork(clearObsoleteChunks)
   }
 }
 
 export default function* chunksSaga() {
   yield [
     fork(watchForNewChunks),
-    fork(clearObsoleteChunks)
+    fork(watchForInvalidateOfChunks),
+    fork(watchForInvalidateCommand)
   ]
 }
