@@ -6,11 +6,13 @@ import {
   setProfitThreshold,
   setObsoleteThreshold,
   setAutocreatedChunkAmount,
-  requestInvalidateChunks
+  requestInvalidateChunks,
+  replaceChunksAmount
 } from 'shared/actions'
 
 import InputNumber from './InputNumber'
 import FloatButton from './FloatButton'
+import ReplaceChunksForm from './ReplaceChunksForm'
 
 class Preferences extends Component {
   constructor(props) {
@@ -54,6 +56,9 @@ class Preferences extends Component {
             label: 'Объём чанка автоматического создания',
             defaultValue: this.props.autocreatedChunkAmount,
             onChange: this.props.setAutocreatedChunkAmount
+          }),
+          ReplaceChunksForm({
+            onChange: this.props.replaceChunksAmount
           })
         ])
       ])
@@ -123,7 +128,8 @@ const dispatchToProps = {
   setProfitThreshold,
   setObsoleteThreshold,
   setAutocreatedChunkAmount,
-  requestInvalidateChunks
+  requestInvalidateChunks,
+  replaceChunksAmount
 }
 
 export default hh(withRouter(connect(mapStateToProps, dispatchToProps)(Preferences)))
