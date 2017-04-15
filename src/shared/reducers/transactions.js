@@ -8,6 +8,7 @@ import { time } from './helpers'
  * @type {boolean} removed
  * @type {number} amount
  * @type {number} created
+ * @type {string} creationMethod
  * @type {number} orderNumber
  * @type {number} profit
  * @type {number} rate

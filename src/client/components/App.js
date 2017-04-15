@@ -15,11 +15,14 @@ class App extends Component {
       style(`@fontface {
         font-family: "Courier_New";
         src: url("Courier_New.woff") format("woff"), url("Courier_New.ttf") format("truetype");
+      } @fontface {
+        font-family: "Emoji_Symbols";
+        src: url("EmojiSymbols.woff") format("woff");
       }`),
       div({ style: styles.linksBox }, [
         h(NavLink, { to: '/', style: styles.link, exact: true, activeStyle: styles.activeLink }, [ span('Минимум') ]),
         h(NavLink, { to: '/full', style: styles.link, activeStyle: styles.activeLink }, [ span('Отслеживание') ]),
-        h(NavLink, { to: '/transactions', style: styles.link, activeStyle: styles.activeLink }, [ span('Транзакции') ]),
+        h(NavLink, { to: '/transactions/active', style: styles.link, activeStyle: styles.activeLink }, [ span('Транзакции') ]),
         h(NavLink, { to: '/preferences', style: styles.link, activeStyle: styles.activeLink }, [ span('Настройки') ])
       ]),
       h(Switch, [
