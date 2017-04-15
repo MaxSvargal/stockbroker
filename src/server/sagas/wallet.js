@@ -13,8 +13,9 @@ export function* setCurrencyPairSaga() {
 }
 
 export function* getWallet() {
-  const { response } = yield call(poloniex.privateRequest, { command: 'returnBalances' })
-  yield put(updateWallet(response))
+  const { response, error } = yield call(poloniex.privateRequest, { command: 'returnBalances' })
+  if (response) yield put(updateWallet(response))
+  if (error) yield fork(getWallet)
 }
 
 export function* doBuySaga() {

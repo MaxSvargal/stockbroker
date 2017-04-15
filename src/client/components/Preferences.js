@@ -30,13 +30,9 @@ class Preferences extends Component {
   }
 
   render() {
-    const { pairNames, wallet } = this.props
-    const isWalletIsset = !!(wallet[pairNames[0]] || wallet[pairNames[1]])
     const styles = this.getStyles()
 
-    return !isWalletIsset ?
-    div({ style: styles.loading }, 'Получение баланса...') :
-    div({ style: styles.root(this.state.flashBg) }, [
+    return div({ style: styles.root(this.state.flashBg) }, [
       div({ style: styles.box }, [
         div({ style: styles.row }, [
           InputNumber({
@@ -110,23 +106,17 @@ class Preferences extends Component {
 Preferences.propTypes = {
   profitThreshold: PropTypes.number,
   obsoleteThreshold: PropTypes.number,
-  autocreatedChunkAmount: PropTypes.number,
-  pairNames: PropTypes.array,
-  wallet: PropTypes.object
+  autocreatedChunkAmount: PropTypes.number
 }
 
 const mapStateToProps = ({
   profitThreshold,
   obsoleteThreshold,
-  currentPair,
-  autocreatedChunkAmount,
-  wallet
+  autocreatedChunkAmount
 }) => ({
-  pairNames: currentPair.split('_'),
   profitThreshold,
   obsoleteThreshold,
-  autocreatedChunkAmount,
-  wallet
+  autocreatedChunkAmount
 })
 
 const dispatchToProps = {
