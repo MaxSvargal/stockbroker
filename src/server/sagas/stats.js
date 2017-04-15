@@ -58,10 +58,10 @@ export function* estimateStatsSaga() {
       const lowestAsk = lastTenStats[9][3]
       const highestBid = lastTenStats[9][4]
 
-      if (sellsDyn > prevSellsDyn && buysDyn >= prevBuysDyn)
+      if (sellsDyn > prevSellsDyn)
         yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), hold)
 
-      if (sellsDyn < prevSellsDyn && buysDyn <= prevBuysDyn)
+      if (buysDyn < prevBuysDyn)
         yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
 
       prevBuysDyn = buysDyn
