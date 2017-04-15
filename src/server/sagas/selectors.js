@@ -36,8 +36,8 @@ export const selectBuyForCover = ({ transactions }, rate) => {
 
   return matches.length >= 1 ?
     matches
-      .sort((a, b) => transactions[b].amount - transactions[a].amount)
       .sort((a, b) => transactions[b].rate - transactions[a].rate)
+      .sort((a, b) => transactions[b].amount - transactions[a].amount)
       .sort(key => transactions[key].creationMethod === 'hollow')[0] :
     false
 }
@@ -51,8 +51,8 @@ export const selectSellForCover = ({ transactions }, rate) => {
 
   return matches.length >= 1 ?
     matches
-      .sort((a, b) => transactions[b].amount - transactions[a].amount)
       .sort((a, b) => transactions[b].rate - transactions[a].rate)
+      .sort((a, b) => transactions[b].amount - transactions[a].amount)
       .sort(key => transactions[key].creationMethod === 'hollow')[0] :
     false
 }
