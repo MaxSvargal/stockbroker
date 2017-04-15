@@ -20,7 +20,10 @@ export const selectLastStatsDynamics = ({ statsDynamics }) =>
   statsDynamics.slice(statsDynamics.length - 11, statsDynamics.length - 1)
 
 export const selectLastTenStats = ({ stats }) =>
-  stats.slice(stats.length - 11, stats.length - 1)
+  stats.slice(stats.length - 10, stats.length)
+
+export const selectLastFiveStats = ({ stats }) =>
+  stats.slice(stats.length - 6, stats.length)
 
 export const selectSellsLastTime = (state, time) => {
   const currTime = new Date().getTime()
