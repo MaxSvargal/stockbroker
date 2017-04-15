@@ -8,7 +8,8 @@ export const selectCurrencyPairSplited = state => state.currentPair.split('_')
 export const selectCurrencyProps = state => state.currencies[state.currentPair]
 export const selectSells = state => state.sell
 export const selectTransactions = state => state.transactions
-export const selectProfitThreshold = state => state.profitThreshold
+export const selectBuyProfitThreshold = state => state.buyProfitThreshold
+export const selectSellProfitThreshold = state => state.sellProfitThreshold
 export const selectObsoleteThreshold = state => state.obsoleteThreshold
 export const selectAutocreatedChunkAmount = state => state.autocreatedChunkAmount
 export const selectTotals = state => state.totals

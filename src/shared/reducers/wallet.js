@@ -1,5 +1,14 @@
 import { createReducer } from 'redux-act'
-import { setCurrency, setCurrencyPair, setFreeCurrencies, updateWallet, setProfitThreshold, setObsoleteThreshold, setAutocreatedChunkAmount } from '../actions'
+import {
+  setAutocreatedChunkAmount,
+  setBuyProfitThreshold,
+  setCurrency,
+  setCurrencyPair,
+  setFreeCurrencies,
+  setObsoleteThreshold,
+  setSellProfitThreshold,
+  updateWallet
+} from '../actions'
 
 export const wallet = createReducer({
   [updateWallet]: (state, data) =>
@@ -19,8 +28,12 @@ export const freeCurrencies = createReducer({
   [setFreeCurrencies]: (state, values) => values
 }, [])
 
-export const profitThreshold = createReducer({
-  [setProfitThreshold]: (state, value) => value
+export const buyProfitThreshold = createReducer({
+  [setBuyProfitThreshold]: (state, value) => value
+}, 0.0001)
+
+export const sellProfitThreshold = createReducer({
+  [setSellProfitThreshold]: (state, value) => value
 }, 0.0001)
 
 export const obsoleteThreshold = createReducer({

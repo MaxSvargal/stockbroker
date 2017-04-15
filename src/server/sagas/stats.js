@@ -6,7 +6,8 @@ import { FIVE_MINUTES } from 'const'
 import { buySaga, sellSaga } from './trade'
 import {
   selectSellsLastTime, selectBuysLastTime, selectLastTenStats,
-  selectProfitThreshold, selectTransactions, selectCurrencyProps,
+  selectSellProfitThreshold, selectBuyProfitThreshold,
+  selectTransactions, selectCurrencyProps,
   selectLastStatsDynamics, selectStopTrade
 } from './selectors'
 
@@ -55,17 +56,18 @@ export function* estimateStatsSaga() {
       const stopTrade = yield select(selectStopTrade)
 
       if (!stopTrade && lastTenStats.length >= 10) {
-        const hold = yield select(selectProfitThreshold)
+        const buyHold = yield select(selectBuyProfitThreshold)
+        const sellHold = yield select(selectSellProfitThreshold)
         const buysDyn = calcDynamic(lastTenStats.map(v => v[1]))
         const sellsDyn = calcDynamic(lastTenStats.map(v => v[2]))
         const lowestAsk = lastTenStats[9][3]
         const highestBid = lastTenStats[9][4]
 
         if (sellsDyn > prevSellsDyn)
-          yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), hold)
+          yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), sellHold)
 
         if (buysDyn < prevBuysDyn)
-          yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
+          yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), buyHold)
 
         yield put(addStatsDynamics({ buysDyn, sellsDyn }))
 

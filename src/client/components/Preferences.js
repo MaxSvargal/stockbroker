@@ -3,11 +3,12 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { hh, div } from 'react-hyperscript-helpers'
 import {
-  setProfitThreshold,
   setObsoleteThreshold,
   setAutocreatedChunkAmount,
   requestInvalidateChunks,
-  replaceChunksAmount
+  replaceChunksAmount,
+  setBuyProfitThreshold,
+  setSellProfitThreshold
 } from 'shared/actions'
 
 import InputNumber from './InputNumber'
@@ -36,12 +37,19 @@ class Preferences extends Component {
 
     return div({ style: styles.root(this.state.flashBg) }, [
       div({ style: styles.box }, [
-        div({ style: styles.row }, [
-          InputNumber({
-            label: 'Порог прибыли',
-            defaultValue: this.props.profitThreshold,
-            onChange: this.props.setProfitThreshold
-          }),
+        div({ style: styles.column }, [
+          div({ style: styles.row }, [
+            InputNumber({
+              label: 'Порог прибыли на покупку',
+              defaultValue: this.props.buyProfitThreshold,
+              onChange: this.props.setBuyProfitThreshold
+            }),
+            InputNumber({
+              label: 'Порог прибыли на продажу',
+              defaultValue: this.props.sellProfitThreshold,
+              onChange: this.props.setSellProfitThreshold
+            })
+          ]),
           InputNumber({
             label: 'Порог удаления устаревших чанков',
             defaultValue: this.props.obsoleteThreshold,
@@ -88,10 +96,14 @@ class Preferences extends Component {
         justifyContent: 'center',
         alignItems: 'center'
       },
-      row: {
+      column: {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center'
+      },
+      row: {
+        display: 'flex',
+        flexDirection: 'row'
       },
       col: {
         margin: '.5rem'
@@ -115,19 +127,22 @@ Preferences.propTypes = {
 }
 
 const mapStateToProps = ({
-  profitThreshold,
+  buyProfitThreshold,
+  sellProfitThreshold,
   obsoleteThreshold,
   autocreatedChunkAmount
 }) => ({
-  profitThreshold,
+  buyProfitThreshold,
+  sellProfitThreshold,
   obsoleteThreshold,
   autocreatedChunkAmount
 })
 
 const dispatchToProps = {
-  setProfitThreshold,
   setObsoleteThreshold,
   setAutocreatedChunkAmount,
+  setBuyProfitThreshold,
+  setSellProfitThreshold,
   requestInvalidateChunks,
   replaceChunksAmount
 }

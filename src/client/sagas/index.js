@@ -4,7 +4,8 @@ import socketCluster from 'socketcluster-client'
 import * as actions from 'shared/actions'
 
 const enabledActions = [
-  actions.setProfitThreshold,
+  actions.setBuyProfitThreshold,
+  actions.setSellProfitThreshold,
   actions.setObsoleteThreshold,
   actions.setAutocreatedChunkAmount,
   actions.requestNewChunks,
