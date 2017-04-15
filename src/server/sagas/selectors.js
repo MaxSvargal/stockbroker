@@ -13,9 +13,13 @@ export const selectObsoleteThreshold = state => state.obsoleteThreshold
 export const selectAutocreatedChunkAmount = state => state.autocreatedChunkAmount
 export const selectTotals = state => state.totals
 export const selectWallet = state => state.wallet
+export const selectStopTrade = state => state.stopTrade
 
-export const selectLastTenStats = state =>
-  state.stats.slice(state.stats.length - 11, state.stats.length - 1)
+export const selectLastStatsDynamics = ({ statsDynamics }) =>
+  statsDynamics.slice(statsDynamics.length - 11, statsDynamics.length - 1)
+
+export const selectLastTenStats = ({ stats }) =>
+  stats.slice(stats.length - 11, stats.length - 1)
 
 export const selectSellsLastTime = (state, time) => {
   const currTime = new Date().getTime()

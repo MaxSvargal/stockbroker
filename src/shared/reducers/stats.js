@@ -1,5 +1,5 @@
 import { createReducer } from 'redux-act'
-import { botMessage, addStats, setCurrentFinalResult } from '../actions'
+import { botMessage, addStats, addStatsDynamics, setDynamicsTotal, setStopTrade } from '../actions'
 import { time } from './helpers'
 
 export const stats = createReducer({
@@ -9,9 +9,20 @@ export const stats = createReducer({
   }
 }, [])
 
-export const statsResult = createReducer({
-  [setCurrentFinalResult]: (state, data) => data
+export const statsDynamics = createReducer({
+  [addStatsDynamics]: (state, data) => {
+    const newState = [ ...state, [ data.buysDyn, data.sellsDyn ] ]
+    return newState.slice(newState.length - 100, newState.length)
+  }
+}, [])
+
+export const statsDynamicsTotal = createReducer({
+  [setDynamicsTotal]: (state, data) => data
 }, 0)
+
+export const stopTrade = createReducer({
+  [setStopTrade]: (state, status) => status
+}, false)
 
 export const botMessages = createReducer({
   [botMessage]: (state, msg) => [ ...state, [ time(), msg ] ]

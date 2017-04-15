@@ -1,8 +1,9 @@
 import test from 'ava'
 import testSaga from 'redux-saga-test-plan'
-import { generateStatsSaga } from 'server/sagas/stats'
-import { selectSellsLastTime, selectBuysLastTime, selectCurrencyProps } from 'server/sagas/selectors'
-import { addStats } from 'shared/actions'
+import { generateStatsSaga, estimateStatsSaga } from 'server/sagas/stats'
+import { selectSellsLastTime, selectBuysLastTime, selectCurrencyProps, selectLastTenStats, selectStopTrade, selectProfitThreshold } from 'server/sagas/selectors'
+import { sellSaga, buySaga } from 'server/sagas/trade'
+import { addStats, addStatsDynamics } from 'shared/actions'
 import { FIVE_MINUTES } from 'const'
 
 test('generateStatsSaga should store statistics', () => {
@@ -12,13 +13,43 @@ test('generateStatsSaga should store statistics', () => {
 
   testSaga(generateStatsSaga)
     .next()
-    .select(selectCurrencyProps)
-    .next({ last: '0.56' })
     .select(selectBuysLastTime, FIVE_MINUTES)
     .next(buys)
     .select(selectSellsLastTime, FIVE_MINUTES)
     .next(sells)
+    .select(selectCurrencyProps)
+    .next({ last: '0.56' })
     .put(addStats(totals))
     .next()
     .isDone()
 })
+
+test('estimateStatsSaga should generate and store stats dynamics', () =>
+  testSaga(estimateStatsSaga)
+    .next()
+    .take(addStats)
+    .next()
+    .select(selectLastTenStats)
+    .next([
+      [ 0.5, 0.50, 0.51 ],
+      [ 0.5, 0.51, 0.52 ],
+      [ 0.5, 0.52, 0.52 ],
+      [ 0.5, 0.51, 0.50 ],
+      [ 0.5, 0.50, 0.51 ],
+      [ 0.5, 0.51, 0.52 ],
+      [ 0.5, 0.52, 0.53 ],
+      [ 0.5, 0.53, 0.53 ],
+      [ 0.5, 0.54, 0.54 ],
+      [ 0.5, 0.55, 0.55 ]
+    ])
+    .select(selectStopTrade)
+    .next(false)
+    .select(selectProfitThreshold)
+    .next(0.01)
+    .fork(sellSaga)
+    .next()
+    .fork(buySaga)
+    .next()
+    .put(addStatsDynamics({ buysDyn: 1, sellsDyn: 1 }))
+    .next()
+    .take(addStats))

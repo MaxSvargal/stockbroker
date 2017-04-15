@@ -1,12 +1,13 @@
 import { delay } from 'redux-saga'
 import { select, put, fork, take, throttle } from 'redux-saga/effects'
-import { setCurrency, addStats, botMessage } from 'shared/actions'
+import { setCurrency, addStats, botMessage, addStatsDynamics, setDynamicsTotal, setStopTrade } from 'shared/actions'
 import { cropNumber } from 'server/utils'
 import { FIVE_MINUTES } from 'const'
 import { buySaga, sellSaga } from './trade'
 import {
-  selectSellsLastTime, selectBuysLastTime, selectLastTenStats, selectProfitThreshold, selectTransactions,
-  selectCurrencyProps
+  selectSellsLastTime, selectBuysLastTime, selectLastTenStats,
+  selectProfitThreshold, selectTransactions, selectCurrencyProps,
+  selectLastStatsDynamics, selectStopTrade
 } from './selectors'
 
 const calcRelativeDynamic = (prev, curr, index) =>
@@ -48,25 +49,58 @@ export function* estimateStatsSaga() {
   }
 
   while (true) {
-    yield take(addStats)
-    const lastTenStats = yield select(selectLastTenStats)
-    const hold = yield select(selectProfitThreshold)
+    try {
+      yield take(addStats)
+      const lastTenStats = yield select(selectLastTenStats)
+      const stopTrade = yield select(selectStopTrade)
 
-    if (lastTenStats.length >= 10) {
-      const buysDyn = calcDynamic(lastTenStats.map(v => v[1]))
-      const sellsDyn = calcDynamic(lastTenStats.map(v => v[2]))
-      const lowestAsk = lastTenStats[9][3]
-      const highestBid = lastTenStats[9][4]
+      if (!stopTrade && lastTenStats.length >= 10) {
+        const hold = yield select(selectProfitThreshold)
+        const buysDyn = calcDynamic(lastTenStats.map(v => v[1]))
+        const sellsDyn = calcDynamic(lastTenStats.map(v => v[2]))
+        const lowestAsk = lastTenStats[9][3]
+        const highestBid = lastTenStats[9][4]
 
-      if (sellsDyn > prevSellsDyn)
-        yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), hold)
+        if (sellsDyn > prevSellsDyn)
+          yield fork(sellSaga, cropNumber(Number(highestBid) - 0.00000001), hold)
 
-      if (buysDyn < prevBuysDyn)
-        yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
+        if (buysDyn < prevBuysDyn)
+          yield fork(buySaga, cropNumber(Number(lowestAsk) + 0.00000001), hold)
 
-      prevBuysDyn = buysDyn
-      prevSellsDyn = sellsDyn
+        yield put(addStatsDynamics({ buysDyn, sellsDyn }))
+
+        prevBuysDyn = buysDyn
+        prevSellsDyn = sellsDyn
+      }
+    } catch (err) {
+      console.log(err)
     }
+  }
+}
+
+export function* estimateDynamicStats() {
+  while (true) {
+    yield take(addStatsDynamics)
+    const dynamics = yield select(selectLastStatsDynamics)
+
+    const buyDynTotal = dynamics.map(v => v[0]).reduce((prev, curr) =>
+      curr >= prev[0] ? [ curr, prev[1] + 1 ] : [ curr, prev[1] - 1 ], [ 0, 0 ])[1]
+
+    const sellDynTotal = dynamics.map(v => v[1]).reduce((prev, curr) =>
+      curr >= prev[0] ? [ curr, prev[1] + 1 ] : [ curr, prev[1] - 1 ], [ 0, 0 ])[1]
+
+    yield put(setDynamicsTotal({ buyDynTotal, sellDynTotal }))
+  }
+}
+
+export function* watchTotalDynamics() {
+  while (true) {
+    const { payload: { buyDynTotal, sellDynTotal } } = yield take(setDynamicsTotal)
+    const con = (
+      (buyDynTotal === 10 || buyDynTotal === -8) ||
+      (sellDynTotal === 10 || sellDynTotal === -8)
+    )
+    yield put(setStopTrade(con))
   }
 }
 
@@ -77,7 +111,7 @@ export function* logBotMessages() {
   }
 }
 
-export function* getDayProfitFalue() {
+export function* getDayProfitValue() {
   while (true) {
     yield delay(10000)
     const trans = yield select(selectTransactions)
@@ -89,7 +123,8 @@ export default function* StatsSaga() {
   yield throttle(5000, setCurrency, generateStatsSaga)
   yield [
     fork(estimateStatsSaga),
+    fork(estimateDynamicStats),
     fork(logBotMessages)
-    // fork(getDayProfitFalue)
+    // fork(getDayProfitValue)
   ]
 }
