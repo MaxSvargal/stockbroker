@@ -5,6 +5,7 @@ import { hh, div } from 'react-hyperscript-helpers'
 import BotLog from './BotLog'
 import TradeTable from './TradeTable'
 import CurrencyStats from './CurrencyStats'
+import CurrencyRate from './CurrencyRate'
 
 class FullMode extends Component {
   render() {
@@ -13,7 +14,10 @@ class FullMode extends Component {
     return div({ style: styles.root }, [
       div({ style: styles.column }, [
         div({ style: styles.currency }, [
-          CurrencyStats(),
+          div({ style: styles.row }, [
+            CurrencyRate(),
+            CurrencyStats()
+          ]),
           div({ style: styles.botLogBox }, [
             BotLog()
           ])
@@ -34,6 +38,10 @@ class FullMode extends Component {
   getStyles() {
     return {
       root: {
+      },
+      row: {
+        display: 'flex',
+        justifyContent: 'space-between'
       },
       column: {
         display: 'flex',

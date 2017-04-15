@@ -134,12 +134,14 @@ class ChunksAddForm extends Component {
       },
       row: {
         display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        padding: '0 0 1rem 0'
+        flexWrap: 'no-wrap',
+        justifyContent: 'space-between',
+        padding: '0 0 1rem 0',
+        width: '100%'
       },
       col: {
-        margin: '0 .5rem'
+        flexGrow: 1,
+        padding: '0 .25rem'
       },
       output: {
         fontSize: '2rem',
@@ -151,13 +153,18 @@ class ChunksAddForm extends Component {
         color: '#fff',
         border: 0,
         fontSize: '1.2rem',
-        padding: '.8rem 2rem',
-        margin: '.5rem 1rem'
+        padding: '.5rem 0',
+        margin: '.25rem .5rem',
+        minWidth: '16rem'
       },
       actionsRow: {
         display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center'
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        alignContent: 'center',
+        alignItems: 'center',
+        marginBottom: '2.5rem'
       }
     }
   }

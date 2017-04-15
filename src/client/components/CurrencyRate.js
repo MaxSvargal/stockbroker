@@ -1,23 +1,30 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
-import { hh, div } from 'react-hyperscript-helpers'
+import { hh, h1, h2, div, span } from 'react-hyperscript-helpers'
 
-class CurrencyStats extends Component {
+import FinalCurrentResult from './FinalCurrentResult'
+
+class CurrencyRate extends Component {
+
+  componentWillReceiveProps(nextProps) {
+    /* eslint class-methods-use-this: 0 */
+    document && nextProps.currency && (document.title = nextProps.currency.last)
+  }
 
   render() {
-    const { currency } = this.props
+    const { currency, currentPair } = this.props
     const styles = this.getStyles()
 
     return !currency ? div('Ожидание обновления курса...') :
       div({ style: styles.root }, [
-        div({ style: styles.info }, [
-          div({ style: styles.bigInfo }, [
-            div({ style: styles.ask }, [ currency.lowestAsk, ' cпрос' ]),
-            div({ style: styles.bid }, [ currency.highestBid, ' предложение' ])
-          ]),
-          div([ currency.hrLow, '/', currency.hrHigh, ' за сутки' ]),
-          div([ 'Сдвиг: ', currency.percentChange, '%' ]),
-          div([ 'Объём: ', currency.baseVolume ]),
+        div({ style: styles.row }, [
+          div([
+            h1({ style: styles.h1 }, [
+              span(currentPair),
+              span({ style: styles.finalCurrent }, [ FinalCurrentResult() ]),
+            ]),
+            h2({ style: styles.h2 }, currency.last)
+          ])
         ])
       ])
   }
@@ -62,6 +69,6 @@ class CurrencyStats extends Component {
 }
 
 const mapStateToProps = ({ currencies, currentPair }) =>
-  ({ currency: currencies[currentPair] })
+  ({ currency: currencies[currentPair], currentPair })
 
-export default hh(connect(mapStateToProps)(CurrencyStats))
+export default hh(connect(mapStateToProps)(CurrencyRate))

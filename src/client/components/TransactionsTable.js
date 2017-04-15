@@ -16,13 +16,7 @@ class TransactionsTable extends Component {
   render() {
     const styles = this.getStyles()
     const headers = [ 'Время/обн.', 'Цена', 'Объём/профит' ]
-    const { transactions } = this.props
-    const transactionsArray = Object.keys(transactions)
-      .map(key => Object.assign({}, transactions[key], { id: key }))
-      // NaN bug fix
-      // TODO: remove after drop db
-      .filter(obj => Boolean(obj.created) && !obj.removed)
-      .sort((a, b) => b.created - a.created)
+    const { data } = this.props
 
     return div([
       table({ style: styles.table }, [
@@ -30,7 +24,7 @@ class TransactionsTable extends Component {
           tr({ style: styles.tr }, headers.map(header =>
             th({ style: styles.th }, header))),
 
-          transactionsArray.map(({ id, type, active, created, updated, rate, amount, profit, error }) =>
+          data.map(({ id, type, active, created, updated, rate, amount, profit, error }) =>
             tr({ style: styles.coloredTypedRow(type, active, error), key: id }, [
               td({ style: styles.col }, updated ?
                 [ formatDate(created), '/', formatDate(updated) ] :
@@ -79,5 +73,4 @@ class TransactionsTable extends Component {
   }
 }
 
-const mapStateToProps = ({ transactions }) => ({ transactions })
-export default hh(connect(mapStateToProps, { removeChunk })(TransactionsTable))
+export default hh(connect(null, { removeChunk })(TransactionsTable))
