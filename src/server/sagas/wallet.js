@@ -22,7 +22,7 @@ export function* doBuySaga() {
     try {
       const { payload: { rate, amount, profit, coverId } } = yield take(doBuy)
       const currencyPair = yield select(selectCurrencyPair)
-      const options = { command: 'buy', currencyPair, rate, amount }
+      const options = { command: 'marginBuy', currencyPair, rate, amount }
 
       const { response, error } = NODE_ENV === 'production' ?
         yield call(poloniex.privateRequest, options) :
@@ -43,7 +43,7 @@ export function* doSellSaga() {
     try {
       const { payload: { rate, amount, profit, coverId } } = yield take(doSell)
       const currencyPair = yield select(selectCurrencyPair)
-      const options = { command: 'sell', currencyPair, rate, amount }
+      const options = { command: 'marginSell', currencyPair, rate, amount }
 
       const { response, error } = NODE_ENV === 'production' ?
         yield call(poloniex.privateRequest, options) :
