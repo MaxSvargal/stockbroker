@@ -1,6 +1,6 @@
 import { call, take, fork, cancelled } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
-import ClientSocket from '../../worker/services/client.wss'
+import ClientSocket from '../services/clientSocket'
 import * as actions from '../actions'
 
 const enabledProcedures = [

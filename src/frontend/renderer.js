@@ -5,18 +5,18 @@ import { h } from 'react-hyperscript-helpers'
 import App from '../client/components/App'
 import renderFullPage from './index.html'
 
-const handleRender = store => (req, res) => {
-  const preloadedState = store.getState()
+const handleRender = (store, location) => {
   const context = {}
+  const state = store.getState()
 
   const html = renderToString(
     h(Provider, { store }, [
-      h(Router, { context, location: req.url }, [
+      h(Router, { context, location }, [
         App()
       ])
     ]))
 
-  res.send(renderFullPage(html, preloadedState))
+  return renderFullPage(html, state)
 }
 
 export default handleRender
