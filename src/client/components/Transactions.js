@@ -1,7 +1,6 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
 import { hh, h, div, span } from 'react-hyperscript-helpers'
-import { removeChunk } from 'shared/actions'
 import { NavLink, Route, Switch } from 'react-router-dom'
 
 import ChunksAddForm from './ChunksAddForm'
@@ -100,4 +99,4 @@ class Transactions extends Component {
 }
 
 const mapStateToProps = ({ transactions }) => ({ transactions })
-export default hh(connect(mapStateToProps, { removeChunk })(Transactions))
+export default hh(connect(mapStateToProps)(Transactions))

@@ -1,6 +1,6 @@
 import { createReducer } from 'redux-act'
 
-import { newTrade } from 'shared/actions'
+import { newTrade } from '../actions'
 import { time } from './helpers'
 
 export const buy = createReducer({

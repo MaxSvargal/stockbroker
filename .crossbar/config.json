@@ -1,0 +1,58 @@
+{
+  "version": 2,
+  "controller": {
+    "id": "stockbroker"
+  },
+  "workers": [
+    {
+       "type": "router",
+       "realms": [
+         {
+          "name": "realm1",
+          "roles": [
+            {
+              "name": "anonymous",
+              "permissions": [
+                {
+                  "uri": "*",
+                   "allow": {
+                      "call": true,
+                      "register": true,
+                      "publish": true,
+                      "subscribe": true
+                   },
+                   "cache": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "transports": [
+        {
+          "type": "web",
+          "endpoint": {
+            "type": "tcp",
+            "port": 9000,
+            "tls": {
+              "key": "self-signed/certs/servers/localhost/privkey.pem",
+              "certificate": "self-signed/certs/servers/localhost/cert.pem",
+              "dhparam": "dhparam.pem",
+              "ciphers": "ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AES:RSA+3DES:!ADH:!AECDH:!MD5:!DSS"
+            }
+          },
+          "paths": {
+            "/": {
+              "type": "static",
+              "directory": "../public"
+            },
+            "ws": {
+              "type": "websocket",
+              "url": "wss://localhost:9000/ws"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

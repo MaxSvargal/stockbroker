@@ -2,7 +2,7 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 
 import rootReducer from 'shared/reducers'
-import rootSaga from 'client/sagas'
+import rootSaga from 'shared/sagas/client'
 
 const { NODE_ENV } = process.env
 
@@ -21,9 +21,9 @@ sagaMiddleware.run(rootSaga)
 
 if (NODE_ENV !== 'production' && module.hot) {
   // Enable Webpack hot module replacement for reducers
-  module.hot.accept('shared/reducers', () => {
+  module.hot.accept('../shared/reducers', () => {
     /* eslint global-require: 0 */
-    const nextRootReducer = require('shared/reducers')
+    const nextRootReducer = require('../shared/reducers')
     store.replaceReducer(nextRootReducer)
   })
 }

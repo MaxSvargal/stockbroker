@@ -5,4 +5,6 @@ node_modules
 .env
 .c9
 .nyc_output
-server/accounts/*
+src/server/accounts/*
+accounts.config.js
+dist/*

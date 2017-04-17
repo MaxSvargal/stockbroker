@@ -1,6 +1,6 @@
 import { createReducer } from 'redux-act'
 import shortid from 'shortid'
-import { buySuccess, buyFailure, sellSuccess, sellFailure, addChunks, removeChunk, replaceChunksAmount } from 'shared/actions'
+import { buySuccess, buyFailure, sellSuccess, sellFailure, addChunks, removeChunk, replaceChunksAmount } from '../actions'
 import { time } from './helpers'
 
 /**
@@ -74,7 +74,7 @@ export const transactions = createReducer({
 
   [replaceChunksAmount]: (state, { from, to }) => {
     const updated = Object.keys(state)
-      .filter(key => state[key].amount === from)
+      .filter(key => state[key].active === true && state[key].amount === from)
       .reduce((obj, key) =>
         Object.assign({}, obj, {
           [key]: Object.assign({}, state[key], { amount: to })

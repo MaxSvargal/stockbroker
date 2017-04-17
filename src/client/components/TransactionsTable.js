@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
 import { hh, div, table, tbody, tr, th, td, button, span } from 'react-hyperscript-helpers'
-import { removeChunk } from 'shared/actions'
+import { removeChunk } from '../../shared/actions'
 
 const formatDate = time => {
   const date = new Date(time)
@@ -82,7 +82,8 @@ class TransactionsTable extends Component {
       emoji: {
         fontFamily: 'Emoji_Symbols',
         color: '#fff',
-        fontSize: '1.2rem'
+        fontSize: '1.2rem',
+        textAlign: 'center'
       }
     }
   }

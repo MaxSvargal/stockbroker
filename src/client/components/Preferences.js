@@ -9,7 +9,7 @@ import {
   replaceChunksAmount,
   setBuyProfitThreshold,
   setSellProfitThreshold
-} from 'shared/actions'
+} from '../../shared/actions'
 
 import InputNumber from './InputNumber'
 import FloatButton from './FloatButton'

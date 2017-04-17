@@ -1,6 +1,6 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
-import { requestNewChunks } from 'shared/actions'
+import { requestNewChunks } from '../../shared/actions'
 import { hh, div, input, label, span, button } from 'react-hyperscript-helpers'
 import BigNumber from 'bignumber.js'
 

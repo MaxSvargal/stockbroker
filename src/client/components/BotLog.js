@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
 import { hh, div } from 'react-hyperscript-helpers'
-import { formatDate } from 'client/utils'
+import { formatDate } from '../../shared/utils'
 
 const checkStringContain = (input, arr) =>
   arr.reduce((prev, curr) => (prev === true || input.search(curr) !== -1), false)
