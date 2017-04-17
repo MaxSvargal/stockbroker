@@ -1,8 +1,8 @@
 import { createStore, applyMiddleware, compose } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 
-import rootReducer from 'shared/reducers'
-import rootSaga from 'shared/sagas/client'
+import rootReducer from '../shared/reducers'
+import rootSaga from './sagas'
 
 const { NODE_ENV } = process.env
 
