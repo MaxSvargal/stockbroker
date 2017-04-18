@@ -24,7 +24,7 @@ router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) 
     const dbName = [ account, currencyOne, currencyTwo ].join('_')
     console.log({ NODE_ENV })
     const dbPath = NODE_ENV === 'development' ?
-      `./server/db/${dbName}` :
+      `./server/db/${dbName}_dev` :
       `http://localhost:5984/${dbName}`
 
     console.log('Use database', dbPath)

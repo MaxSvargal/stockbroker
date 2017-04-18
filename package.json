@@ -5,18 +5,20 @@
   "author": "MaxSvargal",
   "license": "MIT",
   "scripts": {
-    "dev": "npm run build:frontend:dev && NODE_ENV=development node ./dist/frontend_dev_bundle.js",
-    "test": "ACCOUNT=me NODE_ENV=test NODE_PATH=src nyc ava",
-    "test:watch": "npm test -- --watch",
-    "coverage": "nyc report --reporter=lcov --reporter=text-lcov | coveralls",
-    "build:worker": "rollup -c rollup.worker.config.js",
-    "build:frontend": "rollup -c rollup.frontend.config.js",
-    "build:frontend:dev": "rollup -c rollup.frontend.dev.config.js",
     "build:client": "webpack --config webpack.client.config.js",
+    "build:frontend:dev": "rollup -c rollup.frontend.dev.config.js",
+    "build:frontend": "rollup -c rollup.frontend.config.js",
+    "build:worker": "rollup -c rollup.worker.config.js",
     "build": "npm run build:worker && npm run build:frontend && npm run build:client",
+    "coverage": "nyc report --reporter=lcov --reporter=text-lcov | coveralls",
+    "dev": "npm run build:frontend:dev && NODE_ENV=development node ./dist/frontend_dev_bundle.js",
+    "frontend:dev": "npm run build:frontend:dev && NODE_ENV=development node ./dist/frontend_dev_bundle.js",
     "pm2": "pm2 start ./ecosystem.config.js",
     "router": "crossbar start",
-    "start": "npm run build && npm run pm2"
+    "start": "npm run build && npm run pm2",
+    "test:watch": "npm test -- --watch",
+    "test": "ACCOUNT=me NODE_ENV=test NODE_PATH=src nyc ava",
+    "worker:dev": "npm run build:worker && NODE_ENV=development ACCOUNT_NAME=maxsvargal ACCOUNT_KEY=123 ACCOUNT_SECRET=345 CURRENCY_PAIR=BTC_ETH DB_NAME=maxsvargal_btc_eth node ./dist/worker_bundle.js"
   },
   "ava": {
     "require": [
