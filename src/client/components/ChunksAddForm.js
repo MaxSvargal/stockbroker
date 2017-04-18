@@ -111,11 +111,11 @@ class ChunksAddForm extends Component {
       ]),
       div({ style: styles.actionsRow }, [
         button({
-          style: styles.createBtn,
+          style: styles.createBuyBtn,
           onClick: () => this.onCreateBuy() },
           'Создать покупки'),
         button({
-          style: styles.createBtn,
+          style: styles.createSellBtn,
           onClick: () => this.onCreateSell() },
           'Создать продажи')
       ])
@@ -134,9 +134,6 @@ class ChunksAddForm extends Component {
       },
       row: {
         display: 'flex',
-        flexWrap: 'no-wrap',
-        justifyContent: 'space-between',
-        padding: '0 0 1rem 0',
         width: '100%'
       },
       col: {
@@ -148,8 +145,17 @@ class ChunksAddForm extends Component {
         display: 'inline-block',
         minWidth: '12rem'
       },
-      createBtn: {
-        background: '#54a9eb',
+      createBuyBtn: {
+        background: '#0ED2F7',
+        color: '#fff',
+        border: 0,
+        fontSize: '1.2rem',
+        padding: '.5rem 0',
+        margin: '.25rem .5rem',
+        minWidth: '16rem'
+      },
+      createSellBtn: {
+        background: '#F7971E',
         color: '#fff',
         border: 0,
         fontSize: '1.2rem',
@@ -159,7 +165,7 @@ class ChunksAddForm extends Component {
       },
       actionsRow: {
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: 'column',
         flexWrap: 'wrap',
         justifyContent: 'center',
         alignContent: 'center',
