@@ -1,6 +1,6 @@
 import { take, select, put, race } from 'redux-saga/effects'
 import { cropNumber } from '../../shared/utils'
-import { doBuy, doSell, botMessage, buySuccess, buyFailure, sellSuccess, sellFailure, requestNewChunks } from '../../shared/actions'
+import { doBuy, doSell, botMessage, buySuccess, buyFailure, sellSuccess, sellFailure, addChunks } from '../../shared/actions'
 import { selectSellForCover, selectBuyForCover, selectTransactions, selectAutocreatedChunkAmount } from './selectors'
 
 export function* buySaga(rate, hold) {
@@ -11,7 +11,7 @@ export function* buySaga(rate, hold) {
     const chunkAmount = yield select(selectAutocreatedChunkAmount)
     // yield put(botMessage(`Покупка за ${rateWithHold} не покрывает ни одной продажи`))
     if (chunkAmount !== 0)
-      yield put(requestNewChunks({ rate, amount: chunkAmount, num: 1, type: 'buy', creationMethod: 'hollow' }))
+      yield put(addChunks({ rate, amount: chunkAmount, num: 1, type: 'buy', creationMethod: 'hollow' }))
     return false
   }
 
@@ -32,7 +32,7 @@ export function* sellSaga(rate, hold) {
   if (!coverId) {
     const chunkAmount = yield select(selectAutocreatedChunkAmount)
     if (chunkAmount !== 0)
-      yield put(requestNewChunks({ rate, amount: chunkAmount, num: 1, type: 'sell', creationMethod: 'hollow' }))
+      yield put(addChunks({ rate, amount: chunkAmount, num: 1, type: 'sell', creationMethod: 'hollow' }))
     // yield put(botMessage(`Продажа за ${rateWithHold} не покрывает ни одной покупки`))
     return false
   }
