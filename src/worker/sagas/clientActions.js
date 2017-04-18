@@ -20,8 +20,7 @@ const registerActionAsProcedure = (session) => (action, handler) =>
 
 export default function* clientWebSocketSaga() {
   try {
-    const realm = (ACCOUNT_NAME, CURRENCY_PAIR).join('/').replace('_', '/').toLowerCase()
-    console.log({ realm })
+    const realm = [ ACCOUNT_NAME, CURRENCY_PAIR ].join('/').replace('_', '/').toLowerCase()
     const session = yield call(ClientSocket, realm)
     const register = registerActionAsProcedure(session)
 
