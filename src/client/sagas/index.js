@@ -26,12 +26,14 @@ function* watchUpdates(session) {
   try {
     while (true) {
       const actionsArray = yield take(chan)
-      yield actionsArray
+      console.log({ actionsArray })
+      const filtered = actionsArray
         .filter(({ type }) =>
           enabledProcedures
             .map(p => p.toString())
             .filter(a => a !== type))
-        .map(action => put(action))
+      console.log({ filtered })
+      yield filtered.map(action => put(action))
     }
   } finally {
     console.log('terminated')

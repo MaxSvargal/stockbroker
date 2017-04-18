@@ -34,10 +34,10 @@ router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) 
   try {
     const start = new Date()
     const [ , account, currencyOne, currencyTwo ] = ctx.url.match(/\/bot\/(.+)\/(.+)\/(.+)\/page/)
-    const dbName = [ account, currencyOne.toUpperCase(), currencyTwo.toUpperCase() ].join('_')
+    const dbName = [ account, currencyOne, currencyTwo ].join('_')
+
     console.log('Use database', dbName)
-    // Get full state from database
-    const pouchDB = new PouchDB(`http://localhost:5984/${'test'}`)
+    const pouchDB = new PouchDB(`http://localhost:5984/${dbName}`)
     const res = await pouchDB.allDocs({ include_docs: true })
     const state = res.rows.reduce((prev, curr) => Object.assign({}, prev, { [curr.id]: curr.doc.state }), {})
     const store = createStore(rootReducer, state)

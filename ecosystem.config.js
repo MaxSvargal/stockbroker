@@ -1,18 +1,17 @@
 const accounts = require('./accounts.config')
 
 const createWorker = ({ name, pair, account, port }) => ({
-  name: `${name}:${pair}`,
+  name,
   script: './dist/worker_bundle.js',
   watch: './dist/worker_bundle.js',
   source_map_support: true,
   max_memory_restart: '250M',
   env: {
     NODE_ENV: 'production',
-    ACCOUNT_NAME: name,
+    CURRENCY_PAIR: pair,
     ACCOUNT_KEY: account.key,
     ACCOUNT_SECRET: account.secret,
-    CURRENCY_PAIR: pair,
-    DB_PATH: `./server/db/${name}_${pair}`,
+    DB: name,
     PORT: port
   }
 })
@@ -25,29 +24,29 @@ module.exports = {
     source_map_support: true,
     max_memory_restart: '150M'
   }, createWorker({
-    name: 'maxsvargal',
+    name: 'maxsvargal_btc_eth',
     pair: 'BTC_ETH',
     account: accounts.maxsvargal,
     port: 8000
   }), createWorker({
-    name: 'maxsvargal',
+    name: 'maxsvargal_btc_dash',
     pair: 'BTC_DASH',
     account: accounts.maxsvargal,
     port: 8001
   }), createWorker({
-    name: 'lesorub',
+    name: 'lesorub_btc_dash',
     pair: 'BTC_DASH',
     account: accounts.lesorub,
-    port: 8100
+    port: 8002
   }), createWorker({
-    name: 'lesorub',
+    name: 'lesorub_btc_fct',
     pair: 'BTC_FCT',
     account: accounts.lesorub,
-    port: 8101
+    port: 8003
   }), createWorker({
-    name: 'lesorub',
+    name: 'lesorub_usdt_dash',
     pair: 'USDT_DASH',
     account: accounts.lesorub,
-    port: 8102
+    port: 8004
   }) ]
 }
