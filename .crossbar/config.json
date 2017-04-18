@@ -8,7 +8,7 @@
       "type": "router",
       "realms": [
         {
-          "name": "maxsvargal/btc/eth",
+          "name": "maxsvargal_btc_eth",
           "roles": [
             {
               "name": "anonymous",
@@ -28,7 +28,7 @@
           ]
         },
         {
-          "name": "maxsvargal/btc/dash",
+          "name": "maxsvargal_btc_dash",
           "roles": [
             {
               "name": "anonymous",
@@ -48,7 +48,7 @@
            ]
          },
          {
-           "name": "lesorub/btc/dash",
+           "name": "lesorub_btc_dash",
            "roles": [
              {
                "name": "anonymous",
@@ -68,7 +68,7 @@
            ]
          },
          {
-           "name": "lesorub/btc/fct",
+           "name": "lesorub_btc_fct",
            "roles": [
              {
                "name": "anonymous",
@@ -88,7 +88,7 @@
            ]
          },
          {
-           "name": "lesorub/usdt/dash",
+           "name": "lesorub_usdt_dash",
            "roles": [
              {
                "name": "anonymous",
