@@ -1,41 +1,28 @@
 import Koa from 'koa'
 import KoaRouter from 'koa-router'
 import koaStatic from 'koa-static'
+import webpackDevMiddleware from 'koa-webpack-dev-middleware'
+import webpackHotMiddleware from 'koa-webpack-hot-middleware'
+import webpack from 'webpack'
 import path from 'path'
 import { createStore } from 'redux'
-import pm2 from 'pm2'
 import PouchDB from 'pouchdb'
-import PouchDBMemory from 'pouchdb-memory'
 
 import render from './renderer'
-import monitor from './monitor'
-
 import rootReducer from '../shared/reducers'
+import webpackConfig from '../../webpack.client.dev.config'
 
 const { NODE_ENV } = process.env
 const app = new Koa()
 const router = new KoaRouter()
-
-router.get('/', async (ctx, next) => {
-  try {
-    await new Promise((resolve, reject) =>
-      pm2.connect(err => err ? reject(err) : resolve()))
-    const processList = await new Promise((resolve, reject) =>
-      pm2.list((err, list) => err ? reject(err) : resolve(list)))
-
-    const html = monitor(processList)
-    ctx.body = html
-  } catch (err) {
-    console.error(err)
-  }
-  await next()
-})
+const compiler = webpack(webpackConfig)
 
 router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) => {
   try {
     const start = new Date()
     const [ , account, currencyOne, currencyTwo ] = ctx.url.match(/\/bot\/(.+)\/(.+)\/(.+)\/page/)
     const dbName = [ account, currencyOne, currencyTwo ].join('_')
+    console.log({ NODE_ENV })
     const dbPath = NODE_ENV === 'development' ?
       `./server/db/${dbName}` :
       `http://localhost:5984/${dbName}`
@@ -58,6 +45,8 @@ router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) 
   }
 })
 
+app.use(webpackDevMiddleware(compiler, { publicPath: '/', noInfo: true }))
+app.use(webpackHotMiddleware(compiler))
 app.use(router.routes())
 app.use(koaStatic(path.join(__dirname, '../public'), { maxage: 1, }))
 

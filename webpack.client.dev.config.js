@@ -5,7 +5,7 @@ const WebpackChunkHash = require('webpack-chunk-hash')
 const formatter = require('eslint-formatter-pretty')
 
 module.exports = {
-  context: path.resolve(__dirname, 'stockbroker/src'),
+  context: path.resolve(__dirname, 'src'),
   entry: {
     main: [
       'webpack-hot-middleware/client',
@@ -17,7 +17,7 @@ module.exports = {
   output: {
     filename: '[name].js',
     chunkFilename: '[name].js',
-    path: path.resolve(__dirname, 'stockbroker/public'),
+    path: path.resolve(__dirname, 'public'),
     publicPath: '/'
   },
   resolve: {

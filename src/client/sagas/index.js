@@ -17,6 +17,8 @@ const enabledProcedures = [
 
 const changeStateChannel = session => eventChannel(emitter => {
   const sub = session.subscribe('newAction', emitter)
+  /* eslint no-param-reassign: 0 */
+  /* eslint no-underscore-dangle: 0 */
   session._socket.onclose = () => emitter(END)
   return () => session.unsubscribe(sub)
 })
@@ -26,7 +28,7 @@ function* watchUpdates(session) {
   try {
     while (true) {
       const actionsArray = yield take(chan)
-      console.log({ actionsArray })
+      console.log(actionsArray[0])
       const filtered = actionsArray
         .filter(({ type }) =>
           enabledProcedures
@@ -44,6 +46,7 @@ function* watchUpdates(session) {
 export function* watchActionsForRPC(session) {
   while (true) {
     const action = yield take(enabledProcedures)
+    console.log('call action to rpc', action)
     session.call(action.type, [ action ])
   }
 }

@@ -1,8 +1,8 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
-import { requestNewChunks } from '../../shared/actions'
 import { hh, div, input, label, span, button } from 'react-hyperscript-helpers'
 import BigNumber from 'bignumber.js'
+import { requestNewChunks } from '../../shared/actions'
 
 class ChunksAddForm extends Component {
   constructor(props) {
