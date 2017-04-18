@@ -7,8 +7,8 @@ import rootReducer from './reducers'
 import rootSaga from './sagas'
 
 const { DB_PATH } = process.env
-const pouchDB = new PouchDB(DB_PATH, { adapter: 'leveldb', revs_limit: 1, auto_compaction: true })
-
+const dbName = [ account, currencyOne.toUpperCase(), currencyTwo.toUpperCase() ].join('_')
+const pouchDB = new PouchDB(`http://localhost:5984/${'test'}`, { adapter: 'leveldb', revs_limit: 1, auto_compaction: true })
 const sagaMiddleware = createSagaMiddleware()
 const middlewares = applyMiddleware(sagaMiddleware)
 const persist = persistentStore(pouchDB)
