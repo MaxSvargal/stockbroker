@@ -3,7 +3,9 @@ import KoaRouter from 'koa-router'
 import koaStatic from 'koa-static'
 import path from 'path'
 import { createStore } from 'redux'
+import pm2 from 'pm2'
 import render from './renderer'
+import monitor from './monitor'
 
 import ClientSocket from '../shared/services/clientSocket'
 import rootReducer from '../shared/reducers'
@@ -12,7 +14,17 @@ const app = new Koa()
 const router = new KoaRouter()
 
 router.get('/', async (ctx, next) => {
-  ctx.body = 'Show instancies links here'
+  try {
+    await new Promise((resolve, reject) =>
+      pm2.connect(err => err ? reject(err) : resolve()))
+    const processList = await new Promise((resolve, reject) =>
+      pm2.list((err, list) => err ? reject(err) : resolve(list)))
+
+    const html = monitor(processList)
+    ctx.body = html
+  } catch (err) {
+    console.error(err)
+  }
   await next()
 })
 

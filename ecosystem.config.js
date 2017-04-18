@@ -24,12 +24,12 @@ module.exports = {
     source_map_support: true,
     max_memory_restart: '150M'
   }, createWorker({
-    name: 'MAX',
+    name: 'maxsvargal',
     pair: 'BTC_ETH',
     account: accounts.maxsvargal,
     port: 8000
   }), createWorker({
-    name: 'MAX',
+    name: 'maxsvargal',
     pair: 'BTC_DASH',
     account: accounts.maxsvargal,
     port: 8001
