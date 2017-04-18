@@ -11,7 +11,7 @@ const createWorker = ({ name, pair, account, port }) => ({
     CURRENCY_PAIR: pair,
     ACCOUNT_KEY: account.key,
     ACCOUNT_SECRET: account.secret,
-    DB: name,
+    DB_NAME: name,
     PORT: port
   }
 })
