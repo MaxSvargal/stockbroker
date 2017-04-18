@@ -6,8 +6,8 @@ import createSagaMiddleware from 'redux-saga'
 import rootReducer from './reducers'
 import rootSaga from './sagas'
 
-const { DB_PATH } = process.env
-const dbName = [ account, currencyOne.toUpperCase(), currencyTwo.toUpperCase() ].join('_')
+// const { DB_PATH } = process.env
+// const dbName = [ account, currencyOne.toUpperCase(), currencyTwo.toUpperCase() ].join('_')
 const pouchDB = new PouchDB(`http://localhost:5984/${'test'}`, { adapter: 'leveldb', revs_limit: 1, auto_compaction: true })
 const sagaMiddleware = createSagaMiddleware()
 const middlewares = applyMiddleware(sagaMiddleware)
