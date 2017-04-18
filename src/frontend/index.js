@@ -5,6 +5,7 @@ import path from 'path'
 import { createStore } from 'redux'
 import pm2 from 'pm2'
 import PouchDB from 'pouchdb'
+import PouchDBMemory from 'pouchdb-memory'
 
 import render from './renderer'
 import monitor from './monitor'
@@ -36,8 +37,12 @@ router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) 
     const dbName = [ account, currencyOne.toUpperCase(), currencyTwo.toUpperCase() ].join('_')
     console.log('Use database', dbName)
     // Get full state from database
-    const pouchDB = new PouchDB(`./server/db/${dbName}`, { adapter: 'leveldb', revs_limit: 1, auto_compaction: true })
-    const res = await pouchDB.allDocs({ include_docs: true })
+    const localDb = new PouchDB(`./server/db/${dbName}`)
+    const memoryDb = new PouchDBMemory('local')
+    await memoryDb.replicate.from(localDb)
+    console.log({ memoryDb })
+    // const pouchDB = new PouchDB(`http://localhost:5984/${dbName}`)
+    const res = await memoryDb.allDocs({ include_docs: true })
     const state = res.rows.reduce((prev, curr) => Object.assign({}, prev, { [curr.id]: curr.doc.state }), {})
     const store = createStore(rootReducer, state)
     const html = render(store, ctx.url)
