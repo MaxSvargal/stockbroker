@@ -4,7 +4,7 @@ import ClientSocket from '../../shared/services/clientSocket'
 import store from '../index'
 import * as actions from '../../shared/actions'
 
-const { ACCOUNT_NAME, CURRENCY_PAIR } = process.env
+const { DB_NAME } = process.env
 
 export function* watchForActionsAndPublish(session) {
   while (true) {
@@ -20,8 +20,7 @@ const registerActionAsProcedure = (session) => (action, handler) =>
 
 export default function* clientWebSocketSaga() {
   try {
-    const realm = [ ACCOUNT_NAME, CURRENCY_PAIR ].join('/').replace('_', '/').toLowerCase()
-    const session = yield call(ClientSocket, realm)
+    const session = yield call(ClientSocket, DB_NAME)
     const register = registerActionAsProcedure(session)
 
     register('getInitialState', store.getState)
