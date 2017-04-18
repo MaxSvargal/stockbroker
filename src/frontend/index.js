@@ -4,10 +4,11 @@ import koaStatic from 'koa-static'
 import path from 'path'
 import { createStore } from 'redux'
 import pm2 from 'pm2'
+import PouchDB from 'pouchdb'
+
 import render from './renderer'
 import monitor from './monitor'
 
-import ClientSocket from '../shared/services/clientSocket'
 import rootReducer from '../shared/reducers'
 
 const app = new Koa()
@@ -31,13 +32,18 @@ router.get('/', async (ctx, next) => {
 router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) => {
   try {
     const start = new Date()
-    const realm = ctx.url.match(/\/bot\/(.+)\/page/)[1]
-    console.log({ realm })
-    const session = await ClientSocket(realm)
-    const state = await session.call('getInitialState')
+    const [ , account, currencyOne, currencyTwo ] = ctx.url.match(/\/bot\/(.+)\/(.+)\/(.+)\/page/)
+    const dbName = [ account, currencyOne.toUpperCase(), currencyTwo.toUpperCase() ].join('_')
+    console.log('Use database', dbName)
+    // Get full state from database
+    const pouchDB = new PouchDB(`./server/db/${dbName}`, { adapter: 'leveldb', revs_limit: 1, auto_compaction: true })
+    const res = await pouchDB.allDocs({ include_docs: true })
+    const state = res.rows.reduce((prev, curr) => Object.assign({}, prev, { [curr.id]: curr.doc.state }), {})
     const store = createStore(rootReducer, state)
     const html = render(store, ctx.url)
+
     ctx.body = html
+
     await next()
     const ms = new Date() - start
     console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
