@@ -8,6 +8,7 @@ const createWorker = ({ name, pair, account, port }) => ({
   max_memory_restart: '250M',
   env: {
     NODE_ENV: 'development',
+    ACCOUNT_NAME: name,
     ACCOUNT_KEY: account.key,
     ACCOUNT_SECRET: account.secret,
     CURRENCY_PAIR: pair,

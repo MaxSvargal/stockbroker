@@ -31,7 +31,9 @@ router.get('/', async (ctx, next) => {
 router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) => {
   try {
     const start = new Date()
-    const session = await ClientSocket()
+    const realm = ctx.url.match(/\/bot\/(.+)\/page/)[1]
+    console.log({ realm })
+    const session = await ClientSocket(realm)
     const state = await session.call('getInitialState')
     const store = createStore(rootReducer, state)
     const html = render(store, ctx.url)

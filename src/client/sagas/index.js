@@ -48,7 +48,9 @@ export function* watchActionsForRPC(session) {
 
 export default function* clientWebSocketSaga() {
   try {
-    const session = yield call(ClientSocket)
+    const realm = window.location.pathname.match(/\/bot\/(.+)\/page/)[1]
+    console.log({ realm })
+    const session = yield call(ClientSocket, realm)
     yield [
       fork(watchUpdates, session),
       fork(watchActionsForRPC, session)
