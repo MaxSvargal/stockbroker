@@ -41,12 +41,12 @@ module.exports = {
     port: 8100
   }), createWorker({
     name: 'lesorub',
-    pair: 'USDT_DASH',
+    pair: 'BTC_FCT',
     account: accounts.lesorub,
     port: 8101
   }), createWorker({
     name: 'lesorub',
-    pair: 'BTC_FCT',
+    pair: 'USDT_DASH',
     account: accounts.lesorub,
     port: 8102
   }) ]

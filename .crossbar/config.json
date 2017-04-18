@@ -5,9 +5,9 @@
   },
   "workers": [
     {
-       "type": "router",
-       "realms": [
-         {
+      "type": "router",
+      "realms": [
+        {
           "name": "maxsvargal/btc/eth",
           "roles": [
             {
@@ -28,12 +28,12 @@
           ]
         },
         {
-         "name": "maxsvargal/btc/dash",
-         "roles": [
-           {
-             "name": "anonymous",
-             "permissions": [
-               {
+          "name": "maxsvargal/btc/dash",
+          "roles": [
+            {
+              "name": "anonymous",
+              "permissions": [
+                {
                  "uri": "*",
                   "allow": {
                      "call": true,
@@ -42,11 +42,71 @@
                      "subscribe": true
                   },
                   "cache": true
-               }
-             ]
-           }
-         ]
-       }
+                 }
+               ]
+             }
+           ]
+         },
+         {
+           "name": "lesorub/btc/dash",
+           "roles": [
+             {
+               "name": "anonymous",
+               "permissions": [
+                 {
+                   "uri": "*",
+                   "allow": {
+                     "call": true,
+                     "register": true,
+                     "publish": true,
+                     "subscribe": true
+                   },
+                   "cache": true
+                 }
+               ]
+             }
+           ]
+         },
+         {
+           "name": "lesorub/btc/fct",
+           "roles": [
+             {
+               "name": "anonymous",
+               "permissions": [
+                 {
+                   "uri": "*",
+                   "allow": {
+                     "call": true,
+                     "register": true,
+                     "publish": true,
+                     "subscribe": true
+                   },
+                   "cache": true
+                 }
+               ]
+             }
+           ]
+         },
+         {
+           "name": "lesorub/usdt/dash",
+           "roles": [
+             {
+               "name": "anonymous",
+               "permissions": [
+                 {
+                   "uri": "*",
+                   "allow": {
+                     "call": true,
+                     "register": true,
+                     "publish": true,
+                     "subscribe": true
+                   },
+                   "cache": true
+                 }
+               ]
+             }
+           ]
+         }
       ],
       "transports": [
         {
