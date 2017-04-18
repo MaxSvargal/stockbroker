@@ -7,7 +7,7 @@ const createWorker = ({ name, pair, account, port }) => ({
   source_map_support: true,
   max_memory_restart: '250M',
   env: {
-    NODE_ENV: 'production',
+    NODE_ENV: 'development',
     ACCOUNT_KEY: account.key,
     ACCOUNT_SECRET: account.secret,
     CURRENCY_PAIR: pair,
@@ -33,5 +33,20 @@ module.exports = {
     pair: 'BTC_DASH',
     account: accounts.maxsvargal,
     port: 8001
+  }), createWorker({
+    name: 'lesorub',
+    pair: 'BTC_DASH',
+    account: accounts.lesorub,
+    port: 8100
+  }), createWorker({
+    name: 'lesorub',
+    pair: 'USDT_DASH',
+    account: accounts.lesorub,
+    port: 8101
+  }), createWorker({
+    name: 'lesorub',
+    pair: 'BTC_FCT',
+    account: accounts.lesorub,
+    port: 8102
   }) ]
 }
