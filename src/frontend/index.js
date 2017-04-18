@@ -37,7 +37,7 @@ router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) 
     const dbName = [ account, currencyOne.toUpperCase(), currencyTwo.toUpperCase() ].join('_')
     console.log('Use database', dbName)
     // Get full state from database
-    const localDb = new PouchDB(`./server/db/${dbName}`)
+    const localDb = new PouchDB(`../server/db/${dbName}`)
     // const memoryDb = new PouchDBMemory('local')
     // await memoryDb.replicate.from(localDb)
     console.log({ localDb })
