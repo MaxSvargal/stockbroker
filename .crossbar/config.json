@@ -8,7 +8,7 @@
        "type": "router",
        "realms": [
          {
-          "name": "me/btc/eth",
+          "name": "maxsvargal/btc/eth",
           "roles": [
             {
               "name": "anonymous",
@@ -28,7 +28,7 @@
           ]
         },
         {
-         "name": "me/btc/dash",
+         "name": "maxsvargal/btc/dash",
          "roles": [
            {
              "name": "anonymous",
