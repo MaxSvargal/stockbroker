@@ -8,7 +8,7 @@
        "type": "router",
        "realms": [
          {
-          "name": "realm1",
+          "name": "me/btc/eth",
           "roles": [
             {
               "name": "anonymous",
@@ -26,29 +26,44 @@
               ]
             }
           ]
-        }
+        },
+        {
+         "name": "me/btc/dash",
+         "roles": [
+           {
+             "name": "anonymous",
+             "permissions": [
+               {
+                 "uri": "*",
+                  "allow": {
+                     "call": true,
+                     "register": true,
+                     "publish": true,
+                     "subscribe": true
+                  },
+                  "cache": true
+               }
+             ]
+           }
+         ]
+       }
       ],
       "transports": [
         {
           "type": "web",
           "endpoint": {
             "type": "tcp",
-            "port": 9000,
-            "tls": {
-              "key": "self-signed/certs/servers/localhost/privkey.pem",
-              "certificate": "self-signed/certs/servers/localhost/cert.pem",
-              "dhparam": "dhparam.pem",
-              "ciphers": "ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AES:RSA+3DES:!ADH:!AECDH:!MD5:!DSS"
-            }
+            "port": 8080
           },
           "paths": {
             "/": {
-              "type": "static",
-              "directory": "../public"
+              "type": "reverseproxy",
+              "host": "localhost",
+              "port": 8085
             },
             "ws": {
               "type": "websocket",
-              "url": "wss://localhost:9000/ws"
+              "url": "ws://localhost:8080/ws"
             }
           }
         }

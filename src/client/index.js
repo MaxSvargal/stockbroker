@@ -7,9 +7,11 @@ import { h } from 'react-hyperscript-helpers'
 import store from './store'
 import App from './components/App'
 
+const [ , basename ] = document.location.pathname.match(/(.+\/page)(\/.+)/)
+
 const render = Component =>
   ReactDOM.render(
-    h(Router, [
+    h(Router, { basename }, [
       h(AppContainer, [
         h(Provider, { store }, [ Component() ])
       ])

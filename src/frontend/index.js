@@ -1,6 +1,7 @@
 import Koa from 'koa'
-import path from 'path'
+import KoaRouter from 'koa-router'
 import koaStatic from 'koa-static'
+import path from 'path'
 import { createStore } from 'redux'
 import render from './renderer'
 
@@ -8,15 +9,20 @@ import ClientSocket from '../shared/services/clientSocket'
 import rootReducer from '../shared/reducers'
 
 const app = new Koa()
+const router = new KoaRouter()
 
-app.use(koaStatic(path.join(__dirname, '../public'), { maxage: 1, }))
-app.use(async (ctx, next) => {
+router.get('/', async (ctx, next) => {
+  ctx.body = 'Show instancies links here'
+  await next()
+})
+
+router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) => {
   try {
     const start = new Date()
     const session = await ClientSocket()
     const state = await session.call('getInitialState')
     const store = createStore(rootReducer, state)
-    const html = render(store, ctx.request.url)
+    const html = render(store, ctx.url)
     ctx.body = html
     await next()
     const ms = new Date() - start
@@ -25,6 +31,9 @@ app.use(async (ctx, next) => {
     console.log(err)
   }
 })
+
+app.use(router.routes())
+app.use(koaStatic(path.join(__dirname, '../public'), { maxage: 1, }))
 
 app.listen(8085)
 

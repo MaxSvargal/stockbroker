@@ -28,7 +28,9 @@ function* watchUpdates(session) {
       const actionsArray = yield take(chan)
       yield actionsArray
         .filter(({ type }) =>
-          enabledProcedures.map(p => p.toString()).indexOf(type) !== -1)
+          enabledProcedures
+            .map(p => p.toString())
+            .filter(a => a !== type))
         .map(action => put(action))
     }
   } finally {

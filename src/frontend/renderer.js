@@ -5,13 +5,14 @@ import { h } from 'react-hyperscript-helpers'
 import App from '../client/components/App'
 import renderFullPage from './index.html'
 
-const handleRender = (store, location) => {
+const handleRender = (store, url) => {
   const context = {}
+  const [ , basename, location ] = url.match(/(.+\/page)(\/.+)/)
   const state = store.getState()
 
   const html = renderToString(
     h(Provider, { store }, [
-      h(Router, { context, location }, [
+      h(Router, { context, basename, location }, [
         App()
       ])
     ]))
