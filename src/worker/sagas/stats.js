@@ -36,7 +36,7 @@ export function* generateStatsSaga() {
     const lowestAsk = Number(buys[buys.length - 1][1])
     const highestBid = Number(sells[sells.length - 1][1])
 
-    console.log([ currentRate, buyChange, sellChange, lowestAsk, highestBid ])
+    // console.log([ currentRate, buyChange, sellChange, lowestAsk, highestBid ])
     yield put(addStats([ currentRate, buyChange, sellChange, lowestAsk, highestBid ]))
   }
 }
