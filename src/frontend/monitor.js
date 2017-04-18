@@ -45,23 +45,19 @@ const handleRender = (state) => {
     }
   }
 
-  const getWorkerPath = name => {
-    const [ account, pair ] = name.split(':')
-    if (!account || !pair) return name
-    const [ first, second ] = pair.split('_')
-    return `/bot/${account}/${first.toLowerCase()}/${second.toLowerCase()}/page/full`
-  }
-
   const getUptimeMinutes = uptime =>
     ((new Date().getTime() - uptime) / 1000 / 60).toFixed(0)
 
   const html = renderToString(
     div({ style: styles.root }, state.map((p, i) =>
       div({ style: styles.item, key: i }, [
-        a({ style: styles.link(p.pid), href: getWorkerPath(p.name) }, [
+        a({
+          style: styles.link(p.pid),
+          href: `/bot/${p.name.split('_').join('/')}/page/full`
+        }, [
           div({ style: styles.title }, [
-            div({ style: styles.titleAccount }, p.name.split(':')[0]),
-            div({ style: styles.titlePair }, p.name.split(':')[1])
+            div({ style: styles.titleAccount }),
+            div({ style: styles.titlePair }, p.name.split('_').join(' '))
           ]),
           p.pid > 0 && div({ style: styles.col }, [
             div({ style: styles.memory }, `${(p.monit.memory / 1000000).toFixed(0)} Mb`),
