@@ -44,6 +44,7 @@ router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) 
 
     const pouchDB = new PouchDB(dbPath)
     const res = await pouchDB.allDocs({ include_docs: true })
+    pouchDB.close()
     const state = res.rows.reduce((prev, curr) => Object.assign({}, prev, { [curr.id]: curr.doc.state }), {})
     const store = createStore(rootReducer, state)
     const html = render(store, ctx.url)

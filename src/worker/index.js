@@ -8,12 +8,12 @@ import rootSaga from './sagas'
 
 const { NODE_ENV, DB_NAME } = process.env
 const dbPath = NODE_ENV === 'development' ?
-  `./server/db/${DB_NAME}` :
+  `./server/db/${DB_NAME}_dev` :
   `http://localhost:5984/${DB_NAME}`
 
 console.log('Use database', dbPath)
 
-const pouchDB = new PouchDB(dbPath)
+const pouchDB = new PouchDB(dbPath, { adapter: 'leveldb', revs_limit: 1, auto_compaction: true })
 const sagaMiddleware = createSagaMiddleware()
 const middlewares = applyMiddleware(sagaMiddleware)
 const persist = persistentStore(pouchDB)
