@@ -49,19 +49,22 @@ test.skip('transactions < buyFailure should work correctly', t => {
   t.deepEqual(newState, { foo: { rate: 0.5, amount: 1, active: false, error: 'Server error' }, bar: {} })
 })
 
-test('transactions < replaceChunksAmount should replace correct amounts', t => {
+test('transactions < replaceChunksAmount should remove old and create new chunks with passed amount', t => {
   const state = {
     foo: { rate: 0.5, amount: 0.1, active: true },
     bar: { rate: 0.5, amount: 0.5, active: true },
     quz: { rate: 0.5, amount: 0.1, active: true }
   }
-  const expected = {
-    foo: { rate: 0.5, amount: 1, active: true },
-    bar: { rate: 0.5, amount: 0.5, active: true },
-    quz: { rate: 0.5, amount: 1, active: true }
-  }
   const action = replaceChunksAmount({ from: 0.1, to: 1 })
   const newState = transactions(state, action)
-  console.log({ newState })
-  t.deepEqual(newState, expected)
+  const keys = Object.keys(newState)
+
+  t.is(Object.keys(newState).length, 5)
+  t.is(newState[keys[0]].active, false)
+  t.is(newState[keys[1]].active, true)
+  t.is(newState[keys[2]].active, false)
+  t.is(newState[keys[3]].active, true)
+  t.is(newState[keys[3]].amount, 1)
+  t.is(newState[keys[4]].active, true)
+  t.is(newState[keys[4]].amount, 1)
 })

@@ -70,17 +70,22 @@ export const transactions = createReducer({
 
   [removeChunk]: (state, id) =>
     Object.assign({}, state, {
-      [id]: Object.assign({}, state[id], { active: false, removed: true }) }),
+      [id]: Object.assign({}, state[id], { updated: time(), active: false, removed: true }) }),
 
   [replaceChunksAmount]: (state, { from, to }) => {
-    const updated = Object.keys(state)
+    const closedChunks = Object.keys(state)
       .filter(key => state[key].active === true && state[key].amount === from)
-      .reduce((obj, key) =>
-        Object.assign({}, obj, {
-          [key]: Object.assign({}, state[key], { amount: to })
-        })
-      , {})
+      .reduce((obj, key) => Object.assign({}, obj, {
+        [key]: Object.assign({}, state[key], { updated: time(), active: false, removed: true })
+      }), {})
 
-    return Object.assign({}, state, updated)
+    const newChunks = Object.keys(closedChunks)
+      .reduce((obj, key) => Object.assign({}, obj, {
+        [shortid.generate()]: Object.assign({}, state[key], {
+          amount: to, created: time(), active: true
+        })
+      }), {})
+
+    return Object.assign({}, state, closedChunks, newChunks)
   }
 }, {})
