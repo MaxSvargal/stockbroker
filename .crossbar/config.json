@@ -8,6 +8,26 @@
       "type": "router",
       "realms": [
         {
+          "name": "maxsvargal_development_worker",
+          "roles": [
+            {
+              "name": "anonymous",
+              "permissions": [
+                {
+                  "uri": "*",
+                   "allow": {
+                      "call": true,
+                      "register": true,
+                      "publish": true,
+                      "subscribe": true
+                   },
+                   "cache": true
+                }
+              ]
+            }
+          ]
+        },
+        {
           "name": "maxsvargal_btc_eth",
           "roles": [
             {
