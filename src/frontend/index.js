@@ -5,14 +5,12 @@ import path from 'path'
 import { createStore } from 'redux'
 import pm2 from 'pm2'
 import PouchDB from 'pouchdb'
-import PouchDBMemory from 'pouchdb-memory'
 
 import render from './renderer'
 import monitor from './monitor'
 
 import rootReducer from '../shared/reducers'
 
-const { NODE_ENV } = process.env
 const app = new Koa()
 const router = new KoaRouter()
 
@@ -36,9 +34,7 @@ router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) 
     const start = new Date()
     const [ , account, currencyOne, currencyTwo ] = ctx.url.match(/\/bot\/(.+)\/(.+)\/(.+)\/page/)
     const dbName = [ account, currencyOne, currencyTwo ].join('_')
-    const dbPath = NODE_ENV === 'development' ?
-      `./server/db/${dbName}` :
-      `http://localhost:5984/${dbName}`
+    const dbPath = `http://127.0.0.1:5984/${dbName}`
 
     console.log('Use database', dbPath)
 

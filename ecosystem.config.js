@@ -1,13 +1,13 @@
 const accounts = require('./accounts.config')
 
-const createWorker = ({ name, pair, account, port }) => ({
+const createWorker = ({ name, pair, account, port, env }) => ({
   name,
   script: './dist/worker_bundle.js',
   watch: './dist/worker_bundle.js',
   source_map_support: true,
   max_memory_restart: '250M',
   env: {
-    NODE_ENV: 'production',
+    NODE_ENV: env || 'production',
     CURRENCY_PAIR: pair,
     ACCOUNT_KEY: account.key,
     ACCOUNT_SECRET: account.secret,
@@ -24,6 +24,12 @@ module.exports = {
     source_map_support: true,
     max_memory_restart: '150M'
   }, createWorker({
+    name: 'maxsvargal_development_worker',
+    env: 'development',
+    pair: 'BTC_ETH',
+    account: accounts.maxsvargal,
+    port: 7999
+  }), createWorker({
     name: 'maxsvargal_btc_eth',
     pair: 'BTC_ETH',
     account: accounts.maxsvargal,

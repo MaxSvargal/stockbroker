@@ -14,7 +14,7 @@ module.exports = {
       jail: 'src'
     }),
     commonjs({
-      exclude: [ 'node_modules' ],
+      exclude: [ 'node_modules/**' ],
       sourceMap: true
     })
   ]

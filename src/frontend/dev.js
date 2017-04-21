@@ -22,14 +22,11 @@ router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) 
     const start = new Date()
     const [ , account, currencyOne, currencyTwo ] = ctx.url.match(/\/bot\/(.+)\/(.+)\/(.+)\/page/)
     const dbName = [ account, currencyOne, currencyTwo ].join('_')
-    console.log({ NODE_ENV })
-    const dbPath = NODE_ENV === 'development' ?
-      `./server/db/${dbName}` :
-      `http://localhost:5984/${dbName}`
+    const dbPath = `http://localhost:5984/${dbName}`
 
     console.log('Use database', dbPath)
 
-    const pouchDB = new PouchDB(dbPath, { adapter: 'leveldb', revs_limit: 1, auto_compaction: true })
+    const pouchDB = new PouchDB(dbPath)
     const res = await pouchDB.allDocs({ include_docs: true })
     const state = res.rows.reduce((prev, curr) => Object.assign({}, prev, { [curr.id]: curr.doc.state }), {})
     const store = createStore(rootReducer, state)

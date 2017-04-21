@@ -6,14 +6,11 @@ import createSagaMiddleware from 'redux-saga'
 import rootReducer from './reducers'
 import rootSaga from './sagas'
 
-const { NODE_ENV, DB_NAME } = process.env
-const dbPath = NODE_ENV === 'development' ?
-  `./server/db/${DB_NAME}_dev` :
-  `http://localhost:5984/${DB_NAME}`
+const dbPath = `http://127.0.0.1:5984/${process.env.DB_NAME}`
 
 console.log('Use database', dbPath)
 
-const pouchDB = new PouchDB(dbPath, { adapter: 'leveldb', revs_limit: 1, auto_compaction: true })
+const pouchDB = new PouchDB(dbPath)
 const sagaMiddleware = createSagaMiddleware()
 const middlewares = applyMiddleware(sagaMiddleware)
 const persist = persistentStore(pouchDB)

@@ -26,7 +26,8 @@ module.exports = {
   },
   module: {
     rules: [
-      { test: /\.js$/, loader: 'eslint-loader' }
+      { test: /\.js$/, loader: 'eslint-loader' },
+      { test: /\.css$/, use: [ 'style-loader', 'css-loader' ] }
     ]
   },
   plugins: [
