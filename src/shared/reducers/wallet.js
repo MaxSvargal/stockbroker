@@ -2,6 +2,7 @@ import { createReducer } from 'redux-act'
 import {
   setAutocreatedChunkAmount,
   setBuyProfitThreshold,
+  setBalanceValues,
   setCurrency,
   setCurrencyPair,
   setFreeCurrencies,
@@ -47,3 +48,7 @@ export const autocreatedChunkAmount = createReducer({
 export const currentPair = createReducer({
   [setCurrencyPair]: (state, value) => value
 }, '')
+
+export const balanceValues = createReducer({
+  [setBalanceValues]: (state, value) => value
+}, { chunksBuyVolume: 0, chunksSellVolume: 0, availableBuyValue: 0, availableSellValue: 0 })

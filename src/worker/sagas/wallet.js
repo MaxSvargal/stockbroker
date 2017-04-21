@@ -1,11 +1,11 @@
-import { call, take, put, select, fork } from 'redux-saga/effects'
-import { buyFailure, buySuccess, doBuy, doSell, sellFailure, sellSuccess, setCurrencyPair, updateWallet } from '../../shared/actions'
+import { delay } from 'redux-saga'
+import { race, call, take, put, select, fork } from 'redux-saga/effects'
+import { addChunks, buyFailure, buySuccess, doBuy, doSell, sellFailure, sellSuccess, setCurrencyPair, updateWallet, setBalanceValues } from '../../shared/actions'
 import Poloniex from '../services/poloniex'
-import { selectCurrencyPair } from './selectors'
+import { selectCurrencyPair, selectVolumeOfChunksType, selectCurrencyPairSplited, selectAvaliableValue } from './selectors'
 
 const { NODE_ENV, CURRENCY_PAIR, ACCOUNT_KEY, ACCOUNT_SECRET } = process.env
 
-console.log({ ACCOUNT_KEY, ACCOUNT_SECRET })
 export const poloniex = new Poloniex({ key: ACCOUNT_KEY, secret: ACCOUNT_SECRET })
 
 export function* setCurrencyPairSaga() {
@@ -13,50 +13,52 @@ export function* setCurrencyPairSaga() {
 }
 
 export function* getWallet() {
-  const { response, error } = yield call(poloniex.privateRequest, { command: 'returnBalances' })
-  if (response) yield put(updateWallet(response))
-  if (error) yield fork(getWallet)
-}
-
-export function* doBuySaga() {
-  while (true) {
-    try {
-      const { payload: { rate, amount, profit, coverId } } = yield take(doBuy)
-      const currencyPair = yield select(selectCurrencyPair)
-      const options = { command: 'buy', currencyPair, rate, amount }
-
-      const { response, error } = NODE_ENV === 'production' ?
-        yield call(poloniex.privateRequest, options) :
-        { response: { orderNumber: 777 } }
-
-      const orderNumber = response && response.orderNumber
-      orderNumber ?
-        yield put(buySuccess({ rate, amount, profit, coverId, orderNumber })) :
-        yield put(buyFailure({ rate, amount, coverId, error: error || (response && response.error) }))
-    } catch (err) {
-      console.log({ err })
-    }
+  try {
+    const { response, error } = yield call(poloniex.privateRequest, { command: 'returnBalances' })
+    if (error) throw new Error('Fail to get wallet balance.', error)
+    if (response) yield put(updateWallet(response))
+  } catch (err) {
+    console.log({ err })
+    delay(5000)
+    yield fork(getWallet)
   }
 }
 
-export function* doSellSaga() {
+export function* calculateFreeValues() {
   while (true) {
-    try {
-      const { payload: { rate, amount, profit, coverId } } = yield take(doSell)
-      const currencyPair = yield select(selectCurrencyPair)
-      const options = { command: 'sell', currencyPair, rate, amount }
+    yield take([ addChunks, buySuccess, buyFailure, sellSuccess, sellFailure ])
+    const chunksBuyVolume = yield select(selectVolumeOfChunksType, 'buy')
+    const chunksSellVolume = yield select(selectVolumeOfChunksType, 'sell')
 
-      const { response, error } = NODE_ENV === 'production' ?
-        yield call(poloniex.privateRequest, options) :
-        { response: { orderNumber: 777 } }
+    // const [ firstCurrency, seconndCurrency ] = yield select(selectCurrencyPairSplited)
+    const availableBuyValue = 0.20 // yield select(selectAvaliableValue, firstCurrency)
+    const availableSellValue = 3.2 // yield select(selectAvaliableValue, seconndCurrency)
 
-      const orderNumber = response && response.orderNumber
-      orderNumber ?
-        yield put(sellSuccess({ rate, amount, profit, coverId, orderNumber })) :
-        yield put(sellFailure({ rate, amount, coverId, error: error || (response && response.error) }))
-    } catch (err) {
-      console.log({ err })
-    }
+    yield put(setBalanceValues({ chunksBuyVolume, chunksSellVolume, availableBuyValue, availableSellValue }))
+  }
+}
+
+export function* carryOutTransactionsSaga() {
+  try {
+    const { buy, sell } = yield race({ buy: take(doBuy), sell: take(doSell) })
+    const currencyPair = yield select(selectCurrencyPair)
+
+    const { rate, amount, profit, coverId } = (buy && buy.payload) || (sell && sell.payload)
+    const command = (buy && 'buy') || (sell && 'sell')
+    const successCb = (buy && buySuccess) || (sell && sellSuccess)
+    const failureCb = (buy && buyFailure) || (sell && sellFailure)
+    const options = { command, currencyPair, rate, amount }
+
+    const { response, error } = NODE_ENV === 'production' ?
+      yield call(poloniex.privateRequest, options) :
+      { response: { orderNumber: 777 } }
+
+    const orderNumber = response && response.orderNumber
+    orderNumber ?
+      yield put(successCb({ rate, amount, profit, coverId, orderNumber })) :
+      yield put(failureCb({ rate, amount, coverId, error: error || (response && response.error) }))
+  } catch (err) {
+    console.log({ err })
   }
 }
 
@@ -87,9 +89,8 @@ export function* doSellSaga() {
 export default function* walletSaga() {
   yield [
     fork(setCurrencyPairSaga),
-    fork(getWallet),
-    // fork(calculateFreeValues),
-    fork(doBuySaga),
-    fork(doSellSaga)
+    fork(carryOutTransactionsSaga),
+    fork(calculateFreeValues),
+    fork(getWallet)
   ]
 }

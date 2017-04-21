@@ -1,3 +1,6 @@
+import { cropNumber } from '../../shared/utils'
+
+export const selectAvaliableValue = ({ wallet }, currency) => wallet[currency]
 export const selectAsk = state => state.ask
 export const selectBid = state => state.bid
 export const selectBuyTransactions = state => state.buyTransactions
@@ -71,3 +74,11 @@ export const selectObsoleteTransactions = ({ transactions, obsoleteThreshold }, 
     transactions[key].active === true &&
     (lastRate - transactions[key].rate > obsoleteThreshold ||
       transactions[key].rate - lastRate > obsoleteThreshold))
+
+export const selectVolumeOfChunksType = ({ transactions }, type) =>
+  cropNumber(Object.keys(transactions)
+    .filter(key =>
+      transactions[key].active === true &&
+      transactions[key].type === type)
+    .map(key => transactions[key].amount)
+    .reduce((prev, curr) => prev + curr, 0))

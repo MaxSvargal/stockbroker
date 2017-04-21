@@ -1,5 +1,5 @@
 import test from 'ava'
-import * as selectors from 'server/sagas/selectors'
+import * as selectors from 'worker/sagas/selectors'
 
 test('selectBuyForCover should select manimum rate and maximum amount', t => {
   const state = {
@@ -64,4 +64,32 @@ test('selectObsoleteTransactions should work correctly', t => {
   }
   const output = selectors.selectObsoleteTransactions(state, 0.45)
   t.deepEqual(output, [ 'foo', 'qux' ])
+})
+
+test('selectVolumeOfChunksType should return full amount of buy chunks', t => {
+  const state = {
+    transactions: {
+      foo: { rate: 0.43, amount: 0.01, active: true, type: 'buy' },
+      foz: { rate: 0.44, amount: 0.02, active: true, type: 'buy' },
+      bar: { rate: 0.45, amount: 0.03, active: true, type: 'buy' },
+      baz: { rate: 0.46, amount: 0.04, active: false, type: 'buy' },
+      qux: { rate: 0.47, amount: 0.05, active: true, type: 'sell' }
+    }
+  }
+  const output = selectors.selectVolumeOfChunksType(state, 'buy')
+  t.deepEqual(output, 0.06)
+})
+
+test('selectVolumeOfChunksType should return full amount of sell chunks', t => {
+  const state = {
+    transactions: {
+      foo: { rate: 0.43, amount: 0.01, active: true, type: 'sell' },
+      foz: { rate: 0.44, amount: 0.02, active: true, type: 'sell' },
+      bar: { rate: 0.45, amount: 0.03, active: true, type: 'sell' },
+      baz: { rate: 0.46, amount: 0.04, active: false, type: 'sell' },
+      qux: { rate: 0.47, amount: 0.05, active: true, type: 'buy' }
+    }
+  }
+  const output = selectors.selectVolumeOfChunksType(state, 'sell')
+  t.deepEqual(output, 0.06)
 })

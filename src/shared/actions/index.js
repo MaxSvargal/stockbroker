@@ -1,6 +1,7 @@
 import { createAction } from 'redux-act'
 
 export const addChunks = createAction('ADD_CHUNKS')
+export const setBalanceValues = createAction('SET_BALANCE_VOLUMES')
 export const addStats = createAction('ADD_STATS')
 export const addStatsDynamics = createAction('ADD_STATS_DYNAMICS')
 export const botMessage = createAction('BOT_MESSAGE')
