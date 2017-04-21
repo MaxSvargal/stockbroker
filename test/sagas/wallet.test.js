@@ -1,8 +1,8 @@
 import test from 'ava'
 import testSaga from 'redux-saga-test-plan'
-import { calculateFreeValues, getWallet, watchForNewChunks, checkFreeValues, doBuySaga, doSellSaga, poloniex } from 'server/sagas/wallet'
-import { selectWallet, selectCurrentPair, selectUncoveredSells, selectUncoveredBuys, selectCurrencyPair, selectCurrencyPairSplited } from 'server/sagas/selectors'
-import { CURRENT_PAIR } from 'const'
+import { take } from 'redux-saga/effects'
+import { calculateFreeValues, getWallet, watchForNewChunks, checkFreeValues, doBuySaga, doSellSaga, poloniex, carryOutSaga } from 'worker/sagas/wallet'
+import { selectWallet, selectCurrentPair, selectUncoveredSells, selectUncoveredBuys, selectCurrencyPair, selectCurrencyPairSplited } from 'worker/sagas/selectors'
 import {
   setFreeCurrencies, updateWallet, setCurrency, convertCurrencyToChunks,
   doBuy, doSell, sellSuccess, sellFailure, buySuccess, buyFailure
@@ -44,56 +44,32 @@ test.skip('calculateFreeValues should set free currencies', () =>
     .next()
     .isDone())
 
-test.skip('doBuySaga should work correctly', () =>
-  testSaga(doBuySaga)
+test('carryOutSaga should work correctly', () =>
+  testSaga(carryOutSaga)
     .next()
-    .take(doBuy)
-    .next({ payload: { rate: 40.5, amount: 0.0007, profit: 0.00015, coverId: 99 } })
+    .race({
+      buy: take(doBuy),
+      sell: take(doSell)
+    })
+    .next({ buy: { payload: { rate: 40.5, amount: 0.0007, profit: 0.00015, coverId: 99 } } })
     .select(selectCurrencyPair)
     .next('BTC_ETH')
-    .call(poloniex.privateRequest, { command: 'buy', currencyPair: 'BTC_ETH', rate: 40.5, amount: 0.0007 })
-    .next({ response: { orderNumber: '257473046371' } })
-    .put(buySuccess({ rate: 40.5, amount: 0.0007, profit: 0.00015, coverId: 99, orderNumber: '257473046371' }))
-    .next()
-    .take(doBuy))
+    // .call(poloniex.privateRequest, { command: 'buy', currencyPair: 'BTC_ETH', rate: 40.5, amount: 0.0007 })
+    // .next({ response: { orderNumber: '257473046371' } })
+    .put(buySuccess({ rate: 40.5, amount: 0.0007, profit: 0.00015, coverId: 99, orderNumber: 777 })))
 
-test.skip('doBuySaga should store error', () =>
-  testSaga(doBuySaga)
-    .next()
-    .take(doBuy)
-    .next({ payload: { rate: 40.5, amount: 0.0007, coverId: 99 } })
-    .select(selectCurrencyPair)
-    .next('BTC_ETH')
-    .call(poloniex.privateRequest, { command: 'buy', currencyPair: 'BTC_ETH', rate: 40.5, amount: 0.0007 })
-    .next({ response: { error: 'Not enough money' } })
-    .put(buyFailure({ rate: 40.5, amount: 0.0007, coverId: 99, error: 'Not enough money' })))
-
-test.skip('doSellSaga should work correctly', () =>
-  testSaga(doSellSaga)
-    .next()
-    .take(doSell)
-    .next({ payload: { rate: 40.5, amount: 0.0007, profit: 0.00015, coverId: 99 } })
-    .select(selectCurrencyPair)
-    .next('BTC_ETH')
-    .call(poloniex.privateRequest, { command: 'sell', currencyPair: 'BTC_ETH', rate: 40.5, amount: 0.0007 })
-    .next({ response: { orderNumber: '257473046371' } })
-    .put(sellSuccess({ rate: 40.5, amount: 0.0007, profit: 0.00015, coverId: 99, orderNumber: '257473046371' }))
-    .next()
-    .take(doSell))
-
-test.skip('doSellSaga should store error', () =>
-  testSaga(doSellSaga)
-    .next()
-    .take(doSell)
-    .next({ payload: { rate: 40.5, amount: 0.0007, coverId: 99 } })
-    .select(selectCurrencyPair)
-    .next('BTC_ETH')
-    .call(poloniex.privateRequest, { command: 'sell', currencyPair: 'BTC_ETH', rate: 40.5, amount: 0.0007 })
-    .next({ response: { error: 'Not enough money' } })
-    .put(sellFailure({ rate: 40.5, amount: 0.0007, coverId: 99, error: 'Not enough money' }))
-    .next()
-    .take(doSell))
-
-// test('calculateFreeValues should return correct free currencies', () =>
-//   testSaga(calculateFreeValues)
-//     .next())
+// test('carryOutSaga should store error', () =>
+//   testSaga(carryOutSaga)
+//     .next()
+//     .race({
+//       buy: take(doBuy),
+//       sell: take(doSell)
+//     })
+//     .next({ sell: { payload: { rate: 40.5, amount: 0.0007, coverId: 99 } } })
+//     .select(selectCurrencyPair)
+//     .next('BTC_ETH')
+//     .call(poloniex.privateRequest, { command: 'sell', currencyPair: 'BTC_ETH', rate: 40.5, amount: 0.0007 })
+//     .next({ response: { error: 'Not enough money' } })
+//     .put(sellFailure({ rate: 40.5, amount: 0.0007, coverId: 99, error: 'Not enough money' }))
+//     .next()
+//     .take(doSell))

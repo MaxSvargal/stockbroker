@@ -1,8 +1,8 @@
 import test from 'ava'
 import { testSaga } from 'redux-saga-test-plan'
 import { take } from 'redux-saga/effects'
-import { buySaga, sellSaga } from 'server/sagas/trade'
-import { selectTransactions, selectSellForCover } from 'server/sagas/selectors'
+import { buySaga, sellSaga } from 'worker/sagas/trade'
+import { selectTransactions, selectSellForCover } from 'worker/sagas/selectors'
 import { doBuy, doSell, buySuccess, buyFailure, botMessage } from 'shared/actions'
 
 test('buySaga unit should work correctly', () =>
