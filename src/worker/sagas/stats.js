@@ -28,16 +28,11 @@ export function* generateStatsSaga() {
   const sells = yield select(selectSellsLastTime, FIVE_MINUTES)
 
   if (buys.length >= 4 && sells.length >= 4) {
-    const { last } = yield select(selectCurrencyProps)
+    const { last, lowestAsk, highestBid } = yield select(selectCurrencyProps)
     const buyChange = getRateChange(buys)
     const sellChange = getRateChange(sells)
 
-    const currentRate = Number(last)
-    const lowestAsk = Number(buys[buys.length - 1][1])
-    const highestBid = Number(sells[sells.length - 1][1])
-
-    // console.log([ currentRate, buyChange, sellChange, lowestAsk, highestBid ])
-    yield put(addStats([ currentRate, buyChange, sellChange, lowestAsk, highestBid ]))
+    yield put(addStats([ last, buyChange, sellChange, lowestAsk, highestBid ]))
   }
 }
 
