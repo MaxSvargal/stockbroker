@@ -7,6 +7,12 @@ import FullMode from './FullMode'
 import Preferences from './Preferences'
 import Transactions from './Transactions'
 
+if (process.env.BROWSER) {
+  /* eslint global-require: 0 */
+  require('../../../node_modules/react-grid-layout/css/styles.css')
+  require('../../../node_modules/react-resizable/css/styles.css')
+}
+
 class App extends Component {
   render() {
     const styles = this.getStyles()

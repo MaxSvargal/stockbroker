@@ -1,7 +1,8 @@
 import { Component, PropTypes } from 'react'
-import { hh, table, tbody, tr, td, th } from 'react-hyperscript-helpers'
+import { h, hh, table, tbody, tr, td, th } from 'react-hyperscript-helpers'
 import throttle from 'react-throttle-render'
 import deepEqual from 'deep-equal'
+import { Scrollbars } from 'react-custom-scrollbars'
 
 const formatDate = time => {
   const date = new Date(time)
@@ -22,17 +23,19 @@ class Table extends Component {
     const { data, headers } = this.props
     const styles = this.getStyles()
 
-    return table({ style: styles.table }, [
-      tbody({ style: styles.tbody }, [
-        tr({ style: styles.tr }, headers.map(header =>
-          th({ style: styles.th }, header))),
+    return h(Scrollbars, [
+      table({ style: styles.table }, [
+        tbody({ style: styles.tbody }, [
+          tr({ style: styles.tr }, headers.map(header =>
+            th({ style: styles.th }, header))),
 
-        data.map((item, i) =>
-          tr({ key: i, style: styles.coloredTypedRow(item.type) }, [
-            td(item[0] && formatDate(item[0])),
-            item.map(((col, j) =>
-              j > 0 && td({ key: j, style: styles.td }, col)))
-          ]))
+          data.map((item, i) =>
+            tr({ key: i, style: styles.coloredTypedRow(item.type) }, [
+              td(item[0] && formatDate(item[0])),
+              item.map(((col, j) =>
+                j > 0 && td({ key: j, style: styles.td }, col)))
+            ]))
+        ])
       ])
     ])
   }

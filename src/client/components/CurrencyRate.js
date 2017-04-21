@@ -43,7 +43,7 @@ class CurrencyRate extends Component {
         margin: '1rem 0 2.5rem 0'
       },
       h2: {
-        fontSize: '4rem',
+        fontSize: '3.5rem',
         margin: '3.5rem 0',
         color: '#e352c9'
       },

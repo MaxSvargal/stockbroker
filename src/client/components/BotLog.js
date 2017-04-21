@@ -1,6 +1,7 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
-import { hh, div } from 'react-hyperscript-helpers'
+import { h, hh, div } from 'react-hyperscript-helpers'
+import { Scrollbars } from 'react-custom-scrollbars'
 import { formatDate } from '../../shared/utils'
 
 const checkStringContain = (input, arr) =>
@@ -11,19 +12,21 @@ class BotLog extends Component {
     const { data, textColor } = this.props
     const styles = this.getStyles()
 
-    return div({ style: styles.root }, data.map((item, index) =>
-      div({ style: styles.item(index, item[1], textColor) }, `${formatDate(item[0])} ${item[1]}`)))
+    return h(Scrollbars, [
+      div({ style: styles.root }, data.map((item, index) =>
+        div({ style: styles.item(index, item[1], textColor) }, `${formatDate(item[0])} ${item[1]}`)))
+    ])
   }
 
   getStyles() {
     return {
       root: {
-        fontSize: '1.1rem',
-        lineHeight: '1.4rem',
+        lineHeight: '1.34rem',
+        overflow: 'scroll-y'
       },
       item: (index, str, textColor) => ({
         lineHeight: '2rem',
-        padding: '.5rem 1rem',
+        padding: '.25rem 1rem',
         borderTop: '1px solid rgba(0, 0, 0, .25)',
         background: index % 2 ? 'transparent' : 'rgba(0, 0, 0, .15)',
         fontWeight: checkStringContain(str, [ 'Куплено', 'Продано', 'Ошибка' ]) ? 'bold' : 'normal',

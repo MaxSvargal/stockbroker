@@ -1,75 +1,64 @@
 import { Component } from 'react'
-import { hh, div } from 'react-hyperscript-helpers'
+import { h, hh, div } from 'react-hyperscript-helpers'
+import { Responsive, WidthProvider } from 'react-grid-layout'
 
 // import BigTable from './BigTable'
 import BotLog from './BotLog'
 import TradeTable from './TradeTable'
 import CurrencyStats from './CurrencyStats'
 import CurrencyRate from './CurrencyRate'
+import BalancePieChart from './BalancePieChart'
 
-class FullMode extends Component {
+const ResponsiveReactGridLayout = WidthProvider(Responsive)
+
+class FullModePage extends Component {
   render() {
-    const styles = this.getStyles()
-
-    return div({ style: styles.root }, [
-      div({ style: styles.column }, [
-        div({ style: styles.currency }, [
-          div({ style: styles.row }, [
-            CurrencyRate(),
-            CurrencyStats()
-          ]),
-          div({ style: styles.botLogBox }, [
-            BotLog()
-          ])
-        ]),
-        div({ style: styles.tradeBox }, [
-          TradeTable()
-        ])
-      ])
-      // div({ style: styles.row }, [
-      //   BigTable(({ ask }) => ({ data: ask }))(
-      //     { title: 'Предложение', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] }),
-      //   BigTable(({ bid }) => ({ data: bid }))(
-      //     { title: 'Спрос', headers: [ 'Date', 'Price', 'ETH', 'USDT' ] })
-      // ])
-    ])
-  }
-
-  getStyles() {
-    return {
-      root: {
-      },
-      row: {
-        display: 'flex',
-        justifyContent: 'space-between'
-      },
-      column: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around',
-        padding: '1vh 0'
-      },
-      currency: {
-        minWidth: '60vw',
-        margin: '2rem 0'
-      },
-      tradeBox: {
-        minWidth: '32vw',
-        maxWidth: '80vw',
-        marginTop: '1rem',
-        overflow: 'auto',
-        height: '88vh'
-      },
-      botLogBox: {
-        minWidth: '32vw',
-        maxWidth: '65vw',
-        height: 'calc(85vh - 180px)',
-        overflow: 'auto',
-        minHeight: '30vh',
-        maxHeight: '76vh'
-      }
+    const layouts = {
+      lg: [
+        { i: 'rate', x: 0, y: 0, w: 5, h: 1 },
+        { i: 'stats', x: 7, y: 0, w: 3, h: 1 },
+        { i: 'balance', x: 5, y: 0, w: 2, h: 1 },
+        { i: 'trade', x: 10, y: 0, w: 5, h: 4, minW: 3, maxW: 12 },
+        { i: 'log', x: 0, y: 2, w: 7, h: 4, minW: 3, maxW: 12 }
+      ],
+      md: [
+        { i: 'rate', x: 0, y: 0, w: 4, h: 1 },
+        { i: 'stats', x: 7, y: 0, w: 3, h: 1 },
+        { i: 'balance', x: 4, y: 0, w: 3, h: 1 },
+        { i: 'trade', x: 6, y: 2, w: 4, h: 4, minW: 3, maxW: 12 },
+        { i: 'log', x: 0, y: 2, w: 6, h: 4, minW: 3, maxW: 12 }
+      ],
+      sm: [
+        { i: 'rate', x: 0, y: 0, w: 2, h: 1 },
+        { i: 'balance', x: 2, y: 0, w: 2, h: 1 },
+        { i: 'stats', x: 4, y: 0, w: 2, h: 1 },
+        { i: 'trade', x: 3, y: 2, w: 3, h: 3, minW: 3, maxW: 12 },
+        { i: 'log', x: 0, y: 2, w: 3, h: 3, minW: 3, maxW: 12 }
+      ],
+      xs: [
+        { i: 'rate', x: 0, y: 0, w: 4, h: 1 },
+        { i: 'log', x: 0, y: 1, w: 4, h: 2 },
+        { i: 'trade', x: 0, y: 3, w: 4, h: 2 },
+        { i: 'balance', x: 0, y: 5, w: 4, h: 1 },
+        { i: 'stats', x: 0, y: 6, w: 4, h: 1 }
+      ]
     }
+
+    return h(ResponsiveReactGridLayout, {
+      layouts,
+      rowHeight: 160,
+      margin: [ 10, 10 ],
+      containerPadding: [ 20, 20 ],
+      breakpoints: { lg: 1366, md: 996, sm: 768, xs: 320, xxs: 0 },
+      cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }
+    }, [
+      div({ key: 'rate' }, [ CurrencyRate() ]),
+      div({ key: 'stats' }, [ CurrencyStats() ]),
+      div({ key: 'balance' }, [ BalancePieChart() ]),
+      div({ key: 'log' }, [ BotLog() ]),
+      div({ key: 'trade' }, [ TradeTable() ]),
+    ])
   }
 }
 
-export default hh(FullMode)
+export default hh(FullModePage)

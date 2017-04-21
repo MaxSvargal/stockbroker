@@ -12,7 +12,7 @@ class FinalCurrentResult extends Component {
     const charsSell = [ ...new Array(Math.abs(sellDynTotal / 2)) ]
     const styles = this.getStyles()
 
-    return div({ style: styles.root }, [
+    return buyDynTotal && sellDynTotal && div({ style: styles.root }, [
       div({ style: styles.child }, charsBuy.map((v, i) =>
         div({ style: styles.char(isBuyPositive, i) }, isBuyPositive ? '▲' : '▼'))),
 
