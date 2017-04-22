@@ -12,7 +12,6 @@ import render from './renderer'
 import rootReducer from '../shared/reducers'
 import webpackConfig from '../../webpack.client.dev.config'
 
-const { NODE_ENV } = process.env
 const app = new Koa()
 const router = new KoaRouter()
 const compiler = webpack(webpackConfig)
@@ -40,6 +39,11 @@ router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) 
   } catch (err) {
     console.log(err)
   }
+})
+
+router.post('/tradingApi', async (ctx, next) => {
+  ctx.body = { orderNumber: 31226040, BTC: 0.12, ETH: 2.8, DASH: 3.1 }
+  await next()
 })
 
 app.use(webpackDevMiddleware(compiler, { publicPath: '/', noInfo: true }))

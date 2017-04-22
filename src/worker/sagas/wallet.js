@@ -4,7 +4,7 @@ import { addChunks, buyFailure, buySuccess, doBuy, doSell, sellFailure, sellSucc
 import Poloniex from '../services/poloniex'
 import { selectCurrencyPair, selectVolumeOfChunksType, selectCurrencyPairSplited, selectAvaliableValue } from './selectors'
 
-const { NODE_ENV, CURRENCY_PAIR, ACCOUNT_KEY, ACCOUNT_SECRET } = process.env
+const { CURRENCY_PAIR, ACCOUNT_KEY, ACCOUNT_SECRET } = process.env
 
 export const poloniex = new Poloniex({ key: ACCOUNT_KEY, secret: ACCOUNT_SECRET })
 
@@ -49,11 +49,9 @@ export function* carryOutTransactionsSaga() {
     const failureCb = (buy && buyFailure) || (sell && sellFailure)
     const options = { command, currencyPair, rate, amount }
 
-    const { response, error } = NODE_ENV === 'production' ?
-      yield call(poloniex.privateRequest, options) :
-      { response: { orderNumber: 777 } }
-
+    const { response, error } = yield call(poloniex.privateRequest, options)
     const orderNumber = response && response.orderNumber
+
     orderNumber ?
       yield put(successCb({ rate, amount, profit, coverId, orderNumber })) :
       yield put(failureCb({ rate, amount, coverId, error: error || (response && response.error) }))
