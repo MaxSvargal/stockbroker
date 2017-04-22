@@ -22,9 +22,9 @@ class FullModePage extends Component {
         { i: 'log', x: 0, y: 2, w: 7, h: 4, minW: 3, maxW: 12 }
       ],
       md: [
-        { i: 'rate', x: 0, y: 0, w: 4, h: 1 },
+        { i: 'rate', x: 0, y: 0, w: 3, h: 1 },
+        { i: 'balance', x: 3, y: 0, w: 2, h: 1 },
         { i: 'stats', x: 7, y: 0, w: 3, h: 1 },
-        { i: 'balance', x: 4, y: 0, w: 3, h: 1 },
         { i: 'trade', x: 6, y: 2, w: 4, h: 4, minW: 3, maxW: 12 },
         { i: 'log', x: 0, y: 2, w: 6, h: 4, minW: 3, maxW: 12 }
       ],
@@ -47,7 +47,7 @@ class FullModePage extends Component {
     return h(ResponsiveReactGridLayout, {
       layouts,
       rowHeight: 160,
-      margin: [ 10, 10 ],
+      margin: [ 20, 20 ],
       containerPadding: [ 20, 20 ],
       breakpoints: { lg: 1366, md: 996, sm: 768, xs: 320, xxs: 0 },
       cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }

@@ -1,6 +1,7 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
-import { hh, h1, h2, div, span } from 'react-hyperscript-helpers'
+import { hh, h1, h2, h3, div, span } from 'react-hyperscript-helpers'
+import { toFixedRate } from '../../shared/utils'
 
 import FinalCurrentResult from './FinalCurrentResult'
 
@@ -23,7 +24,12 @@ class CurrencyRate extends Component {
               span(currentPair),
               span({ style: styles.finalCurrent }, [ FinalCurrentResult() ]),
             ]),
-            h2({ style: styles.h2 }, currency.last)
+            h2({ style: styles.h2 }, toFixedRate(currency.last)),
+            div({ style: styles.askbid }, [
+              h3({ style: styles.ask }, toFixedRate(currency.lowestAsk)),
+              span(' / '),
+              h3({ style: styles.bid }, toFixedRate(currency.highestBid))
+            ])
           ])
         ])
       ])
@@ -40,11 +46,11 @@ class CurrencyRate extends Component {
       },
       h1: {
         fontSize: '3.5rem',
-        margin: '1rem 0 2.5rem 0'
+        margin: '1rem 0 0 0'
       },
       h2: {
-        fontSize: '3.5rem',
-        margin: '3.5rem 0',
+        fontSize: '3.25rem',
+        margin: '2.5rem 0 1.25rem 0',
         color: '#e352c9'
       },
       finalCurrent: {
@@ -58,11 +64,16 @@ class CurrencyRate extends Component {
         fontWeight: 'bold',
         fontSize: '1.1rem'
       },
+      askbid: {
+        fontSize: '1.2rem'
+      },
       ask: {
-        color: '#cf9a69'
+        color: '#cf9a69',
+        display: 'inline'
       },
       bid: {
-        color: '#67aee6'
+        color: '#67aee6',
+        display: 'inline'
       }
     }
   }
