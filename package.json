@@ -31,7 +31,7 @@
     ]
   },
   "dependencies": {
-    "autobahn": "^0.11.2",
+    "autobahn": "0.12.0",
     "bignumber.js": "^4.0.0",
     "chart.js": "^2.5.0",
     "chokidar": "^1.6.1",
@@ -58,8 +58,8 @@
     "react-grid-layout": "^0.14.6",
     "react-hyperscript-helpers": "^1.2.0",
     "react-redux": "^5.0.3",
-    "react-router": "v4.0.0-beta.7",
-    "react-router-dom": "v4.0.0-beta.7",
+    "react-router": "4.1.1",
+    "react-router-dom": "4.1.1",
     "react-throttle-render": "^2.0.0",
     "redux": "^3.6.0",
     "redux-act": "^1.1.1",
@@ -73,7 +73,7 @@
     "style-loader": "^0.16.1"
   },
   "devDependencies": {
-    "ava": "^0.18.2",
+    "ava": "0.19.1",
     "babili-webpack-plugin": "^0.0.11",
     "chai": "^3.5.0",
     "chunk-manifest-webpack-plugin": "^1.0.0",
