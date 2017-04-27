@@ -7,11 +7,13 @@ module.exports = {
   format: 'cjs',
   plugins: [
     resolve({
-      module: true,
       jsnext: true,
       main: true,
-      preferBuiltins: false,
-      jail: 'src'
+      modulesOnly: true,
+      jail: `${__dirname}/src/`,
+      customResolveOptions: {
+        moduleDirectory: 'node_modules'
+      }
     }),
     commonjs({
       exclude: [ 'node_modules/**' ],
