@@ -4,6 +4,7 @@ import statsSaga from './stats'
 import walletSaga from './wallet'
 import clientActions from './clientActions'
 import chunksSaga from './chunks'
+import decisionsSaga from './decisions'
 
 export default function* root() {
   yield [
@@ -11,6 +12,7 @@ export default function* root() {
     fork(poloniexPublicSaga),
     fork(statsSaga),
     fork(chunksSaga),
-    fork(clientActions)
+    fork(clientActions),
+    fork(decisionsSaga)
   ]
 }

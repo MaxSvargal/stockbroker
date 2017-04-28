@@ -1,5 +1,6 @@
 import { cropNumber } from '../../shared/utils'
 
+export const selectCurrentTime = () => Date.now()
 export const selectAvaliableValue = ({ wallet }, currency) => wallet[currency]
 export const selectAsk = state => state.ask
 export const selectBid = state => state.bid
@@ -18,25 +19,11 @@ export const selectAutocreatedChunkAmount = state => state.autocreatedChunkAmoun
 export const selectTotals = state => state.totals
 export const selectWallet = state => state.wallet
 export const selectStopTrade = state => state.stopTrade
-
-export const selectLastStatsDynamics = ({ statsDynamics }) =>
-  statsDynamics.slice(statsDynamics.length - 11, statsDynamics.length - 1)
-
-export const selectLastTenStats = ({ stats }) =>
-  stats.slice(stats.length - 10, stats.length)
-
-export const selectLastFiveStats = ({ stats }) =>
-  stats.slice(stats.length - 6, stats.length)
-
-export const selectSellsLastTime = (state, time) => {
-  const currTime = new Date().getTime()
-  return state.sell.filter(i => i[0] > currTime - time)
-}
-
-export const selectBuysLastTime = (state, time) => {
-  const currTime = new Date().getTime()
-  return state.buy.filter(i => i[0] > currTime - time)
-}
+export const selectLastStat = ({ stats }) => stats[stats.length - 1]
+export const selectLastStats = ({ stats }, num) => stats.slice(stats.length - num - 1, stats.length - 1)
+export const selectStatsDuringTime = (state, time) => state.stats.filter(i => i.created >= time)
+export const selectBuysDuringTime = (state, time) => state.buy.filter(i => i[0] >= time)
+export const selectSellsDuringTime = (state, time) => state.sell.filter(i => i[0] >= time)
 
 export const selectBuyForCover = ({ transactions }, rate) => {
   const matches = Object.keys(transactions)

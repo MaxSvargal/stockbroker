@@ -93,3 +93,55 @@ test('selectVolumeOfChunksType should return full amount of sell chunks', t => {
   const output = selectors.selectVolumeOfChunksType(state, 'sell')
   t.deepEqual(output, 0.06)
 })
+
+test('selectBuysDuringTime should select correct buys', t => {
+  const state = {
+    buy: [
+      [ 1493396698456 - (1000 * 60 * 7), 0.012, 1 ],
+      [ 1493396698456 - (1000 * 60 * 6), 0.013, 1 ],
+      [ 1493396698457, 0.012, 1 ],
+      [ 1493396762820, 0.011, 2 ],
+      [ 1493396768338, 0.012, 1 ],
+    ]
+  }
+  const output = selectors.selectBuysDuringTime(state, 1493396698456)
+  t.deepEqual(output, [
+    [ 1493396698457, 0.012, 1 ],
+    [ 1493396762820, 0.011, 2 ],
+    [ 1493396768338, 0.012, 1 ]
+  ])
+})
+
+test('selectSellsDuringTime should select correct buys', t => {
+  const state = {
+    sell: [
+      [ 1493396698456 - (1000 * 60 * 7), 0.012, 1 ],
+      [ 1493396698456 - (1000 * 60 * 6), 0.013, 1 ],
+      [ 1493396698457, 0.012, 1 ],
+      [ 1493396762820, 0.011, 2 ],
+      [ 1493396768338, 0.012, 1 ],
+    ]
+  }
+  const output = selectors.selectSellsDuringTime(state, 1493396698456)
+  t.deepEqual(output, [
+    [ 1493396698457, 0.012, 1 ],
+    [ 1493396762820, 0.011, 2 ],
+    [ 1493396768338, 0.012, 1 ]
+  ])
+})
+
+test('selectStatsDuringTime should select correct stats', t => {
+  const state = {
+    stats: [
+      { created: 1493396698456 - (1000 * 60 * 66) },
+      { created: 1493396698456 - (1000 * 60 * 61) },
+      { created: 1493396698456 },
+      { created: 1493396698456 + (1000 * 60 * 5) },
+    ]
+  }
+  const output = selectors.selectStatsDuringTime(state, 1493396698455)
+  t.deepEqual(output, [
+    { created: 1493396698456 },
+    { created: 1493396698456 + (1000 * 60 * 5) }
+  ])
+})
