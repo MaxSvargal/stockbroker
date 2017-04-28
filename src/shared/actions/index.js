@@ -2,9 +2,9 @@ import { createAction } from 'redux-act'
 
 export const addChunks = createAction('ADD_CHUNKS')
 export const setBalanceValues = createAction('SET_BALANCE_VOLUMES')
+export const addMessage = createAction('ADD_MESSAGE', (type, message) => ({ type, message }))
 export const addStats = createAction('ADD_STATS')
 export const addStatsDynamics = createAction('ADD_STATS_DYNAMICS')
-export const botMessage = createAction('BOT_MESSAGE')
 export const buyFailure = createAction('BUY_FAILURE')
 export const buySuccess = createAction('BUY_SUCCESS')
 export const doBuy = createAction('DO_BUY')

@@ -1,51 +1,30 @@
 import { fork, take, put, select } from 'redux-saga/effects'
-import { addStats, addChunks, requestNewChunks, removeChunk, botMessage, requestInvalidateChunks } from '../../shared/actions'
-import { selectObsoleteTransactions, selectCurrencyProps, selectLastTenStats } from '../sagas/selectors'
+import { addMessage, addChunks, requestNewChunks, removeChunk, requestInvalidateChunks } from '../../shared/actions'
+import { selectObsoleteTransactions, selectCurrencyProps } from '../sagas/selectors'
 
-export function* watchForNewChunks() {
+export function* watchForNewChunksSaga() {
   while (true) {
     const { payload } = yield take(requestNewChunks)
-    // const [ , currency ] = yield select(selectCurrencyPairSplited)
+    const { type, num, rate, amount } = payload
 
     yield put(addChunks(payload))
-    // yield put(botMessage(`Созданы ${type === 'buy' ? 'покупки' : 'продажи'} за ${rate} в количестве ${num} частей по ${amount} ${currency}`))
+    yield put(addMessage('chunks', { action: 'created', type, rate, amount, num }))
   }
 }
 
-export function* clearObsoleteChunks() {
-  const { last } = yield select(selectCurrencyProps)
-  const obsoleteTransactions = yield select(selectObsoleteTransactions, last)
-  yield obsoleteTransactions.map(id => put(removeChunk(id)))
-  yield put(botMessage(`Чанки в количестве ${obsoleteTransactions.length} шт. инвалидированы`))
-}
-
-export function* watchForInvalidateOfChunks() {
-  while (true) {
-    yield take(addStats)
-    const lastTenStats = yield select(selectLastTenStats)
-
-    if (lastTenStats.length >= 10) {
-      const isStagnate = lastTenStats.slice(lastTenStats.length - 5, lastTenStats.length)
-        .map(stat => stat[3] - stat[4])
-        .map(value => value.toFixed(5))
-        .reduce((prev, curr) => prev === curr && curr)
-
-      if (isStagnate === true) yield fork(clearObsoleteChunks)
-    }
-  }
-}
-
-export function* watchForInvalidateCommand() {
+export function* clearObsoleteChunksSaga() {
   while (true) {
     yield take(requestInvalidateChunks)
-    yield fork(clearObsoleteChunks)
+    const { last } = yield select(selectCurrencyProps)
+    const obsoleteTransactions = yield select(selectObsoleteTransactions, last)
+    yield obsoleteTransactions.map(id => put(removeChunk(id)))
+    yield put(addMessage('chunks', { action: 'invalidate', num: obsoleteTransactions.length }))
   }
 }
 
 export default function* chunksSaga() {
   yield [
-    fork(watchForNewChunks),
-    fork(watchForInvalidateOfChunks),
-    fork(watchForInvalidateCommand)
+    fork(watchForNewChunksSaga),
+    fork(clearObsoleteChunksSaga)
   ]
 }

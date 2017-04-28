@@ -12,6 +12,18 @@ class BotLog extends Component {
     const { data, textColor } = this.props
     const styles = this.getStyles()
 
+    console.log({ data })
+    /*
+    `Куплено за ${rate}, покрыто ${covered.rate}, объём ${covered.amount}, прибыль ${profit}`
+    `Покупка не удалась. Ошибка: ${response.failure.payload.error}`
+    `Продажа за ${rateWithHold} не покрывает ни одной покупки`
+    `Продано за ${rate}, покрыто ${covered.rate}, объём ${covered.amount}, прибыль: ${profit}`
+    `Продажа не удалась. Ошибка: ${response.failure.payload.error}`
+    `Покупка за ${rateWithHold} не покрывает ни одной продажи`
+    `Созданы ${type === 'buy' ? 'покупки' : 'продажи'} за ${rate} в количестве ${num} частей по ${amount} ${currency}`
+    `Чанки в количестве ${obsoleteTransactions.length} шт. инвалидированы`
+    */
+
     return h(Scrollbars, [
       div({ style: styles.root }, data.map((item, index) =>
         div({ style: styles.item(index, item[1], textColor) }, `${formatDate(item[0])} ${item[1]}`)))
@@ -40,7 +52,6 @@ class BotLog extends Component {
   }
 }
 
-const mapStateToProps = ({ botMessages }) =>
-  ({ data: botMessages.slice(botMessages.length - 5000, botMessages.length).reverse() })
+const mapStateToProps = ({ messages }) => ({ data: messages.reverse() })
 
 export default hh(connect(mapStateToProps)(BotLog))

@@ -1,10 +1,10 @@
 import { delay } from 'redux-saga'
 import { race, call, take, put, select, fork } from 'redux-saga/effects'
-import { addChunks, buyFailure, buySuccess, doBuy, doSell, sellFailure, sellSuccess, setCurrencyPair, updateWallet, setBalanceValues } from '../../shared/actions'
+import { addChunks, buyFailure, buySuccess, doBuy, doSell, sellFailure, sellSuccess, setCurrencyPair, updateWallet, setBalanceValues, addMessage } from '../../shared/actions'
 import Poloniex from '../services/poloniex'
 import { selectCurrencyPair, selectVolumeOfChunksType, selectCurrencyPairSplited, selectAvaliableValue } from './selectors'
 
-const { CURRENCY_PAIR, ACCOUNT_KEY, ACCOUNT_SECRET } = process.env
+const { NODE_ENV, CURRENCY_PAIR, ACCOUNT_KEY, ACCOUNT_SECRET } = process.env
 
 export const poloniex = new Poloniex({ key: ACCOUNT_KEY, secret: ACCOUNT_SECRET })
 
@@ -12,15 +12,24 @@ export function* setCurrencyPairSaga() {
   yield put(setCurrencyPair(CURRENCY_PAIR))
 }
 
-export function* getWallet() {
+export function* getWalletSaga() {
   try {
+    if (NODE_ENV === 'development') return false
     const { response, error } = yield call(poloniex.privateRequest, { command: 'returnBalances' })
     if (error) throw new Error('Fail to get wallet balance.', error)
-    if (response) yield put(updateWallet(response))
+    if (response) {
+      const cleanedWallet = Object.keys(response).reduce((prev, key) =>
+        Number(response[key]) === 0 ? prev :
+          Object.assign({}, prev, { [key]: response[key] }), {})
+
+      yield put(updateWallet(cleanedWallet))
+    }
+    yield delay(60000)
+    yield fork(getWalletSaga)
   } catch (err) {
-    console.log({ err })
-    delay(5000)
-    yield fork(getWallet)
+    yield put(addMessage('error', `getWalletSaga: ${err}`))
+    yield delay(60000)
+    yield fork(getWalletSaga)
   }
 }
 
@@ -89,6 +98,6 @@ export default function* walletSaga() {
     fork(setCurrencyPairSaga),
     fork(carryOutTransactionsSaga),
     fork(calculateFreeValues),
-    fork(getWallet)
+    fork(getWalletSaga)
   ]
 }
