@@ -2,19 +2,15 @@ const HmacSHA512 = require('crypto-js/hmac-sha512')
 const nonce = require('nonce')()
 
 const { NODE_ENV, BROWSER } = process.env
-
-if (!BROWSER) {
   /* eslint global-require: 0 */
-  global.fetch = require('node-fetch')
-}
-
+if (!BROWSER) global.fetch = require('node-fetch')
 
 const keySymbol = Symbol('key')
 const secretSymbol = Symbol('secret')
 const PRIVATE_API_URL = 'https://poloniex.com/tradingApi'
 const DEV_API_URL = 'http://127.0.0.1:8085/tradingApi'
 
-class Poloniex {
+export default class PoloniexPrivateChannel {
   constructor({ key, secret }) {
     this[keySymbol] = key
     this[secretSymbol] = secret
@@ -47,15 +43,13 @@ class Poloniex {
 
   privateRequest(props) {
     const propsWithNonce = Object.assign({}, props, { nonce: nonce(16) })
-    const paramsString = Poloniex.toParamsString(propsWithNonce)
+    const paramsString = this.constructor.toParamsString(propsWithNonce)
     const options = {
       method: 'POST',
       url: NODE_ENV === 'production' ? PRIVATE_API_URL : DEV_API_URL,
       body: paramsString,
       headers: this.getPrivateHeaders(paramsString)
     }
-    return Poloniex.request(options)
+    return this.constructor.request(options)
   }
 }
-
-module.exports = Poloniex

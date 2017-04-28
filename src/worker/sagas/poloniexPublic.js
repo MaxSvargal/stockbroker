@@ -2,7 +2,7 @@ import { call, take, put, fork, select, cancelled } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
 
 import { orderBookModify, orderBookRemove, newTrade, setCurrency } from '../../shared/actions'
-import PoloniexWSS from '../services/poloniex.wss'
+import PoloniexWSS from '../services/poloniexPublic'
 import { selectCurrencyPair } from './selectors'
 
 const channel = (session, topic) => eventChannel(emitter => {

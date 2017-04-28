@@ -1,12 +1,12 @@
 import { delay } from 'redux-saga'
 import { race, call, take, put, select, fork } from 'redux-saga/effects'
 import { addChunks, buyFailure, buySuccess, doBuy, doSell, sellFailure, sellSuccess, setCurrencyPair, updateWallet, setBalanceValues, addMessage } from '../../shared/actions'
-import Poloniex from '../services/poloniex'
+import PoloniexPrivate from '../services/poloniexPrivate'
 import { selectCurrencyPair, selectVolumeOfChunksType, selectCurrencyPairSplited, selectAvaliableValue } from './selectors'
 
 const { NODE_ENV, CURRENCY_PAIR, ACCOUNT_KEY, ACCOUNT_SECRET } = process.env
 
-export const poloniex = new Poloniex({ key: ACCOUNT_KEY, secret: ACCOUNT_SECRET })
+export const poloniex = new PoloniexPrivate({ key: ACCOUNT_KEY, secret: ACCOUNT_SECRET })
 
 export function* setCurrencyPairSaga() {
   yield put(setCurrencyPair(CURRENCY_PAIR))

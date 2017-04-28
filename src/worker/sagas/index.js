@@ -1,5 +1,5 @@
 import { fork } from 'redux-saga/effects'
-import poloniexPublicSaga from './poloniex-public'
+import poloniexPublicSaga from './poloniexPublic'
 import statsSaga from './stats'
 import walletSaga from './wallet'
 import clientActions from './clientActions'
