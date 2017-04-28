@@ -1,39 +1,45 @@
 import { createReducer } from 'redux-act'
 
 import { newTrade } from '../actions'
-import { time } from './helpers'
+import { now } from './helpers'
 
 export const buy = createReducer({
   [newTrade]: (state, { type, rate, amount, total }) => {
-    const newState = [ ...state, [ time(), rate, amount, total ] ]
-    return type === 'buy' ?
-      newState.slice(newState.length - 500, newState.length) :
-      state
+    if (type === 'buy') {
+      const newState = [ ...state, [ now(), rate, amount, total ] ]
+      return newState.slice(newState.length - 1000, newState.length)
+    }
+    return state
   }
 }, [])
 
 export const sell = createReducer({
   [newTrade]: (state, { type, rate, amount, total }) => {
-    const newState = [ ...state, [ time(), rate, amount, total ] ]
-    return type === 'sell' ?
-      newState.slice(newState.length - 500, newState.length) :
-      state
+    if (type === 'sell') {
+      const newState = [ ...state, [ now(), rate, amount, total ] ]
+      return newState.slice(newState.length - 1000, newState.length)
+    }
+    return state
   }
 }, [])
 
 /*
-const TWENTY_MINUTES = 1000 * 60 * 20
-
 export const ask = createReducer({
-  [newTrade]: (state, { type, rate, amount }) =>
-    type === 'ask' && (state.length > 0 || amount) ?
-      getOnlyLast(mergeOnAmount(state, rate, amount), TWENTY_MINUTES) :
-      state,
+  [newTrade]: (state, { type, rate, amount }) => {
+    if (type === 'ask' && (state.length > 0 || amount)) {
+      const newState = mergeOnAmount(state, rate, amount)
+      return newState.slice(newState.length - 50, newState.length)
+    }
+    return state
+  },
 
-  [orderBookModify]: (state, { type, rate, amount }) =>
-    type === 'ask' && (state.length > 0 || amount) ?
-      getOnlyLast(mergeOnAmount(state, rate, amount), TWENTY_MINUTES) :
-      state,
+  [orderBookModify]: (state, { type, rate, amount }) => {
+    if (type === 'ask' && (state.length > 0 || amount)) {
+      const newState = mergeOnAmount(state, rate, amount)
+      return newState.slice(newState.length - 50, newState.length)
+    }
+    return state
+  },
 
   [orderBookRemove]: (state, { type, rate }) =>
     type === 'ask' ?
@@ -42,15 +48,21 @@ export const ask = createReducer({
 }, [])
 
 export const bid = createReducer({
-  [newTrade]: (state, { type, rate, amount }) =>
-    type === 'bid' && (state.length > 0 || amount) > 0 ?
-      getOnlyLast(mergeOnAmount(state, rate, amount), TWENTY_MINUTES) :
-      state,
+  [newTrade]: (state, { type, rate, amount }) => {
+    if (type === 'bid' && (state.length > 0 || amount)) {
+      const newState = mergeOnAmount(state, rate, amount)
+      return newState.slice(newState.length - 50, newState.length)
+    }
+    return state
+  },
 
-  [orderBookModify]: (state, { type, rate, amount }) =>
-    type === 'bid' && (state.length > 0 || amount) > 0 ?
-      getOnlyLast(mergeOnAmount(state, rate, amount), TWENTY_MINUTES) :
-      state,
+  [orderBookModify]: (state, { type, rate, amount }) => {
+    if (type === 'bid' && (state.length > 0 || amount)) {
+      const newState = mergeOnAmount(state, rate, amount)
+      return newState.slice(newState.length - 50, newState.length)
+    }
+    return state
+  },
 
   [orderBookRemove]: (state, { type, rate }) =>
     type === 'bid' ?

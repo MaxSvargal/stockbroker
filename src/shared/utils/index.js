@@ -1,5 +1,6 @@
-export const cropNumber = num =>
-  Number((num).toFixed(8))
+export const toFixedRate = num => Number(num).toFixed(8)
+export const cropNumber = num => Number(toFixedRate(num))
+export const now = () => Date.now()
 
 export const formatDate = time => {
   const date = new Date(time)

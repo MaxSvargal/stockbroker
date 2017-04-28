@@ -1,7 +1,7 @@
 import { createReducer } from 'redux-act'
 import shortid from 'shortid'
 import { buySuccess, buyFailure, sellSuccess, sellFailure, addChunks, removeChunk, replaceChunksAmount } from '../actions'
-import { time } from './helpers'
+import { now, assign } from './helpers'
 
 /**
  * @type {boolean} active
@@ -21,71 +21,68 @@ import { time } from './helpers'
 export const transactions = createReducer({
   [buySuccess]: (state, { rate, amount, profit, coverId, orderNumber }) => {
     const coveredSell = {
-      [coverId]: Object.assign({},
+      [coverId]: assign(
         state[Object.keys(state).find(k => k === coverId)],
-        { orderNumber, profit, updated: time(), active: false })
+        { orderNumber, profit, updated: now(), active: false })
     }
     const newBuy = {
       [shortid.generate()]: {
-        rate, amount, coverId, created: time(), type: 'buy', active: true, creationMethod: 'cover'
+        rate, amount, coverId, created: now(), type: 'buy', active: true, creationMethod: 'cover'
       }
     }
-    return Object.assign({}, state, coveredSell, newBuy)
+    return assign(state, coveredSell, newBuy)
   },
 
   [sellSuccess]: (state, { rate, amount, profit, coverId, orderNumber }) => {
     const coveredBuy = {
-      [coverId]: Object.assign({},
+      [coverId]: assign(
         state[Object.keys(state).find(k => k === coverId)],
-        { orderNumber, profit, updated: time(), active: false })
+        { orderNumber, profit, updated: now(), active: false })
     }
     const newSell = {
       [shortid.generate()]: {
-        rate, amount, coverId, created: time(), type: 'sell', active: true, creationMethod: 'cover'
+        rate, amount, coverId, created: now(), type: 'sell', active: true, creationMethod: 'cover'
       }
     }
-    return Object.assign({}, state, coveredBuy, newSell)
+    return assign(state, coveredBuy, newSell)
   },
 
   [buyFailure]: (state, { rate, amount, coverId, error }) =>
-    Object.assign({}, state, {
+    assign(state, {
       [shortid.generate()]:
-        Object.assign({}, { rate, amount, coverId, error, created: time(), type: 'buy', active: false })
+        assign({ rate, amount, coverId, error, created: now(), type: 'buy', active: false })
     }),
 
   [sellFailure]: (state, { rate, amount, coverId, error }) =>
-    Object.assign({}, state, {
+    assign(state, {
       [shortid.generate()]:
-        Object.assign({}, { rate, amount, coverId, error, created: time(), type: 'sell', active: false })
+        assign({ rate, amount, coverId, error, created: now(), type: 'sell', active: false })
     }),
 
   [addChunks]: (state, { type, num, rate, amount, creationMethod = 'manual' }) =>
-    Object.assign({},
-      state,
+    assign(state,
       [ ...new Array(num) ]
         .map(() => ({ [shortid.generate()]: {
-          rate, amount, type, creationMethod, created: time(), active: true
+          rate, amount, type, creationMethod, created: now(), active: true
         } }))
-        .reduce((prev, curr) => Object.assign({}, prev, curr), {})),
+        .reduce((prev, curr) => assign(prev, curr), {})),
 
   [removeChunk]: (state, id) =>
-    Object.assign({}, state, {
-      [id]: Object.assign({}, state[id], { updated: time(), active: false, removed: true }) }),
+    assign(state, {
+      [id]: assign(state[id], { updated: now(), active: false, removed: true }) }),
 
   [replaceChunksAmount]: (state, { from, to }) => {
     const closedChunks = Object.keys(state)
       .filter(key => state[key].active === true && state[key].amount === from)
-      .reduce((obj, key) => Object.assign({}, obj, {
-        [key]: Object.assign({}, state[key], { updated: time(), active: false, removed: true })
+      .reduce((obj, key) => assign(obj, {
+        [key]: assign(state[key], { updated: now(), active: false, removed: true })
       }), {})
 
     const newChunks = Object.keys(closedChunks)
-      .reduce((obj, key) => Object.assign({}, obj, {
-        [shortid.generate()]: Object.assign({}, state[key], {
-          amount: to, created: time(), active: true
-        })
+      .reduce((obj, key) => assign(obj, {
+        [shortid.generate()]: assign(state[key], { amount: to, created: now(), active: true })
       }), {})
 
-    return Object.assign({}, state, closedChunks, newChunks)
+    return assign(state, closedChunks, newChunks)
   }
 }, {})

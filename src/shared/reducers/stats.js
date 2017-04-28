@@ -1,12 +1,15 @@
 import { createReducer } from 'redux-act'
-import { botMessage, addStats, addStatsDynamics, setDynamicsTotal, setStopTrade } from '../actions'
-import { time } from './helpers'
+import { addStats, addStatsDynamics, setDynamicsTotal, setStopTrade, updateWallet } from '../actions'
+import { now, assign, removeLast, last } from './helpers'
+
+const FIVE_MINUTES = 1000 * 60 * 5
 
 export const stats = createReducer({
-  [addStats]: (state, data) => {
-    const newState = [ ...state, data ]
-    return newState.slice(newState.length - 2000, newState.length)
-  }
+  [addStats]: (state, data) =>
+    state.length <= 0 ? [ data ] :
+      (last(state).created <= data.created - FIVE_MINUTES) ?
+        [ ...state, data ] :
+        [ ...removeLast(state), assign(data, { created: last(state).created }) ]
 }, [])
 
 export const statsDynamics = createReducer({
@@ -24,6 +27,6 @@ export const stopTrade = createReducer({
   [setStopTrade]: (state, status) => status
 }, false)
 
-export const botMessages = createReducer({
-  [botMessage]: (state, msg) => [ ...state, [ time(), msg ] ]
-}, [ [ time(), 'Initiated' ] ])
+export const walletLogs = createReducer({
+  [updateWallet]: (state, data) => [ ...state, [ now(), data ] ]
+}, [])

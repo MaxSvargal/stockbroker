@@ -1,4 +1,6 @@
 import { createReducer } from 'redux-act'
+
+import { assign } from './helpers'
 import {
   setAutocreatedChunkAmount,
   setBuyProfitThreshold,
@@ -11,18 +13,17 @@ import {
   updateWallet
 } from '../actions'
 
-export const wallet = createReducer({
-  [updateWallet]: (state, data) =>
-    Object.keys(data).reduce((prev, key) =>
-      (data[key] !== '0.00000000' ? Object.assign({}, prev, { [key]: data[key] }) : prev), {})
-}, {})
-
 export const currencies = createReducer({
   /* eslint max-len: 0 */
   [setCurrency]: (state, [ currencyPair, last, lowestAsk, highestBid, percentChange, baseVolume, quoteVolume, isFrozen, hrHigh, hrLow ]) =>
-    Object.assign({}, state, {
-      [currencyPair]: { last: Number(last), lowestAsk: Number(lowestAsk), highestBid: Number(highestBid), percentChange, baseVolume, quoteVolume, isFrozen, hrHigh, hrLow }
-    })
+    assign(state, { [currencyPair]: {
+      last: Number(last), lowestAsk: Number(lowestAsk), highestBid: Number(highestBid), percentChange, baseVolume, quoteVolume, isFrozen, hrHigh, hrLow
+    } })
+}, {})
+
+// TODO: remove? Use walletLogs instead?
+export const wallet = createReducer({
+  [updateWallet]: (state, data) => data
 }, {})
 
 export const freeCurrencies = createReducer({
