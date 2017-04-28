@@ -5,6 +5,7 @@ import path from 'path'
 import { createStore } from 'redux'
 import pm2 from 'pm2'
 import PouchDB from 'pouchdb'
+import pouchDBAuthentication from 'pouchdb-authentication'
 
 import render from './renderer'
 import monitor from './monitor'
@@ -38,7 +39,9 @@ router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) 
 
     console.log('Use database', dbPath)
 
-    const pouchDB = new PouchDB(dbPath)
+    const pouchDB = new PouchDB(dbPath, { skip_setup: true })
+    PouchDB.plugin(pouchDBAuthentication)
+    pouchDB.login('frontend', 'y2bFrxP81PwN8TrmPsd').then(() => console.log('Logged to database as frontend'))
     const res = await pouchDB.allDocs({ include_docs: true })
     pouchDB.close()
     const state = res.rows.reduce((prev, curr) => Object.assign({}, prev, { [curr.id]: curr.doc.state }), {})
