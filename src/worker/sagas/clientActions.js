@@ -23,7 +23,6 @@ export default function* clientWebSocketSaga() {
     const session = yield call(ClientSocket, DB_NAME)
     const register = registerActionAsProcedure(session)
 
-    register('getInitialState', store.getState)
     register(actions.setSellProfitThreshold)
     register(actions.setBuyProfitThreshold)
     register(actions.setObsoleteThreshold)
@@ -35,6 +34,6 @@ export default function* clientWebSocketSaga() {
 
     yield fork(watchForActionsAndPublish, session)
   } catch (err) {
-    console.log('Can\'t connect to socket server', err)
+    console.log('Can\'t connect to crossbar router', err)
   }
 }
