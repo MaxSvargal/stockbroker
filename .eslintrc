@@ -29,7 +29,8 @@
     "no-constant-condition": ["error", { "checkLoops": false }],
     "semi": [1, "never"],
     "max-len": [1, 110],
-    "curly": [2, "multi-or-nest" ]
+    "curly": [2, "multi-or-nest" ],
+    "no-nested-ternary": 0
   },
   "plugins": [
     "ava",
