@@ -1,4 +1,4 @@
-import { Component, PropTypes } from 'react'
+import { Component } from 'react'
 import debounce from 'debounce'
 import { hh, div, button } from 'react-hyperscript-helpers'
 
@@ -36,11 +36,6 @@ class FloatButton extends Component {
       }
     }
   }
-}
-
-FloatButton.propTypes = {
-  label: PropTypes.string,
-  onClick: PropTypes.func
 }
 
 export default hh(FloatButton)

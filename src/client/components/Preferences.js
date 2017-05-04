@@ -1,4 +1,3 @@
-import { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { hh, div } from 'react-hyperscript-helpers'
@@ -118,12 +117,6 @@ class Preferences extends Component {
       }
     }
   }
-}
-
-Preferences.propTypes = {
-  profitThreshold: PropTypes.number,
-  obsoleteThreshold: PropTypes.number,
-  autocreatedChunkAmount: PropTypes.number
 }
 
 const mapStateToProps = ({

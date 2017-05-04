@@ -1,4 +1,4 @@
-import { Component, PropTypes } from 'react'
+import { Component } from 'react'
 import debounce from 'debounce'
 import { hh, div, input, label } from 'react-hyperscript-helpers'
 
@@ -43,13 +43,6 @@ class InputNumber extends Component {
       }
     }
   }
-}
-
-InputNumber.propTypes = {
-  label: PropTypes.string.isRequired,
-  defaultValue: PropTypes.number.isRequired,
-  onChange: PropTypes.func.isRequired,
-  children: PropTypes.object
 }
 
 export default hh(InputNumber)

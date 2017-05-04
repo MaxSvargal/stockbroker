@@ -1,4 +1,4 @@
-import { Component, PropTypes } from 'react'
+import { Component } from 'react'
 import { h, hh, table, tbody, tr, td, th } from 'react-hyperscript-helpers'
 import throttle from 'react-throttle-render'
 import deepEqual from 'deep-equal'
@@ -63,15 +63,6 @@ class Table extends Component {
       }
     }
   }
-}
-
-Table.propTypes = {
-  data: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.array
-  ]),
-  headers: PropTypes.array,
-  title: PropTypes.string
 }
 
 export default hh(throttle(1000)(Table))

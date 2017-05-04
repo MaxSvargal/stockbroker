@@ -1,4 +1,4 @@
-import { Component, PropTypes } from 'react'
+import { Component } from 'react'
 import { hh, div, button, h2 } from 'react-hyperscript-helpers'
 
 import InputNumber from './InputNumber'
@@ -68,10 +68,6 @@ class ReplaceChunksForm extends Component {
       }
     }
   }
-}
-
-ReplaceChunksForm.propTypes = {
-  onChange: PropTypes.func
 }
 
 export default hh(ReplaceChunksForm)

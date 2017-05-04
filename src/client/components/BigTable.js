@@ -1,4 +1,4 @@
-import { Component, PropTypes } from 'react'
+import { Component } from 'react'
 import { connect } from 'react-redux'
 import { hh } from 'react-hyperscript-helpers'
 import throttle from 'react-throttle-render'
@@ -20,12 +20,6 @@ class BigTable extends Component {
     const fullData = limit(data.map(summ).slice().sort(), 100)
     return Table({ data: fullData, title, headers })
   }
-}
-
-BigTable.PropTypes = {
-  data: PropTypes.array,
-  headers: PropTypes.array,
-  title: PropTypes.string
 }
 
 // const mapStateToProps = ({ bid }) => ({ data: bid })
