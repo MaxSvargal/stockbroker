@@ -7,14 +7,9 @@ import { formatDate } from '../../shared/utils'
 class BotLog extends Component {
 
   render() {
-    const { data } = this.props
     const styles = this.getStyles()
-
-    console.log({ data })
-    console.log(this.getMessage(data[0]))
-
     return h(Scrollbars, [
-      div({ style: styles.root }, data.map((msg, index) =>
+      div({ style: styles.root }, this.props.data.map((msg, index) =>
         div({ style: styles.item(index) }, [
           formatDate(msg.created), ' ',
           this.getMessage(msg)
@@ -115,6 +110,7 @@ class BotLog extends Component {
   }
 }
 
-const mapStateToProps = ({ messages }) => ({ data: messages.reverse() })
+const mapStateToProps = ({ messages }) =>
+  ({ data: messages.sort((a, b) => b.created - a.created) })
 
 export default hh(connect(mapStateToProps)(BotLog))
