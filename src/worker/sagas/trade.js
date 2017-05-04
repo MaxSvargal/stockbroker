@@ -11,7 +11,7 @@ export function* buySaga(rate, hold) {
     const chunkAmount = yield select(selectAutocreatedChunkAmount)
     if (chunkAmount !== 0)
       yield put(addChunks({ rate, amount: chunkAmount, num: 1, type: 'buy', creationMethod: 'hollow' }))
-    yield put(addMessage('failure', { type: 'buy', rate: rateWithHold }))
+    yield put(addMessage('failure', { action: 'buy', rate: rateWithHold }))
     return false
   }
 
@@ -22,9 +22,9 @@ export function* buySaga(rate, hold) {
   const response = yield race({ success: take(buySuccess), failure: take(buyFailure) })
 
   if (response.success)
-    yield put(addMessage('transaction', { type: 'buy', rate, coveredRate: covered.rate, coveredAmount: covered.amount, profit }))
+    yield put(addMessage('transaction', { action: 'buy', rate, coveredRate: covered.rate, coveredAmount: covered.amount, profit }))
   else if (response.failure)
-    yield put(addMessage('error', { type: 'buy', error: response.failure.payload.error }))
+    yield put(addMessage('error', { action: 'buy', error: response.failure.payload.error }))
 }
 
 export function* sellSaga(rate, hold) {
@@ -35,7 +35,7 @@ export function* sellSaga(rate, hold) {
     const chunkAmount = yield select(selectAutocreatedChunkAmount)
     if (chunkAmount !== 0)
       yield put(addChunks({ rate, amount: chunkAmount, num: 1, type: 'sell', creationMethod: 'hollow' }))
-    yield put(addMessage('failure', { type: 'sell', rate: rateWithHold }))
+    yield put(addMessage('failure', { action: 'sell', rate: rateWithHold }))
     return false
   }
 
@@ -46,7 +46,7 @@ export function* sellSaga(rate, hold) {
   const response = yield race({ success: take(sellSuccess), failure: take(sellFailure) })
 
   if (response.success)
-    yield put(addMessage('transaction', { type: 'sell', rate, coveredRate: covered.rate, coveredAmount: covered.amount, profit }))
+    yield put(addMessage('transaction', { action: 'sell', rate, coveredRate: covered.rate, coveredAmount: covered.amount, profit }))
   else if (response.failure)
-    yield put(addMessage('error', { type: 'sell', error: response.failure.payload.error }))
+    yield put(addMessage('error', { action: 'sell', error: response.failure.payload.error }))
 }

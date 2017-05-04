@@ -18,7 +18,7 @@ export function* clearObsoleteChunksSaga() {
     const { last } = yield select(selectCurrencyProps)
     const obsoleteTransactions = yield select(selectObsoleteTransactions, last)
     yield obsoleteTransactions.map(id => put(removeChunk(id)))
-    yield put(addMessage('chunks', { action: 'invalidate', num: obsoleteTransactions.length }))
+    yield put(addMessage('chunks', { action: 'invalidated', num: obsoleteTransactions.length }))
   }
 }
 

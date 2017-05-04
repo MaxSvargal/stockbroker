@@ -1,32 +1,25 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
-import { h, hh, div } from 'react-hyperscript-helpers'
+import { h, hh, div, span } from 'react-hyperscript-helpers'
 import { Scrollbars } from 'react-custom-scrollbars'
 import { formatDate } from '../../shared/utils'
 
-const checkStringContain = (input, arr) =>
-  arr.reduce((prev, curr) => (prev === true || input.search(curr) !== -1), false)
-
 class BotLog extends Component {
+
   render() {
-    const { data, textColor } = this.props
+    const { data } = this.props
     const styles = this.getStyles()
 
     console.log({ data })
-    /*
-    `Куплено за ${rate}, покрыто ${covered.rate}, объём ${covered.amount}, прибыль ${profit}`
-    `Покупка не удалась. Ошибка: ${response.failure.payload.error}`
-    `Продажа за ${rateWithHold} не покрывает ни одной покупки`
-    `Продано за ${rate}, покрыто ${covered.rate}, объём ${covered.amount}, прибыль: ${profit}`
-    `Продажа не удалась. Ошибка: ${response.failure.payload.error}`
-    `Покупка за ${rateWithHold} не покрывает ни одной продажи`
-    `Созданы ${type === 'buy' ? 'покупки' : 'продажи'} за ${rate} в количестве ${num} частей по ${amount} ${currency}`
-    `Чанки в количестве ${obsoleteTransactions.length} шт. инвалидированы`
-    */
+    console.log(this.getMessage(data[0]))
 
     return h(Scrollbars, [
-      div({ style: styles.root }, data.map((item, index) =>
-        div({ style: styles.item(index, item[1], textColor) }, `${formatDate(item[0])} ${item[1]}`)))
+      div({ style: styles.root }, data.map((msg, index) =>
+        div({ style: styles.item(index) }, [
+          formatDate(msg.created), ' ',
+          this.getMessage(msg)
+        ])
+      ))
     ])
   }
 
@@ -36,18 +29,88 @@ class BotLog extends Component {
         lineHeight: '1.34rem',
         overflow: 'scroll-y'
       },
-      item: (index, str, textColor) => ({
+      item: index => ({
         lineHeight: '2rem',
         padding: '.25rem 1rem',
         borderTop: '1px solid rgba(0, 0, 0, .25)',
-        background: index % 2 ? 'transparent' : 'rgba(0, 0, 0, .15)',
-        fontWeight: checkStringContain(str, [ 'Куплено', 'Продано', 'Ошибка' ]) ? 'bold' : 'normal',
-        color: textColor ||
-          (str.search('Куплено') !== -1 && '#97c47e') ||
-          (str.search('Продано') !== -1 && '#de6a76') ||
-          (str.search('Ошибка') !== -1 && '#ef3435') ||
-          '#fff'
-      })
+        background: index % 2 ? 'transparent' : 'rgba(0, 0, 0, .15)'
+      }),
+      msg: {
+        transaction: {
+          buy: {},
+          sell: {}
+        },
+        failure: {
+          buy: {},
+          sell: {}
+        },
+        error: {
+          buy: {},
+          sell: {}
+        },
+        chunks: {
+          created: {},
+          invalidated: {}
+        },
+        unknown: {}
+      }
+    }
+  }
+
+  getMessage({ type, message }) {
+    const { msg } = this.getStyles()
+    console.log({ type, message });
+
+    switch (type) {
+      case 'transaction': {
+        const { action, rate, coveredRate, coveredAmount, profit } = message
+        return span(
+          { style: msg.transaction[action] },
+          `${action === 'buy' ? 'Куплено' : 'Продано'} за ${rate}, покрыто ${coveredRate}, объём ${coveredAmount}, прибыль ${profit}`
+        )
+      }
+      case 'failure': {
+        const { action, rate } = message
+        return span(
+          { style: msg.failure[action] },
+          `${action === 'buy' ? 'Покупка' : 'Продажа'} за ${rate} не покрывает ни одной покупки`
+        )
+      }
+      case 'error': {
+        const { action, error } = message
+        return span(
+          { style: msg.error[action] },
+          `${action === 'buy' ? 'Покупка' : 'Продажа'} не удалась. Ошибка: ${error}`
+        )
+      }
+      case 'service': {
+        return span({ style: msg.service }, `Сервисное сообщение: ${message}`)
+      }
+      case 'chunks': {
+        const { action, type: actionType, rate, amount, num } = message
+        switch (action) {
+          case 'created':
+            return span(
+              { style: msg.chunks[action] },
+              `Созданы ${actionType === 'buy' ? 'покупки' : 'продажи'} за ${rate} в количестве ${num} частей по ${amount}`
+            )
+          case 'invalidated':
+            return span(
+              { style: msg.chunks[action] },
+              `Чанки в количестве ${num} шт. инвалидированы`
+            )
+          default:
+            return span(
+              { style: msg.unknown },
+              'Неизвестное сообщение типа chunks'
+            )
+        }
+      }
+      default:
+        return span(
+          { style: msg.unknown },
+          `Неизвестное сообщение типа ${type} и параметрами ${JSON.stringify(message)}`
+        )
     }
   }
 }
