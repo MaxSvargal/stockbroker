@@ -1,4 +1,4 @@
-import { fork, take, put, select } from 'redux-saga/effects'
+import { all, fork, take, put, select } from 'redux-saga/effects'
 import { addMessage, addChunks, requestNewChunks, removeChunk, requestInvalidateChunks } from '../../shared/actions'
 import { selectObsoleteTransactions, selectCurrencyProps } from '../sagas/selectors'
 
@@ -23,8 +23,8 @@ export function* clearObsoleteChunksSaga() {
 }
 
 export default function* chunksSaga() {
-  yield [
+  yield all([
     fork(watchForNewChunksSaga),
     fork(clearObsoleteChunksSaga)
-  ]
+  ])
 }

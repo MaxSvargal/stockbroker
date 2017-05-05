@@ -1,4 +1,4 @@
-import { call, take, put, fork, select, cancelled } from 'redux-saga/effects'
+import { all, call, take, put, fork, select, cancelled } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
 
 import { orderBookModify, orderBookRemove, newTrade, setCurrency } from '../../shared/actions'
@@ -69,10 +69,10 @@ function* channelTicker(session) {
 }
 
 function* bootstrap(session) {
-  yield [
+  yield all([
     fork(channelUsdtDash, session),
     fork(channelTicker, session)
-  ]
+  ])
 }
 
 export default function* poloniexPublicSaga() {
