@@ -1,5 +1,5 @@
+import debug from 'debug'
 import PouchDB from 'pouchdb'
-import pouchDBAuthentication from 'pouchdb-authentication'
 import { applyMiddleware, createStore, compose } from 'redux'
 import { persistentStore } from 'redux-pouchdb'
 import createSagaMiddleware from 'redux-saga'
@@ -9,13 +9,8 @@ import rootSaga from './sagas'
 
 const connectToDB = () => {
   const dbPath = `http://127.0.0.1:5984/${process.env.DB_NAME}`
-  console.log('Use database', dbPath)
-  PouchDB.plugin(pouchDBAuthentication)
-  const db = new PouchDB(dbPath, { skipSetup: true })
-  db.login('worker', 'hUY7t9H7tfdF5d7oI93gVfgd')
-    .then(() => console.log('Logged to database as worker'))
-    .catch(err => console.error('Database connection error', err))
-  return db
+  debug('worker')('Use database %s', dbPath)
+  return new PouchDB(dbPath, { auth: { username: 'worker', password: 'hUY7t9H7tfdF5d7oI93gVfgd' } })
 }
 
 const pouchDB = connectToDB()

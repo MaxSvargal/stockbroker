@@ -32,16 +32,16 @@ router.get('/', async (ctx, next) => {
 
 router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) => {
   try {
+    const connectToDB = () => {
+      const [ , account, currencyOne, currencyTwo ] = ctx.url.match(/\/bot\/(.+)\/(.+)\/(.+)\/page/)
+      const dbName = [ account, currencyOne, currencyTwo ].join('_')
+      const dbPath = `http://127.0.0.1:5984/${dbName}`
+      console.log('Use database %s', dbPath)
+      return new PouchDB(dbPath, { auth: { username: 'frontend', password: 'y2bFrxP81PwN8TrmPsd' } })
+    }
+
     const start = new Date()
-    const [ , account, currencyOne, currencyTwo ] = ctx.url.match(/\/bot\/(.+)\/(.+)\/(.+)\/page/)
-    const dbName = [ account, currencyOne, currencyTwo ].join('_')
-    const dbPath = `http://127.0.0.1:5984/${dbName}`
-
-    console.log('Use database', dbPath)
-
-    const pouchDB = new PouchDB(dbPath, { skip_setup: true })
-    PouchDB.plugin(pouchDBAuthentication)
-    pouchDB.login('frontend', 'y2bFrxP81PwN8TrmPsd').then(() => console.log('Logged to database as frontend'))
+    const pouchDB = connectToDB()
     const res = await pouchDB.allDocs({ include_docs: true })
     pouchDB.close()
     const state = res.rows.reduce((prev, curr) => Object.assign({}, prev, { [curr.id]: curr.doc.state }), {})
