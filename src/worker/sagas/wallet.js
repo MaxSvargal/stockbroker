@@ -37,33 +37,35 @@ export function* calculateFreeValues() {
     const chunksBuyVolume = yield select(selectVolumeOfChunksType, 'buy')
     const chunksSellVolume = yield select(selectVolumeOfChunksType, 'sell')
 
-    // const [ firstCurrency, seconndCurrency ] = yield select(selectCurrencyPairSplited)
-    const availableBuyValue = 0.20 // yield select(selectAvaliableValue, firstCurrency)
-    const availableSellValue = 3.2 // yield select(selectAvaliableValue, seconndCurrency)
+    const [ firstCurrency, seconndCurrency ] = yield select(selectCurrencyPairSplited)
+    const availableBuyValue = yield select(selectAvaliableValue, firstCurrency)
+    const availableSellValue = yield select(selectAvaliableValue, seconndCurrency)
 
     yield put(setBalanceValues({ chunksBuyVolume, chunksSellVolume, availableBuyValue, availableSellValue }))
   }
 }
 
 export function* carryOutTransactionsSaga() {
-  try {
-    const { buy, sell } = yield race({ buy: take(doBuy), sell: take(doSell) })
-    const currencyPair = yield select(selectCurrencyPair)
+  while (true) {
+    try {
+      const { buy, sell } = yield race({ buy: take(doBuy), sell: take(doSell) })
+      const currencyPair = yield select(selectCurrencyPair)
 
-    const { rate, amount, profit, coverId } = (buy && buy.payload) || (sell && sell.payload)
-    const command = (buy && 'buy') || (sell && 'sell')
-    const successCb = (buy && buySuccess) || (sell && sellSuccess)
-    const failureCb = (buy && buyFailure) || (sell && sellFailure)
-    const options = { command, currencyPair, rate, amount }
+      const { rate, amount, profit, coverId } = (buy && buy.payload) || (sell && sell.payload)
+      const command = (buy && 'buy') || (sell && 'sell')
+      const successCb = (buy && buySuccess) || (sell && sellSuccess)
+      const failureCb = (buy && buyFailure) || (sell && sellFailure)
+      const options = { command, currencyPair, rate, amount }
 
-    const { response, error } = yield call(poloniex.privateRequest, options)
-    const orderNumber = response && response.orderNumber
+      const { response, error } = yield call(poloniex.privateRequest, options)
+      const orderNumber = response && response.orderNumber
 
-    orderNumber ?
-      yield put(successCb({ rate, amount, profit, coverId, orderNumber })) :
-      yield put(failureCb({ rate, amount, coverId, error: error || (response && response.error) }))
-  } catch (err) {
-    console.log({ err })
+      orderNumber ?
+        yield put(successCb({ rate, amount, profit, coverId, orderNumber })) :
+        yield put(failureCb({ rate, amount, coverId, error: error || (response && response.error) }))
+    } catch (err) {
+      console.log({ err })
+    }
   }
 }
 

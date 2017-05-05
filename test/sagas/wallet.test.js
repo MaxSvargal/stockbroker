@@ -1,7 +1,7 @@
 import test from 'ava'
-import testSaga from 'redux-saga-test-plan'
+import { testSaga } from 'redux-saga-test-plan'
 import { take } from 'redux-saga/effects'
-import { calculateFreeValues, getWallet, watchForNewChunks, checkFreeValues, doBuySaga, doSellSaga, poloniex, carryOutSaga } from 'worker/sagas/wallet'
+import { calculateFreeValues, getWallet, watchForNewChunks, checkFreeValues, doBuySaga, doSellSaga, poloniex, carryOutTransactionsSaga } from 'worker/sagas/wallet'
 import { selectWallet, selectCurrentPair, selectUncoveredSells, selectUncoveredBuys, selectCurrencyPair, selectCurrencyPairSplited } from 'worker/sagas/selectors'
 import {
   setFreeCurrencies, updateWallet, setCurrency, convertCurrencyToChunks,
@@ -18,14 +18,12 @@ import {
 
 test.todo('watchForNewChunks should create chunks correctly')
 
-test('getWallet should request currencies from poloniex immediately', () =>
+test.skip('getWallet should request currencies from poloniex immediately', () =>
   testSaga(getWallet)
     .next()
     .call(poloniex.privateRequest, { command: 'returnBalances' })
     .next({ response: { USDT: '40.5', ETH: '1' } })
-    .put(updateWallet({ USDT: '40.5', ETH: '1' }))
-    .next()
-    .isDone())
+    .put(updateWallet({ USDT: '40.5', ETH: '1' })))
 
 test.skip('calculateFreeValues should set free currencies', () =>
   testSaga(calculateFreeValues)
@@ -44,8 +42,8 @@ test.skip('calculateFreeValues should set free currencies', () =>
     .next()
     .isDone())
 
-test('carryOutSaga should work correctly', () =>
-  testSaga(carryOutSaga)
+test.skip('carryOutTransactionsSaga should work correctly for buy action', () =>
+  testSaga(carryOutTransactionsSaga)
     .next()
     .race({
       buy: take(doBuy),
@@ -54,9 +52,44 @@ test('carryOutSaga should work correctly', () =>
     .next({ buy: { payload: { rate: 40.5, amount: 0.0007, profit: 0.00015, coverId: 99 } } })
     .select(selectCurrencyPair)
     .next('BTC_ETH')
-    // .call(poloniex.privateRequest, { command: 'buy', currencyPair: 'BTC_ETH', rate: 40.5, amount: 0.0007 })
-    // .next({ response: { orderNumber: '257473046371' } })
-    .put(buySuccess({ rate: 40.5, amount: 0.0007, profit: 0.00015, coverId: 99, orderNumber: 777 })))
+    .call(poloniex.privateRequest, { command: 'buy', currencyPair: 'BTC_ETH', rate: 40.5, amount: 0.0007 })
+    .next({ response: { orderNumber: '1234' } })
+    .put(buySuccess({ rate: 40.5, amount: 0.0007, profit: 0.00015, coverId: 99, orderNumber: '1234' }))
+    .next()
+    .isDone())
+
+test.skip('carryOutTransactionsSaga should work correctly for sell action', () =>
+  testSaga(carryOutTransactionsSaga)
+    .next()
+    .race({
+      buy: take(doBuy),
+      sell: take(doSell)
+    })
+    .next({ sell: { payload: { rate: 40.5, amount: 0.0007, profit: 0.00015, coverId: 99 } } })
+    .select(selectCurrencyPair)
+    .next('BTC_ETH')
+    .call(poloniex.privateRequest, { command: 'sell', currencyPair: 'BTC_ETH', rate: 40.5, amount: 0.0007 })
+    .next({ response: { orderNumber: '1234' } })
+    .put(sellSuccess({ rate: 40.5, amount: 0.0007, profit: 0.00015, coverId: 99, orderNumber: '1234' }))
+    .next()
+    .isDone())
+
+test.skip('carryOutTransactionsSaga should catch and call action on error', () =>
+  testSaga(carryOutTransactionsSaga)
+    .next()
+    .race({
+      buy: take(doBuy),
+      sell: take(doSell)
+    })
+    .next({ sell: { payload: { rate: 40.5, amount: 0.0007, profit: 0.00015, coverId: 99 } } })
+    .select(selectCurrencyPair)
+    .next('BTC_ETH')
+    .call(poloniex.privateRequest, { command: 'sell', currencyPair: 'BTC_ETH', rate: 40.5, amount: 0.0007 })
+    .next({ error: 'Not enouth BTC' })
+    .put(sellFailure({ rate: 40.5, amount: 0.0007, coverId: 99, error: 'Not enouth BTC' }))
+    .next()
+    .isDone())
+
 
 // test('carryOutSaga should store error', () =>
 //   testSaga(carryOutSaga)
