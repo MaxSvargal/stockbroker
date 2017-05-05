@@ -14,6 +14,6 @@ import { now } from './helpers'
 export const messages = createReducer({
   [addMessage]: (state, { type, message }) =>
     [ ...state, { created: now(), type, message } ]
-}, [ { created: now(), type: 'service', message: 'Initiated' } ])
+}, [ { created: now(), type: 'service', message: 'Инициализировано.' } ])
 
 export default messages

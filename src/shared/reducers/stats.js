@@ -2,12 +2,12 @@ import { createReducer } from 'redux-act'
 import { addStats, addStatsDynamics, setDynamicsTotal, setStopTrade, updateWallet } from '../actions'
 import { now, assign, removeLast, last } from './helpers'
 
-const FIVE_MINUTES = 1000 * 60 * 5
+const MINUTE = 1000 * 60
 
 export const stats = createReducer({
   [addStats]: (state, data) =>
     state.length <= 0 ? [ data ] :
-      (last(state).created <= data.created - FIVE_MINUTES) ?
+      (last(state).created <= data.created - MINUTE) ?
         [ ...state, data ] :
         [ ...removeLast(state), assign(data, { created: last(state).created }) ]
 }, [])

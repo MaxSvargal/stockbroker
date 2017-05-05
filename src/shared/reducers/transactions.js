@@ -1,7 +1,16 @@
 import { createReducer } from 'redux-act'
 import shortid from 'shortid'
-import { buySuccess, buyFailure, sellSuccess, sellFailure, addChunks, removeChunk, replaceChunksAmount } from '../actions'
 import { now, assign } from './helpers'
+import {
+  addChunks,
+  buyFailure,
+  buySuccess,
+  cleanChunksType,
+  removeChunk,
+  replaceChunksAmount,
+  sellFailure,
+  sellSuccess
+} from '../actions'
 
 /**
  * @type {boolean} active
@@ -70,6 +79,13 @@ export const transactions = createReducer({
   [removeChunk]: (state, id) =>
     assign(state, {
       [id]: assign(state[id], { updated: now(), active: false, removed: true }) }),
+
+  [cleanChunksType]: (state, type) =>
+    assign(state, Object.keys(state)
+      .filter(key => state[key].type === type && state[key].active === true)
+      .reduce((obj, key) => assign(obj, {
+        [key]: assign(state[key], { active: false })
+      }), {})),
 
   [replaceChunksAmount]: (state, { from, to }) => {
     const closedChunks = Object.keys(state)

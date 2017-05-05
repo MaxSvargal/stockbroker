@@ -1,15 +1,16 @@
 import { createReducer } from 'redux-act'
 
-import { assign } from './helpers'
+import { assign, now } from './helpers'
 import {
-  setBuyProfitThreshold,
   setChunkAmount,
   setBalanceValues,
+  setBuyProfitThreshold,
   setCurrency,
   setCurrencyPair,
   setFreeCurrencies,
   setObsoleteThreshold,
   setSellProfitThreshold,
+  stopTransactionsType,
   updateWallet
 } from '../actions'
 
@@ -21,10 +22,9 @@ export const currencies = createReducer({
     } })
 }, {})
 
-// TODO: remove? Use walletLogs instead?
 export const wallet = createReducer({
-  [updateWallet]: (state, data) => data
-}, {})
+  [updateWallet]: (state, data) => [ ...state, [ now(), data ] ]
+}, [])
 
 export const freeCurrencies = createReducer({
   [setFreeCurrencies]: (state, values) => values
@@ -53,3 +53,7 @@ export const currentPair = createReducer({
 export const balanceValues = createReducer({
   [setBalanceValues]: (state, value) => value
 }, { chunksBuyVolume: 0, chunksSellVolume: 0, availableBuyValue: 0, availableSellValue: 0 })
+
+export const stopTransactions = createReducer({
+  [stopTransactionsType]: (state, { type, status }) => assign(state, { [type]: status })
+}, { buy: false, sell: false })
