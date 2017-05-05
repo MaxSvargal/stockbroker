@@ -42,7 +42,7 @@ router.get('/bot/:account/:firstOfPair/:secondOfPair/page/*', async (ctx, next) 
 })
 
 router.post('/tradingApi', async (ctx, next) => {
-  ctx.body = { orderNumber: 31226040, BTC: 0.12, ETH: 2.8, DASH: 3.1 }
+  ctx.body = { orderNumber: 31226040, BTC: 0.1, ETH: 3, DASH: 3.1 }
   await next()
 })
 

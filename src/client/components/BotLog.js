@@ -68,7 +68,7 @@ class BotLog extends Component {
         const { action, rate } = message
         return span(
           { style: msg.failure[action] },
-          `${action === 'buy' ? 'Покупка' : 'Продажа'} за ${rate} не покрывает ни одной покупки`
+          `${action === 'buy' ? 'Покупка' : 'Продажа'} за ${rate} не покрывает ни одной ${action === 'buy' ? 'продажи' : 'покупки'}`
         )
       }
       case 'error': {

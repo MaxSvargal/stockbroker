@@ -6,6 +6,8 @@ class FinalCurrentResult extends Component {
   render() {
     const { statsDynamicsTotal: { buyDynTotal, sellDynTotal } } = this.props
 
+    if (!buyDynTotal || !sellDynTotal) return div()
+
     const isBuyPositive = buyDynTotal >= 0
     const isSellPositive = sellDynTotal >= 0
     const charsBuy = [ ...new Array(Math.abs(buyDynTotal / 2)) ]
