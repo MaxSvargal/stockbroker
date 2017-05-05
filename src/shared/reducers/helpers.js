@@ -8,6 +8,6 @@ export const mergeOnAmount = (state, rate, amount) =>
     [ ...state, [ rate, amount ] ] :
     [ ...state.slice(0, -1), [ rate, state[state.length - 1][1] ] ]
 
-export const assign = (source, value) => Object.assign({}, source, value)
+export const assign = (source, ...values) => Object.assign({}, source, ...values)
 export const removeLast = arr => arr.slice(0, arr.length - 1)
 export const last = arr => arr[arr.length - 1]
