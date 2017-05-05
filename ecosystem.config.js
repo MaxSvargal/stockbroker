@@ -50,9 +50,14 @@ module.exports = {
     account: accounts.lesorub,
     port: 8003
   }), createWorker({
+    name: 'lesorub_btc_ltc',
+    pair: 'BTC_LTC',
+    account: accounts.lesorub,
+    port: 8004
+  }), createWorker({
     name: 'lesorub_usdt_dash',
     pair: 'USDT_DASH',
     account: accounts.lesorub,
-    port: 8004
+    port: 8005
   }) ]
 }

@@ -126,6 +126,26 @@
                ]
              }
            ]
+         },
+         {
+           "name": "lesorub_btc_ltc",
+           "roles": [
+             {
+               "name": "anonymous",
+               "permissions": [
+                 {
+                   "uri": "*",
+                   "allow": {
+                     "call": true,
+                     "register": true,
+                     "publish": true,
+                     "subscribe": true
+                   },
+                   "cache": true
+                 }
+               ]
+             }
+           ]
          }
       ],
       "transports": [
