@@ -1,4 +1,4 @@
-import { call, take, fork, put, cancelled } from 'redux-saga/effects'
+import { all, call, take, fork, put, cancelled } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
 
 import ClientSocket from '../../shared/services/clientSocket'
@@ -8,7 +8,7 @@ const enabledProcedures = [
   actions.setBuyProfitThreshold,
   actions.setSellProfitThreshold,
   actions.setObsoleteThreshold,
-  actions.setAutocreatedChunkAmount,
+  actions.setChunkAmount,
   actions.requestNewChunks,
   actions.removeChunk,
   actions.requestInvalidateChunks,
@@ -49,13 +49,12 @@ export function* watchActionsForRPC(session) {
 export default function* clientWebSocketSaga() {
   try {
     const realm = window.location.pathname.match(/\/bot\/(.+)\/page/)[1].split('/').join('_')
-    console.log({ realm })
     const session = yield call(ClientSocket, realm)
-    yield [
+    yield all([
       fork(watchUpdates, session),
       fork(watchActionsForRPC, session)
-    ]
+    ])
   } catch (err) {
-    console.log('Can\'t connect to socket server', err)
+    console.log('Can\'t connect to the socket server', err)
   }
 }

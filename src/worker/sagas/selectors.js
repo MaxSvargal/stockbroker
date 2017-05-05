@@ -1,6 +1,7 @@
 import { cropNumber } from '../../shared/utils'
 
 export const selectCurrentTime = () => Date.now()
+export const selectChunkAmount = state => state.chunkAmount
 export const selectAvaliableValue = ({ wallet }, currency) => wallet[currency]
 export const selectAsk = state => state.ask
 export const selectBid = state => state.bid

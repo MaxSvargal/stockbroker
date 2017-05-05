@@ -26,7 +26,7 @@ export default function* clientWebSocketSaga() {
     register(actions.setSellProfitThreshold)
     register(actions.setBuyProfitThreshold)
     register(actions.setObsoleteThreshold)
-    register(actions.setAutocreatedChunkAmount)
+    register(actions.setChunkAmount)
     register(actions.requestNewChunks)
     register(actions.removeChunk)
     register(actions.requestInvalidateChunks)

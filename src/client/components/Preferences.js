@@ -1,9 +1,10 @@
+import { Component } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { hh, div } from 'react-hyperscript-helpers'
 import {
   setObsoleteThreshold,
-  setAutocreatedChunkAmount,
+  setChunkAmount,
   requestInvalidateChunks,
   replaceChunksAmount,
   setBuyProfitThreshold,
@@ -62,7 +63,7 @@ class Preferences extends Component {
           InputNumber({
             label: 'Объём чанка автоматического создания',
             defaultValue: this.props.autocreatedChunkAmount,
-            onChange: this.props.setAutocreatedChunkAmount
+            onChange: this.props.setChunkAmount
           }),
           ReplaceChunksForm({
             onChange: this.props.replaceChunksAmount
@@ -133,7 +134,7 @@ const mapStateToProps = ({
 
 const dispatchToProps = {
   setObsoleteThreshold,
-  setAutocreatedChunkAmount,
+  setChunkAmount,
   setBuyProfitThreshold,
   setSellProfitThreshold,
   requestInvalidateChunks,

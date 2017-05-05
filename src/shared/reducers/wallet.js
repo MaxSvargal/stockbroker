@@ -2,8 +2,8 @@ import { createReducer } from 'redux-act'
 
 import { assign } from './helpers'
 import {
-  setAutocreatedChunkAmount,
   setBuyProfitThreshold,
+  setChunkAmount,
   setBalanceValues,
   setCurrency,
   setCurrencyPair,
@@ -42,8 +42,8 @@ export const obsoleteThreshold = createReducer({
   [setObsoleteThreshold]: (state, value) => value
 }, 0.003)
 
-export const autocreatedChunkAmount = createReducer({
-  [setAutocreatedChunkAmount]: (state, value) => value
+export const chunkAmount = createReducer({
+  [setChunkAmount]: (state, value) => value
 }, 0.01)
 
 export const currentPair = createReducer({
