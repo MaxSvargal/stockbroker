@@ -5,7 +5,6 @@ import path from 'path'
 import { createStore } from 'redux'
 import pm2 from 'pm2'
 import PouchDB from 'pouchdb'
-import pouchDBAuthentication from 'pouchdb-authentication'
 
 import render from './renderer'
 import monitor from './monitor'
@@ -15,15 +14,58 @@ import rootReducer from '../shared/reducers'
 const app = new Koa()
 const router = new KoaRouter()
 
+const pm2Connect = () => new Promise((resolve, reject) =>
+  pm2.connect(err => err ? reject(err) : resolve()))
+
+const pm2GetProcessList = () => new Promise((resolve, reject) =>
+  pm2.list((err, list) => err ? reject(err) : resolve(list)))
+
+const pm2Start = name => new Promise((resolve, reject) =>
+  pm2.start(name, (err, proc) => err ? reject(err) : resolve(proc)))
+
+const pm2Restart = name => new Promise((resolve, reject) =>
+  pm2.restart(name, (err, proc) => err ? reject(err) : resolve(proc)))
+
+const pm2Stop = name => new Promise((resolve, reject) =>
+  pm2.stop(name, (err, proc) => err ? reject(err) : resolve(proc)))
+
+
 router.get('/', async (ctx, next) => {
   try {
-    await new Promise((resolve, reject) =>
-      pm2.connect(err => err ? reject(err) : resolve()))
-    const processList = await new Promise((resolve, reject) =>
-      pm2.list((err, list) => err ? reject(err) : resolve(list)))
-
+    await pm2Connect()
+    const processList = await pm2GetProcessList()
     const html = monitor(processList)
     ctx.body = html
+  } catch (err) {
+    console.error(err)
+  }
+  await next()
+})
+
+router.get('/start/:name', async (ctx, next) => {
+  try {
+    await pm2Start(ctx.params.name)
+    ctx.redirect('/')
+  } catch (err) {
+    console.error(err)
+  }
+  await next()
+})
+
+router.get('/restart/:name', async (ctx, next) => {
+  try {
+    await pm2Restart(ctx.params.name)
+    ctx.redirect('/')
+  } catch (err) {
+    console.error(err)
+  }
+  await next()
+})
+
+router.get('/stop/:name', async (ctx, next) => {
+  try {
+    await pm2Stop(ctx.params.name)
+    ctx.redirect('/')
   } catch (err) {
     console.error(err)
   }
