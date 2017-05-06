@@ -94,6 +94,40 @@ test('selectVolumeOfChunksType should return full amount of sell chunks', t => {
   t.deepEqual(output, 0.06)
 })
 
+test('getDayProfitByChunks should calculate profit by closed chunks', t => {
+  const now = new Date().getTime()
+  const hour = 1000 * 60 * 60
+  const state = {
+    transactions: {
+      foo: { updated: now - (hour * 1), active: false, profit: 0.00001, removed: true },
+      foz: { updated: now - (hour * 3), active: true, profit: 0.00001 },
+      bar: { updated: now - (hour * 6), active: false, profit: 0.00001 }, // this
+      baz: { updated: now - (hour * 12), active: false, profit: 0.00001 }, // and this
+      qux: { updated: now - (hour * 25), active: false, profit: 0.00001 }
+    }
+  }
+
+  const output = selectors.getDayProfitByChunks(state)
+  t.is(output, 0.00002)
+})
+
+test.skip('getDayProfitByBalance should get and return the first balance of past 24 hors', t => {
+  const now = new Date().getTime()
+  const hour = 1000 * 60 * 60
+  const state = {
+    walletLogs: [
+      [ now - (hour * 25), { BTC: 0.81, ETH: 3.1 } ],
+      [ now - (hour * 12), { BTC: 0.82, ETH: 3.12 } ],
+      [ now - (hour * 6), { BTC: 0.83, ETH: 3.14 } ],
+      [ now - (hour * 2), { BTC: 0.84, ETH: 3.16 } ],
+      [ now - (hour * 1), { BTC: 0.85, ETH: 3.18 } ]
+    ]
+  }
+
+  const output = selectors.getDayProfitByBalance(state)
+  t.deepEqual(output, { BTC: 0.03, ETH: 0.06 })
+})
+
 test('selectBuysDuringTime should select correct buys', t => {
   const state = {
     buy: [

@@ -1,5 +1,5 @@
 import test from 'ava'
-import testSaga from 'redux-saga-test-plan'
+import { testSaga } from 'redux-saga-test-plan'
 import { addStats } from 'shared/actions'
 import { generateStatsSaga } from 'worker/sagas/stats'
 import {

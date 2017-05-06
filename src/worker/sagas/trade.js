@@ -1,14 +1,14 @@
 import { take, select, put, race } from 'redux-saga/effects'
 import { cropNumber } from '../../shared/utils'
-import { addMessage, doBuy, doSell, buySuccess, buyFailure, sellSuccess, sellFailure, addChunks } from '../../shared/actions'
-import { selectSellForCover, selectBuyForCover, selectTransactions, selectAutocreatedChunkAmount } from './selectors'
+import { addChunks, addMessage, doBuy, doSell, buySuccess, buyFailure, sellSuccess, sellFailure } from '../../shared/actions'
+import { selectSellForCover, selectBuyForCover, selectTransactions, selectChunkAmount } from './selectors'
 
 export function* buySaga(rate, hold) {
   const transactions = yield select(selectTransactions)
   const rateWithHold = cropNumber(rate + hold)
   const coverId = yield select(selectSellForCover, rateWithHold)
   if (!coverId) {
-    const chunkAmount = yield select(selectAutocreatedChunkAmount)
+    const chunkAmount = yield select(selectChunkAmount)
     if (chunkAmount !== 0)
       yield put(addChunks({ rate, amount: chunkAmount, num: 1, type: 'buy', creationMethod: 'hollow' }))
     yield put(addMessage('failure', { action: 'buy', rate: rateWithHold }))
@@ -32,19 +32,16 @@ export function* sellSaga(rate, hold) {
   const rateWithHold = cropNumber(rate - hold)
   const coverId = yield select(selectBuyForCover, rateWithHold)
   if (!coverId) {
-    const chunkAmount = yield select(selectAutocreatedChunkAmount)
+    const chunkAmount = yield select(selectChunkAmount)
     if (chunkAmount !== 0)
       yield put(addChunks({ rate, amount: chunkAmount, num: 1, type: 'sell', creationMethod: 'hollow' }))
     yield put(addMessage('failure', { action: 'sell', rate: rateWithHold }))
     return false
   }
-
   const covered = transactions[coverId]
   const profit = cropNumber((rate - covered.rate) * (covered.amount - (covered.amount * 0.25)))
-
   yield put(doSell({ rate, amount: covered.amount, profit, coverId }))
   const response = yield race({ success: take(sellSuccess), failure: take(sellFailure) })
-
   if (response.success)
     yield put(addMessage('transaction', { action: 'sell', rate, coveredRate: covered.rate, coveredAmount: covered.amount, profit }))
   else if (response.failure)

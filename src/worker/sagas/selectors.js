@@ -22,9 +22,16 @@ export const selectWallet = state => state.wallet
 export const selectStopTrade = state => state.stopTrade
 export const selectLastStat = ({ stats }) => stats[stats.length - 1]
 export const selectLastStats = ({ stats }, num) => stats.slice(stats.length - num - 1, stats.length - 1)
-export const selectStatsDuringTime = (state, time) => state.stats.filter(i => i.created >= time)
+export const selectStatsDuringTime = (state, time) => state.stats.filter(i => i.created > time)
 export const selectBuysDuringTime = (state, time) => state.buy.filter(i => i[0] >= time)
 export const selectSellsDuringTime = (state, time) => state.sell.filter(i => i[0] >= time)
+export const selectStopTransactionState = (state, key) => state.stopTransactions[key]
+
+export const selectAvaliableSourceCurrency = state =>
+  state.wallet[state.wallet.length - 1][1][state.currentPair.split('_')[0]]
+
+export const selectAvaliablePurposeBalance = state =>
+  state.wallet[state.wallet.length - 1][1][state.currentPair.split('_')[1]]
 
 export const selectBuyForCover = ({ transactions }, rate) => {
   const matches = Object.keys(transactions)
@@ -70,3 +77,20 @@ export const selectVolumeOfChunksType = ({ transactions }, type) =>
       transactions[key].type === type)
     .map(key => transactions[key].amount)
     .reduce((prev, curr) => prev + curr, 0))
+
+export const getDayProfitByChunks = ({ transactions }) =>
+  cropNumber(Object.keys(transactions)
+    .filter(key =>
+      transactions[key].profit &&
+      transactions[key].active === false &&
+      transactions[key].removed !== true &&
+      transactions[key].updated >= new Date().getTime() - (1000 * 60 * 60 * 24)) // 24h
+    .map(key => transactions[key].profit)
+    .reduce((summ, profit) => summ + profit, 0))
+
+export const getDayProfitByBalance = ({ walletLogs }) => {
+  const fromBalance = walletLogs.filter(item => item[0] >= new Date().getTime() - (1000 * 60 * 60 * 24))[0][1]
+  const toBalance = walletLogs[walletLogs.length - 1][1]
+  return Object.keys(fromBalance).reduce((obj, key) =>
+    Object.assign({}, obj, { [key]: cropNumber(toBalance[key] - fromBalance[key]) }), {})
+}

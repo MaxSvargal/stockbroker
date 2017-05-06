@@ -1,6 +1,6 @@
 import test from 'ava'
 import { transactions } from 'shared/reducers/transactions'
-import { buySuccess, sellSuccess, addChunks, removeChunk, buyFailure, replaceChunksAmount } from 'shared/actions'
+import { buySuccess, sellSuccess, addChunks, removeChunk, buyFailure, replaceChunksAmount, cleanChunksType } from 'shared/actions'
 
 test.skip('transactions < buySuccess should work correctly', t => {
   const data = { orderNumber: 987, rate: 0.5, coverId: 'rkg' }
@@ -41,12 +41,14 @@ test.skip('transactions < removeBuyChunk should work correctly', t => {
   t.deepEqual(newState, { foo: { rate: 0.5, amount: 1, removed: true }, bar: {} })
 })
 
-test.skip('transactions < buyFailure should work correctly', t => {
-  const state = { foo: { rate: 0.5, amount: 1, active: true }, bar: {} }
-  const action = buyFailure({ id: 'foo', error: 'Server error' })
+test('transactions < buyFailure should work correctly', t => {
+  const state = { foo: {}, bar: {} }
+  const action = buyFailure({ rate: 0.5, amount: 0.1, coverId: 'foo', error: 'Server error' })
   const newState = transactions(state, action)
-
-  t.deepEqual(newState, { foo: { rate: 0.5, amount: 1, active: false, error: 'Server error' }, bar: {} })
+  const key = Object.keys(newState)[2]
+  t.is(newState[key].coverId, 'foo')
+  t.is(newState[key].error, 'Server error')
+  t.is(newState[key].type, 'buy')
 })
 
 test('transactions < replaceChunksAmount should remove old and create new chunks with passed amount', t => {
@@ -67,4 +69,21 @@ test('transactions < replaceChunksAmount should remove old and create new chunks
   t.is(newState[keys[3]].amount, 1)
   t.is(newState[keys[4]].active, true)
   t.is(newState[keys[4]].amount, 1)
+})
+
+test('transactions < cleanChunksType should remove all chunks of passed type', t => {
+  const state = {
+    foo: { rate: 0.5, amount: 0.1, active: true, type: 'sell' },
+    bar: { rate: 0.5, amount: 0.5, active: true, type: 'buy' },
+    quz: { rate: 0.5, amount: 0.1, active: false, type: 'buy' }
+  }
+  const expected = {
+    foo: { rate: 0.5, amount: 0.1, active: true, type: 'sell' },
+    bar: { rate: 0.5, amount: 0.5, active: false, type: 'buy' },
+    quz: { rate: 0.5, amount: 0.1, active: false, type: 'buy' }
+  }
+  const action = cleanChunksType('buy')
+  const newState = transactions(state, action)
+
+  t.deepEqual(newState, expected)
 })
