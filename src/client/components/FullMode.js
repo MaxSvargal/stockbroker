@@ -7,7 +7,7 @@ import BotLog from './BotLog'
 import TradeTable from './TradeTable'
 import CurrencyStats from './CurrencyStats'
 import CurrencyRate from './CurrencyRate'
-import BalancePieChart from './BalancePieChart'
+import WalletBalance from './WalletBalance'
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive)
 
@@ -54,7 +54,7 @@ class FullModePage extends Component {
     }, [
       div({ key: 'rate' }, [ CurrencyRate() ]),
       div({ key: 'stats' }, [ CurrencyStats() ]),
-      div({ key: 'balance' }, [ BalancePieChart() ]),
+      div({ key: 'balance' }, [ WalletBalance() ]),
       div({ key: 'log' }, [ BotLog() ]),
       div({ key: 'trade' }, [ TradeTable() ]),
     ])

@@ -54,7 +54,6 @@ class BotLog extends Component {
 
   getMessage({ type, message }) {
     const { msg } = this.getStyles()
-    console.log({ type, message });
 
     switch (type) {
       case 'transaction': {

@@ -1,4 +1,4 @@
-import { all, call, take, fork, put, cancelled } from 'redux-saga/effects'
+import { call, take, fork, put, cancelled } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
 
 import ClientSocket from '../../shared/services/clientSocket'
@@ -50,10 +50,8 @@ export default function* clientWebSocketSaga() {
   try {
     const realm = window.location.pathname.match(/\/bot\/(.+)\/page/)[1].split('/').join('_')
     const session = yield call(ClientSocket, realm)
-    yield all([
-      fork(watchUpdates, session),
-      fork(watchActionsForRPC, session)
-    ])
+    yield fork(watchUpdates, session)
+    yield fork(watchActionsForRPC, session)
   } catch (err) {
     console.log('Can\'t connect to the socket server', err)
   }

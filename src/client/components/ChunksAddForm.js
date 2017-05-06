@@ -178,7 +178,7 @@ class ChunksAddForm extends Component {
 
 const mapStateToProps = ({ currencies, currentPair, wallet }) => ({
   pairNames: currentPair.split('_'),
-  amount: wallet[currentPair.split('_')[1]],
+  amount: wallet[wallet.length - 1][1][currentPair.split('_')[1]],
   rate: currencies[currentPair] && currencies[currentPair].last
 })
 
