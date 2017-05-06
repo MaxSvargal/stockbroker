@@ -7,6 +7,7 @@ const createWorker = ({ name, pair, account, port, env }) => ({
   source_map_support: true,
   max_memory_restart: '250M',
   env: {
+    UV_THREADPOOL_SIZE: 128,
     NODE_ENV: env || 'production',
     CURRENCY_PAIR: pair,
     ACCOUNT_KEY: account.key,
