@@ -3989,7 +3989,7 @@ lodash.clonedeep@^3.0.0:
     lodash._baseclone "^3.0.0"
     lodash._bindcallback "^3.0.0"
 
-lodash.clonedeep@^4.5.0:
+lodash.clonedeep@^4.1.0, lodash.clonedeep@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz#e23f3f9c4f8fbdde872529c1071857a086e5ccef"
 
@@ -5783,6 +5783,16 @@ redux-mock-store@^1.2.2:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/redux-mock-store/-/redux-mock-store-1.2.3.tgz#1b3ad299da91cb41ba30d68e3b6f024475fb9e1b"
 
+redux-pouchdb-rethink@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/redux-pouchdb-rethink/-/redux-pouchdb-rethink-1.0.1.tgz#4e5232ea91886e59816afc9fd8b72e9663e8b5f4"
+  dependencies:
+    lodash.clonedeep "^4.1.0"
+    lodash.isequal "^4.0.0"
+    transit-immutable-js "^0.5.2"
+    transit-js "^0.8.846"
+    uuid "^3.0.0"
+
 redux-pouchdb@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/redux-pouchdb/-/redux-pouchdb-0.1.1.tgz#20bf0fbbd6c363535f41acc11ef6571289c5eca3"
@@ -6655,6 +6665,14 @@ tough-cookie@~2.3.0:
   resolved "https://registry.yarnpkg.com/tough-cookie/-/tough-cookie-2.3.2.tgz#f081f76e4c85720e6c37a5faced737150d84072a"
   dependencies:
     punycode "^1.4.1"
+
+transit-immutable-js@^0.5.2:
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/transit-immutable-js/-/transit-immutable-js-0.5.4.tgz#d92c981744bf403c3bbb3fd0c368fc484e8a1864"
+
+transit-js@^0.8.846:
+  version "0.8.846"
+  resolved "https://registry.yarnpkg.com/transit-js/-/transit-js-0.8.846.tgz#76e06e8f0e6be27675e3442112f5c9bb75343464"
 
 trim-newlines@^1.0.0:
   version "1.0.0"

@@ -63,6 +63,7 @@
     "redux": "^3.6.0",
     "redux-act": "^1.1.1",
     "redux-pouchdb": "^0.1.1",
+    "redux-pouchdb-rethink": "^1.0.1",
     "redux-saga": "0.15.3",
     "rollup": "^0.41.6",
     "shortid": "^2.2.8",
