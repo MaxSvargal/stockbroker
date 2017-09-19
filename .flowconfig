@@ -1,0 +1,10 @@
+[include]
+./src/worker/.*
+
+[ignore]
+./build/*
+.*/node_modules/redux-saga-test-plan/.*
+.*/node_modules/gulp-flowtype/.*
+
+[options]
+module.file_ext=.mjs

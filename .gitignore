@@ -1,10 +1,7 @@
-coverage
 node_modules
+build
+.gulp-cache
 .tmp
 .DS_Store
-.env
-.c9
-.nyc_output
 src/server/accounts/*
 accounts.config.js
-dist/*
