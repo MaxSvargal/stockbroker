@@ -1,6 +1,5 @@
 node_modules
 build
-.gulp-cache
 .tmp
 .DS_Store
 src/server/accounts/*

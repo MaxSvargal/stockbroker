@@ -1,0 +1,15 @@
+import { createAction } from 'redux-act'
+
+export const cancelOrder = createAction('CANCEL_ORDER')
+export const createOrder = createAction('CREATE_ORDER')
+export const makeCancelOrder = createAction('MAKE_CANCEL_ORDER')
+export const newOrder = createAction('NEW_ORDER')
+export const newTrade = createAction('NEW_TRADE')
+export const setCurrency = createAction('SET_CURRENCY')
+export const setOrderBook = createAction('SET_ORDER_BOOK')
+export const setOrders = createAction('SET_ORDERS')
+export const setWallet = createAction('SET_WALLET')
+export const tradeExecute = createAction('TRADE_EXECUTE')
+export const updateOrder = createAction('UPDATE_ORDER')
+export const updateOrderBook = createAction('UPDATE_ORDER_BOOK')
+export const updateWallet = createAction('UPDATE_WALLET')

@@ -10,12 +10,11 @@ import rootSaga from './sagas'
 
 // require('events').EventEmitter.defaultMaxListeners = 30
 
-const { ACCOUNT, PAIR } = process.env
+const { ACCOUNT } = process.env
 
 const connectToDB = () => {
-  const dbPath = `http://127.0.0.1:5984/${ACCOUNT}_${PAIR.toLowerCase()}`
-  debug('worker')('Use database %s', dbPath)
-  console.log(typeof PouchDB)
+  const dbPath = `http://127.0.0.1:5984/${ACCOUNT}`
+  debug('worker')('Connect to database %s', dbPath)
   return PouchDB(dbPath, {
     ajax: {
       cache: true,
@@ -31,7 +30,6 @@ const connectToDB = () => {
 const db = connectToDB()
 console.log(db)
 
-export default db
 const sagaMiddleware = createSagaMiddleware()
 const middlewares = applyMiddleware(sagaMiddleware)
 const persist = persistentStore({ db })
