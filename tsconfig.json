@@ -2,22 +2,22 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es6",
-    "baseUrl": "src",
+    "baseUrl": "./src",
     "moduleResolution": "node",
     "outDir": "build",
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
+    "noImplicitReturns": true,
     "preserveConstEnums": true,
     "removeComments": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "strictNullChecks": true,
-    "paths": {
-      "*": [
-        "node_modules/*",
-        "src/types/*"
-      ]
-    }
-  }
+    "strictNullChecks": true
+  },
+  "exclude": [
+    "build",
+    "node_modules",
+    "*.test.ts"
+  ]
 }
