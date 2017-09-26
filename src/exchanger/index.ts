@@ -1,11 +1,12 @@
 import debug from 'debug'
-import PouchDB from 'pouchdb'
 import { applyMiddleware, compose, createStore } from 'redux'
 import { persistentStore } from 'redux-pouchdb-plus'
 import createSagaMiddleware from 'redux-saga'
 
-import rootReducer from './reducers'
+import rootReducer from 'shared/reducers'
 import rootSaga from './sagas'
+
+const PouchDB = require('pouchdb')
 
 // require('events').EventEmitter.defaultMaxListeners = 30
 

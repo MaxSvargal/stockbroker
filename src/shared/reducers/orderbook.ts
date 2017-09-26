@@ -1,5 +1,5 @@
 import { createReducer } from 'redux-act'
-import { setOrderBook, updateOrderBook } from '../actions'
+import { setOrderBook, updateOrderBook } from 'exchanger/actions'
 
 const defaultState = { bid: {}, ask: {} }
 const orderBookReducer = createReducer<typeof defaultState>({}, defaultState)

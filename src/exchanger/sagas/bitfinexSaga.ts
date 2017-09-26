@@ -20,9 +20,10 @@ export default function* bitfinexSaga(): any {
 
     if (Array.isArray(pairs))
       pairs.forEach(pair => {
-        bws.subscribeOrderBook(pair)
+        // bws.subscribeOrderBook(pair)
         bws.subscribeTicker(pair)
         bws.subscribeTrades(pair)
+        bws.subscribeCandles(`t${pair}`, '1m')
       })
 
     bws.on('error', (err: Error) => { throw err })

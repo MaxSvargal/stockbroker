@@ -6,6 +6,7 @@
   "author": "MaxSvargal <maxsvargal@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "exchanger": "DEBUG=dev ACCOUNT=maxsvargal PAIRS=BTCUSD  NODE_PATH=./src ts-node ./src/exchanger/index.ts",
     "build": "tsc",
     "test": "jest"
   },
@@ -29,19 +30,29 @@
         "skipBabel": true
       }
     },
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "modulePaths": [
+      "<rootDir>/src/"
+    ]
   },
   "dependencies": {
-    "bitfinex-api-node": "^1.2.0",
+    "autobahn": "^17.5.2",
+    "bitfinex-api-node": "https://github.com/MaxSvargal/bitfinex-api-node.git",
+    "immutable": "^3.8.1",
     "pouchdb": "^6.3.4",
     "redux": "^3.7.2",
     "redux-act": "^1.4.0",
-    "redux-pouchdb-plus": "^0.8.1",
+    "redux-pouchdb-plus": "https://github.com/medihack/redux-pouchdb-plus.git",
     "redux-saga": "^0.15.6",
+    "reselect": "^3.0.1",
     "typescript": "^2.5.2"
   },
   "devDependencies": {
+    "@types/autobahn": "^0.9.37",
+    "@types/debug": "^0.0.30",
     "@types/jest": "^20.0.8",
+    "@types/node": "^8.0.28",
+    "@types/pouchdb": "^6.3.0",
     "debug": "^3.0.1",
     "jest": "^21.0.2",
     "jest-cli": "^21.1.0",

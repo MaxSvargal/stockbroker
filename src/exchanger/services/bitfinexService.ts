@@ -1,4 +1,4 @@
-import BFX from 'bitfinex-api-node'
+const BFX = require('bitfinex-api-node')
 
 const API_KEY = 'o7yl00PaXcqt6SiNtinCLW2GeEWGMXlaCxAp7sIv6J8'
 const API_SECRET = 'SD1xukgXJVFEDAhLr3L0f13J06VRWFHDhtWCubPJHLQ'

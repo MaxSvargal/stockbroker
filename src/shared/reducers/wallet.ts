@@ -1,7 +1,7 @@
 import { createReducer } from 'redux-act'
-import { setWallet, updateWallet } from '../actions'
+import { setWallet, updateWallet } from 'exchanger/actions'
 
-type State = {
+type WalletState = {
   [walletType: string]: {
     [currency: string]: {
       balance: number
@@ -11,11 +11,11 @@ type State = {
   }
 }
 
-const walletReducer = createReducer({}, <State>{})
+const walletReducer = createReducer<WalletState>({}, {})
 
 walletReducer.on(setWallet, (state, payload) =>
   payload.reduce((prev, [ walletType, currency, balance, unsettledInterest, balanceAvaliable ]) =>
-    ({ ...prev, [walletType]: { ...prev[walletType], [currency]: { balance, unsettledInterest, balanceAvaliable } } }), <State>{} ))
+    ({ ...prev, [walletType]: { ...prev[walletType], [currency]: { balance, unsettledInterest, balanceAvaliable } } }), <WalletState>{} ))
 
 walletReducer.on(updateWallet, (state, [ walletType, currency, balance, unsettledInterest, balanceAvaliable ]) =>
   ({ ...state, [walletType]: { ...state[walletType], [currency]: { balance, unsettledInterest, balanceAvaliable } } }))
