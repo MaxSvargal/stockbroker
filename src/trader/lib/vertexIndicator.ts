@@ -7,7 +7,7 @@ export default (candles: CandleData[]) => {
       const [ pMts, pOpen, pClose, pHight, pLow ] = a[i]
       const [ cMts, cOpen, cClose, cHight, cLow ] = a[i + 1]
 
-      const trueRange = Math.max(pHight - cLow, cLow - pClose, cHight - pClose)
+      const trueRange = Math.max(cHight - cLow, cLow - pClose, cHight - pClose)
       const vmUp = cHight - pLow
       const vmDn = cLow - pHight
 

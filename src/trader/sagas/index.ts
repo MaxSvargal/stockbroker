@@ -28,15 +28,15 @@ function* vertex() {
     const lowestLow = yield select(selectLowestLow, 'trade:1m:tBTCUSD', 14)
     const highestHigh = yield select(selectHighestHigh, 'trade:1m:tBTCUSD', 14)
 
-    const lastCandles = <CandleData[]>candles.slice(0, 3) // +3 candles ???
+    const lastCandles = <CandleData[]>candles.slice(candles.length - 3, candles.length) // +3 candles ???
     const lastStochastics = lastCandles.map(candle => stochasticOscillator(candle[2], lowestLow, highestHigh))
     const currentStochastic = stochasticOscillator(current, lowestLow, highestHigh)
 
     const KStochastic = currentStochastic
     const DStochastic = SMA(lastStochastics)
 
-    debug('worker')(candles)
-    debug('worker')(lastCandles)
+    // debug('worker')(candles)
+    // debug('worker')(lastCandles)
     // debug('worker')(lastStochastics)
     // debug('worker')({ lowestLow, highestHigh })
     debug('worker')(vertexResults)
