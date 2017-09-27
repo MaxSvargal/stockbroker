@@ -1,5 +1,20 @@
-import sum from './main'
+import debug from 'debug'
+import { applyMiddleware, compose, createStore } from 'redux'
+import { persistentStore } from 'redux-pouchdb-rethink'
+import createSagaMiddleware from 'redux-saga'
 
-console.log(sum(1, 3.2))
+import rootReducer from 'shared/reducers'
+import rootSaga from './sagas'
+import connectToDB from 'shared/services/pouchdbService'
 
-// On 5 seconds loop check database, calculate results, apply algorytms and send RPC calls to exchange-conn
+const { ACCOUNT = 'demo' } = process.env
+
+debug('worker')('Connect to database %s', ACCOUNT)
+
+const db = connectToDB(ACCOUNT)
+const sagaMiddleware = createSagaMiddleware()
+const middlewares = applyMiddleware(sagaMiddleware)
+const persist = persistentStore({ db, onReady: () => sagaMiddleware.run(rootSaga) })
+const store = createStore(rootReducer, compose(middlewares, persist))
+
+export default store

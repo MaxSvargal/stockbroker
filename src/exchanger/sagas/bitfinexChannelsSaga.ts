@@ -1,20 +1,20 @@
 import { all, call, take, fork, put } from 'redux-saga/effects'
 import { eventChannel, delay, END, SagaIterator } from 'redux-saga'
-import { WS } from 'bitfinex-api-node'
-import { OrderBookPayload, TradeData, WalletData, CandleData } from 'exchanger/actions'
+import { BFX } from 'bitfinex-api-node'
+import { OrderBookPayload, TradeData, WalletData, CandleData, TickerData } from 'shared/types'
 import debug from 'debug'
 import * as actions from '../actions'
 
 type Pair = string
 
-export const channel = (bws: WS, name: string) => eventChannel(emitter => {
+export const channel = (bws: BFX, name: string) => eventChannel(emitter => {
   bws.on(name, (...data: any[]) => emitter(data))
   bws.on('close', () => emitter(END))
-  return bws.close
+  return bws.ws.close.bind(bws)
 })
 
 // TODO https://github.com/redux-saga/redux-saga/issues/1177
-export function* channelSaga(bws: WS, name: string, saga: any) {
+export function* channelSaga(bws: BFX, name: string, saga: any) {
   const chan = yield call(channel, bws, name)
   while (true) {
     const data = yield take(chan)
@@ -51,12 +51,17 @@ export function* candlesChannelSaga(key: string, data: CandleData & CandleData[]
     yield put(actions.updateCandle({ key, data }))
 }
 
-export default function* runChannels(bws: WS) {
+export function* tickerUpdateChannelSaga(pair: Pair, data: TickerData) {
+  yield put(actions.updateTicker({ pair, data }))
+}
+
+export default function* runChannels(bws: BFX) {
   yield all([
     // fork(channelSaga, bws, 'trades', tradeChannelSaga),
     fork(channelSaga, bws, 'book', orderBookChannelSaga),
     fork(channelSaga, bws, 'candles', candlesChannelSaga),
     fork(channelSaga, bws, 'ws', walletSnapshotChannelSaga),
-    fork(channelSaga, bws, 'wu', walletUpdateChannelSaga)
+    fork(channelSaga, bws, 'wu', walletUpdateChannelSaga),
+    fork(channelSaga, bws, 'ticker', tickerUpdateChannelSaga)
   ])
 }

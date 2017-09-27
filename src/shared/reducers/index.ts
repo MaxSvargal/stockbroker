@@ -1,12 +1,13 @@
 import { Reducer, combineReducers } from 'redux'
-import { persistentReducer } from 'redux-pouchdb-plus'
+import { persistentReducer } from 'redux-pouchdb-rethink'
 
 import orderbook from './orderbook'
 import trades from './trades'
 import wallet from './wallet'
 import candles from './candles'
+import tickers from './tickers'
 
-const reducers: { [name: string]: Reducer<any> } = { orderbook, trades, wallet, candles }
+const reducers: { [name: string]: Reducer<any> } = { orderbook, trades, wallet, candles, tickers }
 
 const persistentReducers = Object.keys(reducers).reduce((obj, name) =>
   ({ ...obj, [name]: persistentReducer(reducers[name], { name }) }), {})

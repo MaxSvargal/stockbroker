@@ -1,7 +1,6 @@
 import debug from 'debug'
 import { all, call, take, fork, put } from 'redux-saga/effects'
 import { eventChannel, delay, END } from 'redux-saga'
-import { WS } from 'bitfinex-api-node'
 
 import bitfinexService from '../services/bitfinexService'
 import * as actions from '../actions'

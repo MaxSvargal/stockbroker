@@ -1,34 +1,17 @@
 import debug from 'debug'
 import { applyMiddleware, compose, createStore } from 'redux'
-import { persistentStore } from 'redux-pouchdb-plus'
+import { persistentStore } from 'redux-pouchdb-rethink'
 import createSagaMiddleware from 'redux-saga'
 
 import rootReducer from 'shared/reducers'
 import rootSaga from './sagas'
+import connectToDB from 'shared/services/pouchdbService'
 
-const PouchDB = require('pouchdb')
+const { ACCOUNT = 'demo' } = process.env
 
-// require('events').EventEmitter.defaultMaxListeners = 30
+debug('worker')('Connect to database %s', ACCOUNT)
 
-const { ACCOUNT } = process.env
-
-const connectToDB = () => {
-  const dbPath = `http://127.0.0.1:5984/${ACCOUNT}`
-  debug('worker')('Connect to database %s', dbPath)
-  return new PouchDB(dbPath, {
-    ajax: {
-      cache: true,
-      timeout: 120000,
-    },
-    auth: {
-      username: 'worker',
-      password: 'hUY7t9H7tfdF5d7oI93gVfgd',
-    },
-  })
-}
-
-const db = connectToDB()
-
+const db = connectToDB(ACCOUNT)
 const sagaMiddleware = createSagaMiddleware()
 const middlewares = applyMiddleware(sagaMiddleware)
 const persist = persistentStore({ db })

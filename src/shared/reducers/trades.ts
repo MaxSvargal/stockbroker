@@ -1,5 +1,6 @@
 import { createReducer } from 'redux-act'
-import { addTrade, setTrades, TradesPayload, MTS, AMOUNT, PRICE } from 'exchanger/actions'
+import { addTrade, setTrades } from 'exchanger/actions'
+import { MTS, AMOUNT, PRICE, TradesPayload } from 'shared/types'
 
 type TradesState = {
   [pair: string]: {

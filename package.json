@@ -6,7 +6,8 @@
   "author": "MaxSvargal <maxsvargal@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "exchanger": "DEBUG=dev ACCOUNT=maxsvargal PAIRS=BTCUSD  NODE_PATH=./src ts-node ./src/exchanger/index.ts",
+    "exchanger": "DEBUG=dev ACCOUNT=maxsvargal PAIRS=BTCUSD NODE_PATH=./src ts-node ./src/exchanger/index.ts",
+    "trader": "nodemon",
     "build": "tsc",
     "test": "jest"
   },
@@ -35,6 +36,16 @@
       "<rootDir>/src/"
     ]
   },
+  "nodemonConfig": {
+    "watch": [
+      "src/**/*.ts"
+    ],
+    "ext": "ts js json",
+    "ignore": [
+      "*.test.ts"
+    ],
+    "exec": "DEBUG=worker ACCOUNT=maxsvargal PAIRS=BTCUSD NODE_PATH=./src ts-node ./src/trader/index.ts"
+  },
   "dependencies": {
     "autobahn": "^17.5.2",
     "bitfinex-api-node": "https://github.com/MaxSvargal/bitfinex-api-node.git",
@@ -42,7 +53,7 @@
     "pouchdb": "^6.3.4",
     "redux": "^3.7.2",
     "redux-act": "^1.4.0",
-    "redux-pouchdb-plus": "https://github.com/medihack/redux-pouchdb-plus.git",
+    "redux-pouchdb-rethink": "^1.1.0",
     "redux-saga": "^0.15.6",
     "reselect": "^3.0.1",
     "typescript": "^2.5.2"
@@ -56,6 +67,7 @@
     "debug": "^3.0.1",
     "jest": "^21.0.2",
     "jest-cli": "^21.1.0",
+    "nodemon": "^1.12.1",
     "redux-mock-store": "^1.2.3",
     "redux-saga-test-plan": "^3.1.0",
     "ts-jest": "^21.0.1",
