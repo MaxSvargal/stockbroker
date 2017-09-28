@@ -1,0 +1,53 @@
+{
+  "version": 2,
+  "controller": {
+    "id": "stockbroker"
+  },
+  "workers": [
+    {
+      "type": "router",
+      "realms": [
+        {
+          "name": "maxsvargal",
+          "roles": [
+            {
+              "name": "worker",
+              "permissions": [
+                {
+                  "uri": "*",
+                  "cache": true,
+                  "allow": {
+                    "call": true,
+                    "register": true,
+                    "publish": true,
+                    "subscribe": true
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "transports": [
+        {
+          "type": "websocket",
+          "endpoint": {
+            "type": "tcp",
+            "port": 9000
+          },
+          "auth": {
+            "ticket": {
+              "type": "static",
+              "principals": {
+                "worker": {
+                  "role": "worker",
+                  "ticket": "nHyRzIpW37YnHq$1L"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

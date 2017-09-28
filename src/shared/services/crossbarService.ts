@@ -1,21 +1,22 @@
-import { Connection } from 'autobahn'
+import { Connection, Session } from 'autobahn'
 
-interface autobahnInterface {
+interface CrossbarService {
   realm: string,
   onclose: (reason: string, details: any) => boolean
 }
 
-export default ({ realm, onclose }: autobahnInterface) =>
-  new Promise(resolve => {
+export default ({ realm, onclose }: CrossbarService) =>
+  new Promise((resolve: (session: Session, details: any) => void) => {
     const connection = new Connection({
+      realm,
+      authid: 'worker',
+      authmethods: [ 'ticket' ],
+      onchallenge: () => 'nHyRzIpW37YnHq$1L',
       url: 'ws://localhost:9000',
       use_es6_promises: true,
-      authmethods: [ 'ticket' ],
-      authid: 'worker',
-      onchallenge: () => 'nHyRzIpW37YnHq$1L',
-      realm
     })
 
     connection.onopen = resolve
     connection.onclose = onclose
+    connection.open()
   })

@@ -6,5 +6,6 @@ declare module 'bitfinex-api-node' {
     constructor(key: string, secret: string, options?: { version?: number })
     on(event: string, cb: function): void
     auth(): void
+    send(res: any): void
   }
 }

@@ -6,6 +6,7 @@ import bitfinexService from '../services/bitfinexService'
 import * as actions from '../actions'
 
 import bitfinexChannelsSaga from './bitfinexChannelsSaga'
+import bitfinexOrdersSaga from './bitfinexOrdersSaga'
 
 const { PAIRS } = process.env
 
@@ -16,6 +17,7 @@ export default function* bitfinexSaga(): any {
     const bws = yield call(bitfinexService)
 
     yield fork(bitfinexChannelsSaga, bws)
+    yield fork(bitfinexOrdersSaga, bws)
 
     if (Array.isArray(pairs))
       pairs.forEach(pair => {

@@ -10,7 +10,7 @@ type Pair = string
 export const channel = (bws: BFX, name: string) => eventChannel(emitter => {
   bws.on(name, (...data: any[]) => emitter(data))
   bws.on('close', () => emitter(END))
-  return bws.ws.close.bind(bws)
+  return () => bws.ws.close.bind(bws)
 })
 
 // TODO https://github.com/redux-saga/redux-saga/issues/1177

@@ -1,8 +1,10 @@
-import { all, call } from 'redux-saga/effects'
+import { all, fork } from 'redux-saga/effects'
 import bitfinexSaga from './bitfinexSaga'
+import crossbarSaga from './crossbarSaga'
 
 export default function* rootSaga() {
   yield all([
-    call(bitfinexSaga)
+    fork(bitfinexSaga),
+    fork(crossbarSaga)
   ])
 }
