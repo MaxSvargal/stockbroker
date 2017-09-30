@@ -27,12 +27,12 @@ export function* analyticsSaga() {
 
     if (lastDStochastic && lastDStochastic > 80 && DStochastic < 80) {
       debug('worker')('Stochastic signal to sell by', bid)
-      yield put(execNewOrder({ symbol: `t${PAIR}`, amount: -0.005, price: bid }))
+      yield put(execNewOrder({ symbol: `t${PAIR}`, amount: -0.01, price: bid }))
     }
 
     if (lastDStochastic && lastDStochastic < 20 && DStochastic > 20) {
       debug('worker')('Stochastic signal to buy by', ask)
-      yield put(execNewOrder({ symbol: `t${PAIR}`, amount: 0.005, price: ask }))
+      yield put(execNewOrder({ symbol: `t${PAIR}`, amount: 0.01, price: ask }))
     }
 
     lastDStochastic = DStochastic

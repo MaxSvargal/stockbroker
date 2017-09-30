@@ -2,10 +2,9 @@ import debug from 'debug'
 import { delay } from 'redux-saga'
 import { all, fork, select, put } from 'redux-saga/effects'
 import { selectCandles, selectTicker, selectLowestLow, selectHighestHigh } from './selectors'
-import vertexIndicator from 'trader/lib/vertexIndicator'
-import stochasticOscillator, { SMA } from 'trader/lib/stochasticOscillator'
+import vertexIndicator from 'shared/lib/vertexIndicator'
+import stochasticOscillator, { SMA } from 'shared/lib/stochasticOscillator'
 import { CandleData } from 'shared/types'
-import { execAgressiveBuy, execAgressiveSell } from 'shared/actions'
 
 export default function* analyticsSaga() {
   let lastHigh = -1
@@ -47,12 +46,12 @@ export default function* analyticsSaga() {
 
     if (DStochastic > 20 && lastDStochastic < 20) {
       debug('worker')('Стохастик индикатор подаёт сигнал к покупке', bid)
-      yield put(execAgressiveBuy({ symbol: 'tBTCUSD', amount: 0.005, price: ask }))
+      // yield put(execAgressiveBuy({ symbol: 'tBTCUSD', amount: 0.005, price: ask }))
     }
 
     if (DStochastic < 80 && lastDStochastic > 80) {
       debug('worker')('Стохастик индикатор подаёт сигнал к продаже', ask)
-      yield put(execAgressiveSell({ symbol: 'tBTCUSD', amount: -0.005, price: bid }))
+      // yield put(execAgressiveSell({ symbol: 'tBTCUSD', amount: -0.005, price: bid }))
     }
 
     lastDStochastic = DStochastic
