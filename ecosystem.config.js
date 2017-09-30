@@ -6,8 +6,8 @@ module.exports = {
       watch: true,
       env: {
         "DEBUG": "worker",
-        "ACCOUNT": "maxsvargal"
-        "PAIRS": "BTCUSD"
+        "ACCOUNT": "maxsvargal",
+        "PAIRS": "BTCUSD",
         "NODE_PATH": "./src"
       }
     },
@@ -17,8 +17,8 @@ module.exports = {
       watch: true,
       env: {
         "DEBUG": "worker",
-        "ACCOUNT": "maxsvargal"
-        "PAIR": "BTCUSD"
+        "ACCOUNT": "maxsvargal",
+        "PAIR": "BTCUSD",
         "NODE_PATH": "./src"
       }
     }
