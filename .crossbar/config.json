@@ -26,6 +26,26 @@
               ]
             }
           ]
+        },
+        {
+          "name": "lesorub",
+          "roles": [
+            {
+              "name": "worker",
+              "permissions": [
+                {
+                  "uri": "*",
+                  "cache": true,
+                  "allow": {
+                    "call": true,
+                    "register": true,
+                    "publish": true,
+                    "subscribe": true
+                  }
+                }
+              ]
+            }
+          ]
         }
       ],
       "transports": [

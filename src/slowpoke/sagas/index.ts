@@ -7,16 +7,17 @@ import { selectCandles, selectTicker, selectLowestLow, selectHighestHigh } from 
 import stochasticOscillator, { SMA } from 'shared/lib/stochasticOscillator'
 import { CandleData } from 'shared/types'
 
-const { PAIR, AMOUNT } = process.env
+const { ACCOUNT, PAIR, AMOUNT } = process.env
 if (!PAIR || !AMOUNT) throw Error('No pair or amount will passed by environment')
 const amount = Number(AMOUNT)
 
 export function* analyticsSaga() {
   let lastDStochastic
   while (true) {
-    const candles = yield select(selectCandles, `trade:15m:t${PAIR}`, 14)
-    const lowestLow = yield select(selectLowestLow, `trade:15m:t${PAIR}`, 14)
-    const highestHigh = yield select(selectHighestHigh, `trade:15m:t${PAIR}`, 14)
+    const candlesKey = `trade:5m:t${PAIR}`
+    const candles = yield select(selectCandles, candlesKey, 14)
+    const lowestLow = yield select(selectLowestLow, candlesKey, 14)
+    const highestHigh = yield select(selectHighestHigh, candlesKey, 14)
     const ticker = yield select(selectTicker, PAIR)
 
     const lastCandles = <CandleData[]>candles.slice(candles.length - 4, candles.length - 1)
@@ -24,7 +25,7 @@ export function* analyticsSaga() {
     const lastStochastics = lastCandles.map(candle => stochasticOscillator(candle[2], lowestLow, highestHigh))
     const DStochastic = SMA(lastStochastics)
 
-    debug('worker')({ PAIR, DStochastic })
+    debug('worker')({ ACCOUNT, PAIR, DStochastic })
 
     if (lastDStochastic && lastDStochastic > 80 && DStochastic < 80) {
       debug('worker')('Stochastic signal to sell by', bid)
