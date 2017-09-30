@@ -34,6 +34,6 @@ module.exports = {
     slowpoke('maxsvargal')('LTCUSD', 1),
     slowpoke('maxsvargal')('ETCUSD', 1),
 
-    slowpoke('lesorub')('ETCUSD', 5)
+    slowpoke('lesorub')('ETCUSD', 1)
   ]
 }
