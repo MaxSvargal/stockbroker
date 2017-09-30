@@ -6,8 +6,9 @@
   "author": "MaxSvargal <maxsvargal@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "exchanger": "DEBUG=dev ACCOUNT=maxsvargal PAIRS=BTCUSD NODE_PATH=./src ts-node ./src/exchanger/index.ts",
-    "trader": "nodemon",
+    "exchanger": "DEBUG=worker ACCOUNT=maxsvargal PAIRS=BTCUSD NODE_PATH=./src ts-node ./src/exchanger/index.ts",
+    "slowpoke": "DEBUG=worker ACCOUNT=maxsvargal PAIR=BTCUSD NODE_PATH=./src ts-node ./src/slowpoke/index.ts",
+    "dev": "nodemon",
     "build": "tsc",
     "test": "jest"
   },
@@ -44,7 +45,7 @@
     "ignore": [
       "*.test.ts"
     ],
-    "exec": "DEBUG=worker ACCOUNT=maxsvargal PAIRS=BTCUSD NODE_PATH=./src ts-node ./src/trader/index.ts"
+    "exec": "DEBUG=worker ACCOUNT=maxsvargal PAIR=BTCUSD NODE_PATH=./src ts-node ./src/slowpoke/index.ts"
   },
   "dependencies": {
     "autobahn": "^17.5.2",

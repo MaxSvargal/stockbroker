@@ -6,7 +6,7 @@ import bitfinexService from '../services/bitfinexService'
 import * as actions from '../actions'
 
 import bitfinexChannelsSaga from './bitfinexChannelsSaga'
-import bitfinexOrdersSaga from './bitfinexOrdersSaga'
+import bitfinexRequestsSaga from './bitfinexRequestsSaga'
 
 const { PAIRS } = process.env
 
@@ -17,18 +17,18 @@ export default function* bitfinexSaga(): any {
     const bws = yield call(bitfinexService)
 
     yield fork(bitfinexChannelsSaga, bws)
-    yield fork(bitfinexOrdersSaga, bws)
+    yield fork(bitfinexRequestsSaga, bws)
 
     if (Array.isArray(pairs))
       pairs.forEach(pair => {
         // bws.subscribeOrderBook(pair)
         bws.subscribeTicker(pair)
         bws.subscribeTrades(pair)
-        bws.subscribeCandles(`t${pair}`, '1m')
+        bws.subscribeCandles(`t${pair}`, '15m')
       })
 
-    bws.on('error', (err: Error) => { throw err })
-    bws.on('close', () => { throw Error('Bitfinex connection closed') })
+    // bws.on('error', (err: Error) => { throw err })
+    // bws.on('close', () => { throw Error('Bitfinex connection closed') })
 
     debug('worker')('Connection to bitfinex socket established')
     debug('worker')('Listen pairs: ', PAIRS)

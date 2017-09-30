@@ -7,10 +7,7 @@ import * as actions from 'shared/actions'
 const { ACCOUNT } = process.env
 
 const enabledProcedures = [
-  actions.execAgressiveBuy,
-  actions.execAgressiveSell,
-  actions.execPassiveBuy,
-  actions.execPassiveSell
+  actions.execNewOrder
 ]
 
 export function* watchRPCActions(session: Session) {

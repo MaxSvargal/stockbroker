@@ -1,7 +1,6 @@
 import { createAction } from 'redux-act'
-import { requestOrderPayload } from 'shared/types'
+import { NewOrderPayload, CancelOrderPayload, PassiveTradingPayload } from 'shared/types'
 
-export const execAgressiveBuy = createAction<requestOrderPayload>('EXEC_AGRESSIVE_BUY')
-export const execAgressiveSell = createAction<requestOrderPayload>('EXEC_AGRESSIVE_SELL')
-export const execPassiveBuy = createAction<requestOrderPayload>('EXEC_PASSIVE_BUY')
-export const execPassiveSell = createAction<requestOrderPayload>('EXEC_PASSIVE_SELL')
+export const setPassiveTrading = createAction<PassiveTradingPayload>('SET_PASSIVE_TRADING')
+export const execNewOrder = createAction<NewOrderPayload>('EXEC_NEW_ORDERY')
+export const execCacelOrder = createAction<CancelOrderPayload>('EXEC_CANCEL_ORDER')

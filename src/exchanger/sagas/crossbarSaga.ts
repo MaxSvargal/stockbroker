@@ -10,6 +10,11 @@ import * as actions from 'shared/actions'
 
 const { ACCOUNT } = process.env
 
+const avaliableProcedures = [
+  actions.execNewOrder,
+  actions.setPassiveTrading
+]
+
 export function* watchForActionsAndPublish(session: Session) {
   while (true) {
     const action = yield take('*')
@@ -32,11 +37,7 @@ export function* connectSaga() {
 
     const session = yield call(CrossbarService, { realm, onclose })
     const register = registerActionAsProcedure(session)
-
-    register(actions.execAgressiveBuy)
-    register(actions.execAgressiveSell)
-    register(actions.execPassiveBuy)
-    register(actions.execPassiveSell)
+    avaliableProcedures.forEach(register)
 
     // yield fork(watchForActionsAndPublish, session)
     debug('worker')('Connection to router socket established')

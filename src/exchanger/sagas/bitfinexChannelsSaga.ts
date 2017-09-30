@@ -1,11 +1,9 @@
 import { all, call, take, fork, put } from 'redux-saga/effects'
 import { eventChannel, delay, END, SagaIterator } from 'redux-saga'
 import { BFX } from 'bitfinex-api-node'
-import { OrderBookPayload, TradeData, WalletData, CandleData, TickerData } from 'shared/types'
+import { OrderBookPayload, TradeData, WalletData, CandleData, TickerData, OrderData, PAIR } from 'shared/types'
 import debug from 'debug'
 import * as actions from '../actions'
-
-type Pair = string
 
 export const channel = (bws: BFX, name: string) => eventChannel(emitter => {
   bws.on(name, (...data: any[]) => emitter(data))
@@ -13,23 +11,26 @@ export const channel = (bws: BFX, name: string) => eventChannel(emitter => {
   return () => bws.ws.close.bind(bws)
 })
 
-// TODO https://github.com/redux-saga/redux-saga/issues/1177
-export function* channelSaga(bws: BFX, name: string, saga: any) {
-  const chan = yield call(channel, bws, name)
-  while (true) {
-    const data = yield take(chan)
-    yield fork(saga, ...data)
+export function* channelSaga(bws: BFX, name: string, saga: (...data: any[]) => SagaIterator) {
+  try {
+    const chan = yield call(channel, bws, name)
+    while (true) {
+      const data = yield take(chan)
+      yield fork(saga, ...data)
+    }
+  } catch (err) {
+    debug('worker')('Channel closed', err)
   }
 }
 
-export function* orderBookChannelSaga(pair: Pair, data: OrderBookPayload & OrderBookPayload[]) {
+export function* orderBookChannelSaga(pair: PAIR, data: OrderBookPayload & OrderBookPayload[]) {
   if (Array.isArray(data[0]))
     yield put(actions.setOrderBook(data))
   else
     yield put(actions.updateOrderBook(data))
 }
 
-export function* tradeChannelSaga(pair: Pair, data: [ string, TradeData ] & TradeData[]) {
+export function* tradeChannelSaga(pair: PAIR, data: [ string, TradeData ] & TradeData[]) {
   if (Array.isArray(data[0]))
     yield put(actions.setTrades({ pair, data }))
   else if (data[0] === 'tu')
@@ -51,17 +52,55 @@ export function* candlesChannelSaga(key: string, data: CandleData & CandleData[]
     yield put(actions.updateCandle({ key, data }))
 }
 
-export function* tickerUpdateChannelSaga(pair: Pair, data: TickerData) {
+export function* tickerUpdateChannelSaga(pair: PAIR, data: TickerData) {
   yield put(actions.updateTicker({ pair, data }))
 }
+
+export function* ordersSnapshotChannelSaga(data: OrderData[]) {
+  yield put(actions.setOrders(data))
+}
+
+export function* orderNewChannelSaga(data: OrderData) {
+  yield put(actions.newOrder(data))
+}
+
+export function* orderUpdateChannelSaga(data: OrderData) {
+  yield put(actions.updateOrder(data))
+}
+
+export function* orderCancelChannelSaga(data: OrderData) {
+  yield put(actions.cancelOrder(data))
+}
+
+// export function* newMyTradeChannelSaga(data: MyTradesData) {
+//   yield put(actions.newMyTrade)
+// }
+//
+// export function* updateMyTradeChannelSaga(data: MyTradesData) {
+//   yield put(actions.updateMyTrade)
+// }
+//
+// export function* positionsSnapshotChannelSaga(data: MyTradesData) {
+//   yield put(actions.newMyTrade)
+// }
 
 export default function* runChannels(bws: BFX) {
   yield all([
     // fork(channelSaga, bws, 'trades', tradeChannelSaga),
+    fork(channelSaga, bws, 'ticker', tickerUpdateChannelSaga),
     fork(channelSaga, bws, 'book', orderBookChannelSaga),
     fork(channelSaga, bws, 'candles', candlesChannelSaga),
     fork(channelSaga, bws, 'ws', walletSnapshotChannelSaga),
     fork(channelSaga, bws, 'wu', walletUpdateChannelSaga),
-    fork(channelSaga, bws, 'ticker', tickerUpdateChannelSaga)
+    fork(channelSaga, bws, 'os', ordersSnapshotChannelSaga),
+    fork(channelSaga, bws, 'on', orderNewChannelSaga),
+    fork(channelSaga, bws, 'ou', orderUpdateChannelSaga),
+    fork(channelSaga, bws, 'oc', orderCancelChannelSaga),
+    // fork(channelSaga, bws, 'te', newMyTradeChannelSaga),
+    // fork(channelSaga, bws, 'tu', updateMyTradeChannelSaga),
+    // fork(channelSaga, bws, 'ps', positionsSnapshotChannelSaga),
+    // fork(channelSaga, bws, 'pn', positionsNewChannelSaga),
+    // fork(channelSaga, bws, 'pu', positionsUpdateChannelSaga),
+    // fork(channelSaga, bws, 'pc', positionsCancelChannelSaga),
   ])
 }

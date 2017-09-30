@@ -10,14 +10,11 @@ import { execAgressiveBuy, execAgressiveSell } from 'shared/actions'
 export default function* analyticsSaga() {
   let lastHigh = -1
   let lastLow = -1
+  let lastDStochastic = -1
 
   while (true) {
     const candles = yield select(selectCandles, 'trade:1m:tBTCUSD', 14)
     const [ upwardVertex, downwardVertex ] = vertexIndicator(candles)
-
-    if (upwardVertex > Math.abs(downwardVertex)) debug('worker')('Положительная тенденция')
-    if (upwardVertex < Math.abs(downwardVertex)) debug('worker')('Отрицательная тенденция')
-
 
     const ticker = yield select(selectTicker, 'BTCUSD')
     const [ bid, bidSize, ask, askSize, dailyChange, dailyChangePerc, lastPrice ] = ticker
@@ -32,7 +29,7 @@ export default function* analyticsSaga() {
     const KStochastic = currentStochastic
     const DStochastic = SMA(lastStochastics)
 
-    // debug('worker')(ticker)
+    debug('worker')({ lastPrice, bid, ask })
     // debug('worker')(candles)
     // debug('worker')(lastCandles)
     // debug('worker')(lastStochastics)
@@ -40,18 +37,50 @@ export default function* analyticsSaga() {
     debug('worker')([ upwardVertex, downwardVertex ])
     debug('worker')([ KStochastic, DStochastic ])
 
+    if (KStochastic >= 80 && DStochastic >= 80 && upwardVertex > Math.abs(downwardVertex)) {
+      debug('worker')('Переоценено. Торгуем в стакане, продаём по', ask)
+    }
+
+    if (KStochastic <= 20 && DStochastic <= 20 && upwardVertex < Math.abs(downwardVertex)) {
+      debug('worker')('Недооценено. Торгуем в стакане, покупаем по', bid)
+    }
+
+    if (DStochastic > 20 && lastDStochastic < 20) {
+      debug('worker')('Стохастик индикатор подаёт сигнал к покупке', bid)
+      yield put(execAgressiveBuy({ symbol: 'tBTCUSD', amount: 0.005, price: ask }))
+    }
+
+    if (DStochastic < 80 && lastDStochastic > 80) {
+      debug('worker')('Стохастик индикатор подаёт сигнал к продаже', ask)
+      yield put(execAgressiveSell({ symbol: 'tBTCUSD', amount: -0.005, price: bid }))
+    }
+
+    lastDStochastic = DStochastic
+
+    // if (KStochastic >= 20 && DStochastic >= 20 && upwardVertex > Math.abs(downwardVertex)) {
+    //   debug('worker')('Переоценено. Торгуем в стакане, покупаем по', ask)
+    // }
+    //
+    // if (KStochastic <= 80 && DStochastic <= 80 && upwardVertex < Math.abs(downwardVertex)) {
+    //   debug('worker')('Недооценено. Торгуем в стакане, продаём по', bid)
+    // }
+
+    // если значения на вертексе сильно разошлись, а потом развернулись - это подтверждающий сигнал
+
+    // применять данные алгоритм только когда не торгуется в стакане
     if (
       KStochastic >= 80 &&
       DStochastic >= 80 &&
       KStochastic - DStochastic < 1 &&
-      upwardVertex > 1 &&
-      downwardVertex > -0.8
+      upwardVertex > 1
     ) {
       debug('worker')('Пик для продажи', bid)
 
       if (bid > lastHigh) {
-        debug('worker')('Пробит максимум', bid)
-        yield put(execAgressiveSell({ symbol: 'tBTCUSD', amount: -0.005, price: bid }))
+        debug('worker')('Пробит максимум, ожидаем', bid)
+      } else if (bid < lastHigh) {
+        debug('worker')('Максимум достигнут, продаём', bid)
+        // yield put(execAgressiveSell({ symbol: 'tBTCUSD', amount: -0.005, price: bid }))
       }
 
       lastHigh = bid
@@ -61,14 +90,16 @@ export default function* analyticsSaga() {
       KStochastic <= 20 &&
       DStochastic <= 20 &&
       KStochastic - DStochastic < 1 &&
-      upwardVertex < 0.8 &&
       downwardVertex < -1
     ) {
       debug('worker')('Дно для покупки', ask)
 
       if (ask < lastLow) {
-        debug('worker')('Пробит минимум', ask)
-        yield put(execAgressiveBuy({ symbol: 'tBTCUSD', amount: 0.005, price: ask }))
+        debug('worker')('Пробит минимум, ожидаем', ask)
+      } else if (ask > lastLow) {
+        // играть в стакане до индикации стохастика?
+        debug('worker')('Минимум достигнут, покупаем', ask)
+        // yield put(execAgressiveBuy({ symbol: 'tBTCUSD', amount: 0.005, price: ask }))
       }
 
       lastLow = ask
