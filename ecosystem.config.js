@@ -6,9 +6,9 @@ module.exports = {
       watch: true,
       env: {
         "DEBUG": "worker",
+        "NODE_PATH": "./src",
         "ACCOUNT": "maxsvargal",
-        "PAIRS": "BTCUSD",
-        "NODE_PATH": "./src"
+        "PAIRS": "BTCUSD,ETCUSD"
       }
     },
     {
@@ -17,9 +17,22 @@ module.exports = {
       watch: true,
       env: {
         "DEBUG": "worker",
+        "NODE_PATH": "./src",
         "ACCOUNT": "maxsvargal",
         "PAIR": "BTCUSD",
-        "NODE_PATH": "./src"
+        "AMOUNT": "0.01"
+      }
+    },
+    {
+      name: "maxsvargal_slowpoke_etcusd",
+      script: "./src/slowpoke/index.ts",
+      watch: true,
+      env: {
+        "DEBUG": "worker",
+        "NODE_PATH": "./src",
+        "ACCOUNT": "maxsvargal",
+        "PAIR": "ETCUSD",
+        "AMOUNT": "1"
       }
     }
   ]
