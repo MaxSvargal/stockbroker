@@ -1,5 +1,5 @@
 module.exports = {
-  apps : [
+  apps: [
     {
       name: "maxsvargal_exchanger",
       script: "./src/exchanger/index.ts",
