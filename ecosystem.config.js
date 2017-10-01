@@ -26,14 +26,15 @@ const slowpoke = (account) => (pair, amount) => ({
 module.exports = {
   apps: [
     exchanger('maxsvargal', [ 'BTCUSD', 'DSHUSD', 'ETHUSD', 'LTCUSD', 'ETCUSD' ]),
-    exchanger('lesorub', [ 'ETCUSD' ]),
+    exchanger('lesorub', [ 'BTCUSD', 'ETCUSD' ]),
 
-    slowpoke('maxsvargal')('BTCUSD', 0.005),
-    slowpoke('maxsvargal')('DSHUSD', 0.04),
+    slowpoke('maxsvargal')('BTCUSD', 0.02),
+    slowpoke('maxsvargal')('DSHUSD', 0.05),
     slowpoke('maxsvargal')('ETHUSD', 0.05),
     slowpoke('maxsvargal')('LTCUSD', 1),
     slowpoke('maxsvargal')('ETCUSD', 1),
 
-    slowpoke('lesorub')('ETCUSD', 1)
+    slowpoke('lesorub')('BTCUSD', 0.02),
+    slowpoke('lesorub')('ETCUSD', 1),
   ]
 }
