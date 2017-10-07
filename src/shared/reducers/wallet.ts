@@ -1,7 +1,7 @@
 import { createReducer } from 'redux-act'
 import { setWallet, updateWallet } from 'exchanger/actions'
 
-type WalletState = {
+export type WalletState = {
   [walletType: string]: {
     [currency: string]: {
       balance: number

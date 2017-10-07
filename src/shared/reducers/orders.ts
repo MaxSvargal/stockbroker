@@ -4,7 +4,7 @@ import { newOrder, updateOrder, cancelOrder, setOrders } from 'exchanger/actions
 import { OrderData } from 'shared/types'
 
 export type OrdersState = {
-  [id: number]: OrderData
+  [id: string]: OrderData
 }
 
 const simpleMerge = (state: OrdersState, data: OrderData) =>

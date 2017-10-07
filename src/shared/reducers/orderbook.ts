@@ -1,8 +1,17 @@
 import { createReducer } from 'redux-act'
 import { setOrderBook, updateOrderBook } from 'exchanger/actions'
+import { OrderBookData } from 'shared/types'
 
-const defaultState = { bid: {}, ask: {} }
-const orderBookReducer = createReducer<typeof defaultState>({}, defaultState)
+export type OrderbookState = {
+  bid: {
+    [price: string]: OrderBookData
+  },
+  ask: {
+    [price: string]: OrderBookData
+  }
+}
+
+const orderBookReducer = createReducer<OrderbookState>({}, { bid: {}, ask: {} })
 
 orderBookReducer.on(setOrderBook, (state, payload) =>
   payload.reduce((prev, [ price, count, amount ]) => {
@@ -12,7 +21,7 @@ orderBookReducer.on(setOrderBook, (state, payload) =>
 
 orderBookReducer.on(updateOrderBook, (state, [ price, count, amount ]) => {
   const type = amount > 0 ? 'bid' : 'ask'
-  const partOfType: { [key: string]: number[] } = state[type]
+  const partOfType = state[type]
 
   const removeEntity = () =>
     Object.keys(partOfType).reduce((prev, curr) =>

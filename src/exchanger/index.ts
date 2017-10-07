@@ -1,3 +1,5 @@
+require('events').EventEmitter.defaultMaxListeners = 30
+
 import debug from 'debug'
 import { applyMiddleware, compose, createStore } from 'redux'
 import { persistentStore } from 'redux-pouchdb-rethink'

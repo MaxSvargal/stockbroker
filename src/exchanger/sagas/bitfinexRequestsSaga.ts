@@ -1,7 +1,7 @@
 import debug from 'debug'
 import { all, call, take, fork } from 'redux-saga/effects'
 import { BFX } from 'bitfinex-api-node'
-import { execNewOrder, execCacelOrder } from 'shared/actions'
+import { execNewOrder, execCancelOrder } from 'shared/actions'
 
 const { ACCOUNT } = process.env
 
@@ -24,7 +24,7 @@ export function* newOrderSaga(bws: BFX) {
 
 export function* cancelOrderSaga(bws: BFX) {
   while (true) {
-    const { payload: { id } } = yield take(execCacelOrder)
+    const { payload: { id } } = yield take(execCancelOrder)
     const req = [ 0, 'oc', null, { id } ]
     yield call([ bws, 'send' ], req)
     debug('trade')({ action: 'cancelOrder', id })

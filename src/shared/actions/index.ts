@@ -3,4 +3,4 @@ import { NewOrderPayload, CancelOrderPayload, PassiveTradingPayload } from 'shar
 
 export const setPassiveTrading = createAction<PassiveTradingPayload>('SET_PASSIVE_TRADING')
 export const execNewOrder = createAction<NewOrderPayload>('EXEC_NEW_ORDERY')
-export const execCacelOrder = createAction<CancelOrderPayload>('EXEC_CANCEL_ORDER')
+export const execCancelOrder = createAction<CancelOrderPayload>('EXEC_CANCEL_ORDER')

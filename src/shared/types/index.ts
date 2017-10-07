@@ -41,7 +41,7 @@ export type VOLUME = number
 export type WALLET_TYPE = string
 
 export type CandleData = [ MTS, OPEN, CLOSE, HIGHT, LOW, VOLUME ]
-export type OrderBookPayload = [ PRICE, COUNT, AMOUNT ]
+export type OrderBookData = [ PRICE, COUNT, AMOUNT ]
 export type OrderData = [ ID, GID, CID, SYMBOL, MTS_CREATE, MTS_UPDATE, AMOUNT, AMOUNT_ORIG, TYPE, TYPE_PREV, FLAGS, ORDER_STATUS, PRICE, PRICE_AVG, PRICE_TRAILING, PRICE_AUX_LIMIT, NOTIFY, HIDDEN, PLACED_ID ]
 export type TickerData = [ BID, BID_SIZE, ASK, ASK_SIZE, DAILY_CHANGE, DAILY_CHANGE_PERC, LAST_PRICE, VOLUME, HIGH, LOW ]
 export type TradeData = [ ID, MTS, AMOUNT, PRICE ]

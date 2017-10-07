@@ -1,7 +1,7 @@
 import { all, call, take, fork, put } from 'redux-saga/effects'
 import { eventChannel, delay, END, SagaIterator } from 'redux-saga'
 import { BFX } from 'bitfinex-api-node'
-import { OrderBookPayload, TradeData, WalletData, CandleData, TickerData, OrderData, PAIR } from 'shared/types'
+import { OrderBookData, TradeData, WalletData, CandleData, TickerData, OrderData, PAIR } from 'shared/types'
 import debug from 'debug'
 import * as actions from '../actions'
 
@@ -23,7 +23,7 @@ export function* channelSaga(bws: BFX, name: string, saga: (...data: any[]) => S
   }
 }
 
-export function* orderBookChannelSaga(pair: PAIR, data: OrderBookPayload & OrderBookPayload[]) {
+export function* orderBookChannelSaga(pair: PAIR, data: OrderBookData & OrderBookData[]) {
   if (Array.isArray(data[0]))
     yield put(actions.setOrderBook(data))
   else
@@ -79,10 +79,6 @@ export function* orderCancelChannelSaga(data: OrderData) {
 // export function* updateMyTradeChannelSaga(data: MyTradesData) {
 //   yield put(actions.updateMyTrade)
 // }
-//
-// export function* positionsSnapshotChannelSaga(data: MyTradesData) {
-//   yield put(actions.newMyTrade)
-// }
 
 export default function* runChannels(bws: BFX) {
   yield all([
@@ -98,9 +94,5 @@ export default function* runChannels(bws: BFX) {
     fork(channelSaga, bws, 'oc', orderCancelChannelSaga),
     // fork(channelSaga, bws, 'te', newMyTradeChannelSaga),
     // fork(channelSaga, bws, 'tu', updateMyTradeChannelSaga),
-    // fork(channelSaga, bws, 'ps', positionsSnapshotChannelSaga),
-    // fork(channelSaga, bws, 'pn', positionsNewChannelSaga),
-    // fork(channelSaga, bws, 'pu', positionsUpdateChannelSaga),
-    // fork(channelSaga, bws, 'pc', positionsCancelChannelSaga),
   ])
 }
