@@ -256,4 +256,5 @@ type ExpectApi = {
 
 declare module 'redux-saga-test-plan' {
   export function expectSaga(generator: Function, ...sagaArgs: mixed[]): ExpectApi
+  export function testSaga(generator: Function, ...sagaArgs: mixed[]): Api
 }
