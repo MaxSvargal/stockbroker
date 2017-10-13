@@ -57,15 +57,7 @@ export function* analyticsSaga() {
     // debug('worker')({ lastStableMACD })
     // debug('worker')({ currentClosePrice, stoc: round(currentStochastic), macd: round(currentMACD) })
 
-    if (lastStableMACD > 0 && currentMACD > 0 && lastStableMACD > currentMACD) {
-      debug('worker')('Classic MACD signal to sell for', ask)
-      if (currentStochastic >= 60) debug('worker')('Stochastic approve sell on value', currentStochastic)
-    }
-
-    if (lastStableMACD < 0 && currentMACD < 0 && lastStableMACD < currentMACD) {
-      debug('worker')('Classic MACD signal to buy for', bid)
-      if (currentStochastic >= 60) debug('worker')('Stochastic approve buy on value', currentStochastic)
-    }
+    debug('worker')(`=============== ${SYMBOL} ${bid}/${ask} ================`)
 
     // alternative
     yield put(addMACDResult(currentMACD))
@@ -81,11 +73,12 @@ export function* analyticsSaga() {
         macdSecondGroup < 0 &&
         macdSecondGroup < 0 &&
         macdFirstGroup > macdSecondGroup &&
-        macdSecondGroup < macdThirdGroup
+        macdSecondGroup < macdThirdGroup &&
+        lastStableMACD < macdThirdGroup
       ) {
-        debug('worker')('Alternative MACD signal to buy for', bid)
-        if (currentStochastic <= 50) debug('worker')('Stochastic is under', currentStochastic)
-        if (currentStochastic <= 40) debug('worker')('Stochastic approve buy on value', currentStochastic)
+        debug('worker')('MACD signal to buy for', bid)
+        if (currentStochastic <= 50) debug('worker')('Stochastic is under', parseInt(currentStochastic))
+        if (currentStochastic <= 40) debug('worker')('Stochastic approve buy on value', parseInt(currentStochastic))
       }
 
       if (
@@ -93,15 +86,16 @@ export function* analyticsSaga() {
         macdSecondGroup > 0 &&
         macdSecondGroup > 0 &&
         macdFirstGroup < macdSecondGroup &&
-        macdSecondGroup > macdThirdGroup
+        macdSecondGroup > macdThirdGroup &&
+        lastStableMACD > macdThirdGroup
       ) {
-        debug('worker')('Alternative MACD signal to sell for', ask)
-        if (currentStochastic >= 50) debug('worker')('Stochastic is upper', currentStochastic)
-        if (currentStochastic >= 60) debug('worker')('Stochastic approve sell on value', currentStochastic)
+        debug('worker')('MACD signal to sell for', ask)
+        if (currentStochastic >= 50) debug('worker')('Stochastic is upper', parseInt(currentStochastic))
+        if (currentStochastic >= 60) debug('worker')('Stochastic approve sell on value', parseInt(currentStochastic))
       }
     }
 
-    yield delay(5000)
+    yield delay(10000)
   }
 }
 
