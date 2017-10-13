@@ -2,58 +2,104 @@ import debug from 'debug'
 import { delay } from 'redux-saga'
 import { all, fork, put, select } from 'redux-saga/effects'
 import RPCSaga from 'shared/sagas/rpc'
-import { execNewOrder } from 'shared/actions'
-import { selectCandles, selectTicker, selectLowestLow, selectHighestHigh } from 'shared/sagas/selectors'
-import stochasticOscillator, { SMA } from 'shared/lib/stochasticOscillator'
+import { execNewOrder, addStochasticResult, addMACDResult } from 'shared/actions'
+import { selectCandles, selectTickerBySymbol, selectLowestLow, selectHighestHigh, selectMACDResults, selectStochasticResults } from 'shared/sagas/selectors'
+import stochasticOscillator from 'shared/lib/stochasticOscillator'
+import { MACDHistogram, SMA, EMA } from 'shared/lib/macdHistogram'
 import { CandleData } from 'shared/types'
 
 const { ACCOUNT, PAIR, AMOUNT } = process.env
 if (!PAIR || !AMOUNT) throw Error('No pair or amount will passed by environment')
-const amount = Number(AMOUNT)
+// const AMOUNT = Number(AMOUNT)
+const SYMBOL = `t${PAIR}`
+const candlesKey = `trade:5m:${SYMBOL}`
+
+const round = (num: number) => parseFloat(num.toFixed(2))
+
+const stochasticLength = 39
+const MACDFastLength = 12
+const MACDLongLength = 26
+
+export function* calcStochastic(closePrices: number[]) {
+  const lowestLow = yield select(selectLowestLow, candlesKey, stochasticLength)
+  const highestHigh = yield select(selectHighestHigh, candlesKey, stochasticLength)
+  return stochasticOscillator(closePrices.slice(-1)[0], lowestLow, highestHigh)
+}
+
+export function calcMACD(closePrices: number[]) {
+  return MACDHistogram(closePrices, MACDFastLength, MACDLongLength)
+}
 
 export function* analyticsSaga() {
-  let lastDStochastics = [ 0, 0 ]
+  let stochasticsCache = []
+  let macdCache = []
+
   while (true) {
-    const candlesKey = `trade:5m:t${PAIR}`
-    const candles = yield select(selectCandles, candlesKey, 14)
-    const lowestLow = yield select(selectLowestLow, candlesKey, 14)
-    const highestHigh = yield select(selectHighestHigh, candlesKey, 14)
-    const ticker = yield select(selectTicker, PAIR)
 
-    const lastCandles = <CandleData[]>candles.slice(candles.length - 3, candles.length)
-    const [ bid, bidSize, ask, askSize, dailyChange, dailyChangePerc, lastPrice ] = ticker
-    const lastStochastics = lastCandles.map(candle => stochasticOscillator(candle[2], lowestLow, highestHigh))
-    const DStochastic = SMA(lastStochastics)
+    const candles = yield select(selectCandles, candlesKey, stochasticLength)
+    const ticker = yield select(selectTickerBySymbol, SYMBOL)
+    const [ bid, _, ask ] = ticker
 
-    debug('worker')([ ACCOUNT, PAIR, DStochastic ])
-    // debug('worker')({ lastDStochastics, DStochastic })
+    const closePrices = candles.map((c: number[]) => c[2])
+    const currentClosePrice = closePrices.slice(-1)[0]
+    const prevClosePrice = closePrices.slice(-2, -1)[0]
 
-    if (
-      lastDStochastics[0] !== 0 &&
-      lastDStochastics[0] > 80 &&
-      lastDStochastics[1] > DStochastic &&
-      lastDStochastics[1] > 80 &&
-      DStochastic < 80
-    ) {
-      debug('worker')(`[${ACCOUNT}] Stochastic signal to sell -${amount} ${PAIR}`)
-      yield put(execNewOrder({ symbol: `t${PAIR}`, amount: -amount, price: bid }))
+    const currentStochastic = yield calcStochastic(closePrices)
+    const currentMACD = calcMACD(closePrices)
+    const lastStableMACD = calcMACD(closePrices.slice(0, -1))
+    // const lastStableStochastic = yield calcStochastic(closePrices.slice(0, -1))
+
+    // yield put(addStochasticResult(currentStochastic))
+
+    // debug('worker')({ lastStableStochastic, lastStableMACD })
+    // debug('worker')({ currentClosePrice, currentStochastic, currentMACD })
+
+    // debug('worker')({ lastStableMACD })
+    // debug('worker')({ currentClosePrice, stoc: round(currentStochastic), macd: round(currentMACD) })
+
+    if (lastStableMACD > 0 && currentMACD > 0 && lastStableMACD > currentMACD) {
+      debug('worker')('Classic MACD signal to sell for', ask)
+      if (currentStochastic >= 60) debug('worker')('Stochastic approve sell on value', currentStochastic)
     }
 
-    if (
-      lastDStochastics[0] !== 0 &&
-      lastDStochastics[0] < 20 &&
-      lastDStochastics[1] < DStochastic &&
-      lastDStochastics[1] < 20 &&
-      DStochastic > 20
-    ) {
-      debug('worker')(`[${ACCOUNT}] Stochastic signal to buy ${amount} ${PAIR}`)
-      yield put(execNewOrder({ symbol: `t${PAIR}`, amount: amount, price: ask }))
+    if (lastStableMACD < 0 && currentMACD < 0 && lastStableMACD < currentMACD) {
+      debug('worker')('Classic MACD signal to buy for', bid)
+      if (currentStochastic >= 60) debug('worker')('Stochastic approve buy on value', currentStochastic)
     }
 
-    lastDStochastics = [
-      DStochastic !== lastDStochastics[1] ? lastDStochastics[1] : lastDStochastics[0],
-      DStochastic
-    ]
+    // alternative
+    yield put(addMACDResult(currentMACD))
+    const macdResults = yield select(selectMACDResults, 15)
+
+    if (macdResults.length >= 15) {
+      const macdFirstGroup = EMA(macdResults.slice(0, 5))
+      const macdSecondGroup = EMA(macdResults.slice(5, 10))
+      const macdThirdGroup = EMA(macdResults.slice(10, 15))
+
+      if (
+        macdFirstGroup < 0 &&
+        macdSecondGroup < 0 &&
+        macdSecondGroup < 0 &&
+        macdFirstGroup > macdSecondGroup &&
+        macdSecondGroup < macdThirdGroup
+      ) {
+        debug('worker')('Alternative MACD signal to buy for', bid)
+        if (currentStochastic <= 50) debug('worker')('Stochastic is under', currentStochastic)
+        if (currentStochastic <= 40) debug('worker')('Stochastic approve buy on value', currentStochastic)
+      }
+
+      if (
+        macdFirstGroup > 0 &&
+        macdSecondGroup > 0 &&
+        macdSecondGroup > 0 &&
+        macdFirstGroup < macdSecondGroup &&
+        macdSecondGroup > macdThirdGroup
+      ) {
+        debug('worker')('Alternative MACD signal to sell for', ask)
+        if (currentStochastic >= 50) debug('worker')('Stochastic is upper', currentStochastic)
+        if (currentStochastic >= 60) debug('worker')('Stochastic approve sell on value', currentStochastic)
+      }
+    }
 
     yield delay(5000)
   }
