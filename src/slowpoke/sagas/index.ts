@@ -57,7 +57,7 @@ export function* analyticsSaga() {
     // debug('worker')({ lastStableMACD })
     // debug('worker')({ currentClosePrice, stoc: round(currentStochastic), macd: round(currentMACD) })
 
-    debug('worker')(`=============== ${SYMBOL} ${bid}/${ask} ================`)
+    debug('worker')(`===== ${SYMBOL} ${bid}/${ask} | MACD ${round(lastStableMACD)}/${round(currentMACD)} | STH ${round(currentStochastic)} =====`)
 
     // alternative
     yield put(addMACDResult(currentMACD))
