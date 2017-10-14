@@ -34,14 +34,14 @@ export function calcMACD(closePrices: number[]) {
 }
 
 export function* doBuySaga() {
-  const [ ask, reserverAsk ] = yield select(selectLowestAsks)
-  const price = ask[2] >= AMOUNT ? ask[2] : reserverAsk[2]
+  const [ ask, reserveAsk ] = yield select(selectLowestAsks)
+  const price = ask[2] >= AMOUNT ? ask[0] : reserveAsk[0]
   yield put(execNewOrder({ symbol: SYMBOL, amount: AMOUNT, price: price }))
 }
 
 export function* doSellSaga() {
   const [ bid, reserveBid ] = yield select(selectHighestBids)
-  const price = bid[2] >= AMOUNT ? bid[2] : reserveBid[2]
+  const price = bid[2] >= AMOUNT ? bid[0] : reserveBid[0]
   yield put(execNewOrder({ symbol: SYMBOL, amount: -AMOUNT, price: price }))
 }
 
@@ -51,8 +51,8 @@ export function* analyticsSaga() {
   while (true) {
 
     const candles = yield select(selectCandles, candlesKey, stochasticLength)
-    const ticker = yield select(selectTickerBySymbol, SYMBOL)
-    const [ bid, _, ask ] = ticker
+    const [ [ ask ] ] = yield select(selectLowestAsks)
+    const [ [ bid ] ] = yield select(selectHighestBids)
 
     const closePrices = candles.map((c: number[]) => c[2])
     const currentClosePrice = closePrices.slice(-1)[0]
