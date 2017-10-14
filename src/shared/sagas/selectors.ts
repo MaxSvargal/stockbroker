@@ -4,7 +4,6 @@ import { CandlesState } from 'shared/reducers/candles'
 import { OrderbookState } from 'shared/reducers/orderbook'
 import { OrdersState } from 'shared/reducers/orders'
 import { TickersState } from 'shared/reducers/tickers'
-import { TradePositionsState } from 'shared/reducers/tradePositions'
 import { WalletState } from 'shared/reducers/wallet'
 import { MACDState } from 'shared/reducers/macd'
 
@@ -13,7 +12,6 @@ export type State = {
   orderbook: OrderbookState,
   orders: OrdersState,
   tickers: TickersState,
-  tradePositions: TradePositionsState,
   wallet: WalletState,
   macd: MACDState
 }
