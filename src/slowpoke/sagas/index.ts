@@ -75,7 +75,7 @@ export function* analyticsSaga() {
       macd[1] > macd[2] &&
       macd[2] > macd[3]
     ) {
-      debug('worker')('MACD signal to sell for', ask)
+      debug('worker')('MACD signal to sell for', bid)
       if (currentStochastic >= 60) {
         debug('worker')('Stochastic approve sell on value', parseInt(currentStochastic))
         yield fork(doSellSaga)
