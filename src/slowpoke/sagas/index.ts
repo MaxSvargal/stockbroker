@@ -33,8 +33,7 @@ export function calcMACD(closePrices: number[]) {
 }
 
 export function* analyticsSaga() {
-  let stochasticsCache = []
-  let macdCache = []
+  // yield put(clearMACDResults)
 
   while (true) {
 
@@ -50,8 +49,9 @@ export function* analyticsSaga() {
     const currentMACD = calcMACD(closePrices)
     // const lastStableMACD = calcMACD(closePrices.slice(0, -1))
 
+    // TODO: PAIRS CONFLICTS
     yield put(addMACDResult(currentMACD))
-    const macdResults = yield select(selectMACDResults, 4)
+    const macdResults = yield select(selectMACDResults, 5)
     const macd = macdResults.map(round)
 
     debug('worker')(`===== ${SYMBOL} ${bid}/${ask} | MACD ${macd.join('/')} | STH ${round(currentStochastic)} =====`)
