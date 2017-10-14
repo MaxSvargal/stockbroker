@@ -15,6 +15,8 @@ const SYMBOL = `t${PAIR}`
 const candlesKey = `trade:5m:${SYMBOL}`
 
 const round = (num: number) => parseFloat(num.toFixed(2))
+const allIsPositive = (arr: number[]): boolean => arr.map(n => n > 0).reduce((a, b) => a && b)
+const allIsNegative = (arr: number[]): boolean => arr.map(n => n < 0).reduce((a, b) => a && b)
 
 const stochasticLength = 39
 const MACDFastLength = 12
@@ -46,53 +48,36 @@ export function* analyticsSaga() {
 
     const currentStochastic = yield calcStochastic(closePrices)
     const currentMACD = calcMACD(closePrices)
-    const lastStableMACD = calcMACD(closePrices.slice(0, -1))
-    // const lastStableStochastic = yield calcStochastic(closePrices.slice(0, -1))
+    // const lastStableMACD = calcMACD(closePrices.slice(0, -1))
 
-    // yield put(addStochasticResult(currentStochastic))
-
-    // debug('worker')({ lastStableStochastic, lastStableMACD })
-    // debug('worker')({ currentClosePrice, currentStochastic, currentMACD })
-
-    // debug('worker')({ lastStableMACD })
-    // debug('worker')({ currentClosePrice, stoc: round(currentStochastic), macd: round(currentMACD) })
-
-    debug('worker')(`===== ${SYMBOL} ${bid}/${ask} | MACD ${round(lastStableMACD)}/${round(currentMACD)} | STH ${round(currentStochastic)} =====`)
-
-    // alternative
     yield put(addMACDResult(currentMACD))
-    const macdResults = yield select(selectMACDResults, 15)
+    const macdResults = yield select(selectMACDResults, 4)
+    const macd = macdResults.map(round)
 
-    if (macdResults.length >= 15) {
-      const macdFirstGroup = EMA(macdResults.slice(0, 5))
-      const macdSecondGroup = EMA(macdResults.slice(5, 10))
-      const macdThirdGroup = EMA(macdResults.slice(10, 15))
+    debug('worker')(`===== ${SYMBOL} ${bid}/${ask} | MACD ${macd.join('/')} | STH ${round(currentStochastic)} =====`)
 
-      if (
-        macdFirstGroup < 0 &&
-        macdSecondGroup < 0 &&
-        macdSecondGroup < 0 &&
-        macdFirstGroup > macdSecondGroup &&
-        macdSecondGroup < macdThirdGroup &&
-        lastStableMACD < macdThirdGroup
-      ) {
-        debug('worker')('MACD signal to buy for', bid)
-        if (currentStochastic <= 50) debug('worker')('Stochastic is under', parseInt(currentStochastic))
-        if (currentStochastic <= 40) debug('worker')('Stochastic approve buy on value', parseInt(currentStochastic))
-      }
+    if (
+      allIsPositive(macd) &&
+      macd[0] < macd[1] &&
+      macd[1] > macd[2] &&
+      macd[2] < macd[3] &&
+      macd[3] < macd[4]
+    ) {
+      debug('worker')('MACD signal to sell for', ask)
+      if (currentStochastic >= 60)
+        debug('worker')('Stochastic approve sell on value', parseInt(currentStochastic))
+    }
 
-      if (
-        macdFirstGroup > 0 &&
-        macdSecondGroup > 0 &&
-        macdSecondGroup > 0 &&
-        macdFirstGroup < macdSecondGroup &&
-        macdSecondGroup > macdThirdGroup &&
-        lastStableMACD > macdThirdGroup
-      ) {
-        debug('worker')('MACD signal to sell for', ask)
-        if (currentStochastic >= 50) debug('worker')('Stochastic is upper', parseInt(currentStochastic))
-        if (currentStochastic >= 60) debug('worker')('Stochastic approve sell on value', parseInt(currentStochastic))
-      }
+    if (
+      allIsNegative(macd) &&
+      macd[0] > macd[1] &&
+      macd[1] < macd[2] &&
+      macd[2] > macd[3] &&
+      macd[3] > macd[4]
+    ) {
+      debug('worker')('MACD signal to buy for', ask)
+      if (currentStochastic <= 40)
+        debug('worker')('Stochastic approve buy on value', parseInt(currentStochastic))
     }
 
     yield delay(10000)
