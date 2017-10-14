@@ -47,6 +47,7 @@ export function* doSellSaga() {
 
 export function* analyticsSaga() {
   yield put(clearMACDResults({ symbol: SYMBOL }))
+  let lastTradePrice = 0
 
   while (true) {
     const candles = yield select(selectCandles, candlesKey, stochasticLength)
@@ -78,7 +79,10 @@ export function* analyticsSaga() {
       debug('worker')('MACD signal to sell for', bid)
       if (currentStochastic >= 60) {
         debug('worker')('Stochastic approve sell on value', parseInt(currentStochastic))
-        yield fork(doSellSaga)
+        if (lastTradePrice !== bid) {
+          yield fork(doSellSaga)
+          lastTradePrice = bid
+        }
       }
     }
 
@@ -93,7 +97,10 @@ export function* analyticsSaga() {
       debug('worker')('MACD signal to buy for', ask)
       if (currentStochastic <= 40) {
         debug('worker')('Stochastic approve buy on value', parseInt(currentStochastic))
-        yield fork(doBuySaga)
+        if (lastTradePrice !== ask) {
+          yield fork(doBuySaga)
+          lastTradePrice = ask
+        }
       }
     }
 
