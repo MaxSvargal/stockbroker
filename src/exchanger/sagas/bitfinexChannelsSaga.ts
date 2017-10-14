@@ -84,7 +84,7 @@ export default function* runChannels(bws: BFX) {
   yield all([
     // fork(channelSaga, bws, 'trades', tradeChannelSaga),
     fork(channelSaga, bws, 'ticker', tickerUpdateChannelSaga),
-    fork(channelSaga, bws, 'book', orderBookChannelSaga),
+    fork(channelSaga, bws, 'orderbook', orderBookChannelSaga),
     fork(channelSaga, bws, 'candles', candlesChannelSaga),
     fork(channelSaga, bws, 'ws', walletSnapshotChannelSaga),
     fork(channelSaga, bws, 'wu', walletUpdateChannelSaga),

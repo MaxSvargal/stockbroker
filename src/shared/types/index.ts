@@ -48,12 +48,12 @@ export type TradeData = [ ID, MTS, AMOUNT, PRICE ]
 export type WalletData = [ WALLET_TYPE, CURRENCY, BALANCE, UNSETTLED_INTEREST, BALANCE_AVAILABLE ]
 
 export type CancelOrderPayload = { id: ID }
-export type PassiveTradingPayload = { symbol: SYMBOL, enable: boolean, position: 'SELL' | 'BUY' }
+export type PassiveTradingPayload = { symbol: string, enable: boolean, position: 'SELL' | 'BUY' }
 export type CandlePayload = { key: KEY, data: CandleData }
 export type CandlesPayload = { key: KEY, data: CandleData[] }
-export type NewOrderPayload = { symbol: SYMBOL, amount: AMOUNT, price: PRICE }
+export type NewOrderPayload = { symbol: string, amount: AMOUNT, price: PRICE }
 export type TickerPayload = { pair: PAIR, data: TickerData }
 export type TradePayload = { pair: PAIR, data: TradeData }
 export type TradesPayload = { pair: PAIR, data: TradeData[] }
-export type RequestOrderSequencePayload = { symbol: SYMBOL, amount: AMOUNT, chunks: number }
+export type RequestOrderSequencePayload = { symbol: string, amount: AMOUNT, chunks: number }
 export type RequestNewPassiveOrderPayload = {}

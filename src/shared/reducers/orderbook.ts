@@ -17,7 +17,7 @@ orderBookReducer.on(setOrderBook, (state, payload) =>
   payload.reduce((prev, [ price, count, amount ]) => {
     const type = amount > 0 ? 'bid' : 'ask'
     return { ...prev, [type]: { ...prev[type], [price]: [ price, count, amount ] } }
-  }, state))
+  }, { bid: {}, ask: {} }))
 
 orderBookReducer.on(updateOrderBook, (state, [ price, count, amount ]) => {
   const type = amount > 0 ? 'bid' : 'ask'

@@ -3,14 +3,15 @@ import { delay } from 'redux-saga'
 import { all, fork, put, select } from 'redux-saga/effects'
 import RPCSaga from 'shared/sagas/rpc'
 import { execNewOrder, addStochasticResult, addMACDResult } from 'shared/actions'
-import { selectCandles, selectTickerBySymbol, selectLowestLow, selectHighestHigh, selectMACDResults, selectStochasticResults } from 'shared/sagas/selectors'
+import { selectCandles, selectTickerBySymbol, selectLowestLow, selectHighestHigh, selectMACDResults, selectHighestBids, selectLowestAsks } from 'shared/sagas/selectors'
 import stochasticOscillator from 'shared/lib/stochasticOscillator'
 import { MACDHistogram, SMA, EMA } from 'shared/lib/macdHistogram'
 import { CandleData } from 'shared/types'
 
-const { ACCOUNT, PAIR, AMOUNT } = process.env
-if (!PAIR || !AMOUNT) throw Error('No pair or amount will passed by environment')
+const { ACCOUNT, PAIR } = process.env
+if (!PAIR) throw Error('No pair or amount will passed by environment')
 // const AMOUNT = Number(AMOUNT)
+const AMOUNT = 0.005
 const SYMBOL = `t${PAIR}`
 const candlesKey = `trade:5m:${SYMBOL}`
 
@@ -30,6 +31,18 @@ export function* calcStochastic(closePrices: number[]) {
 
 export function calcMACD(closePrices: number[]) {
   return MACDHistogram(closePrices, MACDFastLength, MACDLongLength)
+}
+
+export function* doBuySaga() {
+  const [ ask, reserverAsk ] = yield select(selectLowestAsks)
+  const price = ask[2] >= AMOUNT ? ask[2] : reserverAsk[2]
+  yield put(execNewOrder({ symbol: SYMBOL, amount: AMOUNT, price: price }))
+}
+
+export function* doSellSaga() {
+  const [ bid, reserveBid ] = yield select(selectHighestBids)
+  const price = bid[2] >= AMOUNT ? bid[2] : reserveBid[2]
+  yield put(execNewOrder({ symbol: SYMBOL, amount: -AMOUNT, price: price }))
 }
 
 export function* analyticsSaga() {
@@ -63,8 +76,10 @@ export function* analyticsSaga() {
       macd[2] > macd[3]
     ) {
       debug('worker')('MACD signal to sell for', ask)
-      if (currentStochastic >= 60)
+      if (currentStochastic >= 60) {
         debug('worker')('Stochastic approve sell on value', parseInt(currentStochastic))
+        yield fork(doSellSaga)
+      }
     }
 
     if (
@@ -74,8 +89,10 @@ export function* analyticsSaga() {
       macd[2] < macd[3]
     ) {
       debug('worker')('MACD signal to buy for', ask)
-      if (currentStochastic <= 40)
+      if (currentStochastic <= 40) {
         debug('worker')('Stochastic approve buy on value', parseInt(currentStochastic))
+        yield fork(doBuySaga)
+      }
     }
 
     yield delay(10000)

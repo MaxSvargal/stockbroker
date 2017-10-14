@@ -21,7 +21,7 @@ export default function* bitfinexSaga(): any {
 
     if (Array.isArray(pairs))
       pairs.forEach(pair => {
-        // bws.subscribeOrderBook(pair)
+        bws.subscribeOrderBook(pair)
         // bws.subscribeTrades(pair)
         bws.subscribeTicker(pair)
         bws.subscribeCandles(`t${pair}`, '5m')
