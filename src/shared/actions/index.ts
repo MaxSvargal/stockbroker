@@ -7,4 +7,5 @@ export const execCancelOrder = createAction<Types.CancelOrderPayload>('EXEC_CANC
 export const requestNewPassiveOrder = createAction<Types.RequestNewPassiveOrderPayload>('REQUEST_NEW_PASSIVE_ORDER')
 export const requestOrdersSequence = createAction<Types.RequestOrderSequencePayload>('REQUEST_ORDER_SEQUENCE')
 export const addStochasticResult = createAction<number>('ADD_STOCHASTIC_RESULT')
-export const addMACDResult = createAction<number>('ADD_MACD_RESULT')
+export const addMACDResult = createAction<Types.AddMACDResultPayload>('ADD_MACD_RESULT')
+export const clearMACDResults = createAction<Types.ClearMACDResultsPayload>('CLEAR_MACD_RESULTS')

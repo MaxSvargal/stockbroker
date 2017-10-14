@@ -4,16 +4,18 @@ import { CandlesState } from 'shared/reducers/candles'
 import { OrderbookState } from 'shared/reducers/orderbook'
 import { OrdersState } from 'shared/reducers/orders'
 import { TickersState } from 'shared/reducers/tickers'
+import { TradePositionsState } from 'shared/reducers/tradePositions'
 import { WalletState } from 'shared/reducers/wallet'
-import { IndicatorsState } from 'shared/reducers/indicators'
+import { MACDState } from 'shared/reducers/macd'
 
 export type State = {
   candles: CandlesState,
   orderbook: OrderbookState,
   orders: OrdersState,
   tickers: TickersState,
-  wallet: WalletState
-  indicators: IndicatorsState
+  tradePositions: TradePositionsState,
+  wallet: WalletState,
+  macd: MACDState
 }
 
 const objKeysOfKey = (obj: { [key: string]: any }, key: string) => Object.keys((obj && obj[key]) || {}).sort((a, b) => Number(a) - Number(b))
@@ -65,8 +67,5 @@ export const selectAmountToSell = ({ wallet }: State, symbol: string) => {
 // export const selectTradePositionState = ({ tradePositions }: State, symbol: string) =>
 //   tradePositions[symbol]
 
-export const selectStochasticResults = ({ indicators: { stochastic } }: State, length: number) =>
-  stochastic.slice(-length)
-
-export const selectMACDResults = ({ indicators: { macd } }: State, length: number) =>
-  macd.slice(-length)
+export const selectMACDResults = ({ macd }: State, symbol: string, length: number) =>
+  macd[symbol].slice(-length)

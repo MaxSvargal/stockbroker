@@ -57,3 +57,5 @@ export type TradePayload = { pair: PAIR, data: TradeData }
 export type TradesPayload = { pair: PAIR, data: TradeData[] }
 export type RequestOrderSequencePayload = { symbol: string, amount: AMOUNT, chunks: number }
 export type RequestNewPassiveOrderPayload = {}
+export type AddMACDResultPayload = { symbol: string, value: number }
+export type ClearMACDResultsPayload = { symbol: string }

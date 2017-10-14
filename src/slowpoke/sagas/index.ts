@@ -2,7 +2,7 @@ import debug from 'debug'
 import { delay } from 'redux-saga'
 import { all, fork, put, select } from 'redux-saga/effects'
 import RPCSaga from 'shared/sagas/rpc'
-import { execNewOrder, addStochasticResult, addMACDResult } from 'shared/actions'
+import { execNewOrder, addMACDResult, clearMACDResults } from 'shared/actions'
 import { selectCandles, selectTickerBySymbol, selectLowestLow, selectHighestHigh, selectMACDResults, selectHighestBids, selectLowestAsks } from 'shared/sagas/selectors'
 import stochasticOscillator from 'shared/lib/stochasticOscillator'
 import { MACDHistogram, SMA, EMA } from 'shared/lib/macdHistogram'
@@ -46,10 +46,9 @@ export function* doSellSaga() {
 }
 
 export function* analyticsSaga() {
-  // yield put(clearMACDResults)
+  yield put(clearMACDResults({ symbol: SYMBOL }))
 
   while (true) {
-
     const candles = yield select(selectCandles, candlesKey, stochasticLength)
     const [ [ ask ] ] = yield select(selectLowestAsks)
     const [ [ bid ] ] = yield select(selectHighestBids)
@@ -62,9 +61,8 @@ export function* analyticsSaga() {
     const currentMACD = calcMACD(closePrices)
     // const lastStableMACD = calcMACD(closePrices.slice(0, -1))
 
-    // TODO: PAIRS CONFLICTS
-    yield put(addMACDResult(currentMACD))
-    const macdResults = yield select(selectMACDResults, 5)
+    yield put(addMACDResult({ symbol: SYMBOL, value: currentMACD }))
+    const macdResults = yield select(selectMACDResults, SYMBOL, 5)
     const macd = macdResults.map(round)
 
     debug('worker')(`===== ${SYMBOL} ${bid}/${ask} | MACD ${macd.join('/')} | STH ${round(currentStochastic)} =====`)
