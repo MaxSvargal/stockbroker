@@ -64,16 +64,18 @@ export function* analyticsSaga() {
 
     // TODO: PAIRS CONFLICTS
     yield put(addMACDResult(currentMACD))
-    const macdResults = yield select(selectMACDResults, 4)
+    const macdResults = yield select(selectMACDResults, 5)
     const macd = macdResults.map(round)
 
     debug('worker')(`===== ${SYMBOL} ${bid}/${ask} | MACD ${macd.join('/')} | STH ${round(currentStochastic)} =====`)
 
     if (
       allIsPositive(macd) &&
+      macd[0] > 5 &&
       macd[0] < macd[1] &&
       macd[1] > macd[2] &&
-      macd[2] > macd[3]
+      macd[2] > macd[3] &&
+      macd[3] > macd[4]
     ) {
       debug('worker')('MACD signal to sell for', bid)
       if (currentStochastic >= 60) {
@@ -84,9 +86,11 @@ export function* analyticsSaga() {
 
     if (
       allIsNegative(macd) &&
+      macd[0] < -5 &&
       macd[0] > macd[1] &&
       macd[1] < macd[2] &&
-      macd[2] < macd[3]
+      macd[2] < macd[3] &&
+      macd[3] < macd[4]
     ) {
       debug('worker')('MACD signal to buy for', ask)
       if (currentStochastic <= 40) {
