@@ -1,5 +1,2 @@
-export default (current: number, lowest: number, highest: number) =>
+export default (current: number, lowest: number, highest: number): number =>
   ((current - lowest) / (highest - lowest)) * 100
-
-export const SMA = (values: number[]) =>
-  values.reduce((a, b) => a + b) / values.length

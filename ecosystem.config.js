@@ -10,9 +10,9 @@ const exchanger = (account, pairs) => ({
   }
 })
 
-const slowpoke = (account) => (pair, amount) => ({
-  name: `slowpoke_${account}_${pair}`,
-  script: "./src/slowpoke/index.ts",
+const mcstoch = (account) => (pair, amount) => ({
+  name: `mcstoch_${account}_${pair}`,
+  script: "./src/mcstoch/index.ts",
   watch: true,
   env: {
     "DEBUG": "worker",
@@ -28,7 +28,7 @@ module.exports = {
     exchanger('maxsvargal', [ 'BTCUSD' /*, 'LTCUSD', 'DSHUSD', 'ETHUSD', 'ETCUSD' */ ]),
     // exchanger('lesorub', [ 'BTCUSD', 'ETCUSD' ]),
 
-    slowpoke('maxsvargal')('BTCUSD', 0.01),
+    mcstoch('maxsvargal')('BTCUSD', 0.005),
     // slowpoke('maxsvargal')('DSHUSD', 0.05),
     // slowpoke('maxsvargal')('ETHUSD', 0.05),
     // slowpoke('maxsvargal')('LTCUSD', 1),

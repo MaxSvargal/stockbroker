@@ -7,10 +7,11 @@
   "license": "MIT",
   "scripts": {
     "exchanger": "DEBUG=worker ACCOUNT=maxsvargal PAIRS=BTCUSD NODE_PATH=./src ts-node ./src/exchanger/index.ts",
-    "slowpoke": "DEBUG=worker ACCOUNT=maxsvargal PAIR=BTCUSD NODE_PATH=./src ts-node ./src/slowpoke/index.ts",
+    "mcstoch": "DEBUG=worker ACCOUNT=maxsvargal PAIR=BTCUSD NODE_PATH=./src ts-node ./src/mcstoch/index.ts",
     "dev": "nodemon",
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "pm2:reload": "pm2 startOrReload ecosystem.config.js --update-env"
   },
   "jest": {
     "transform": {
@@ -45,11 +46,12 @@
     "ignore": [
       "*.test.ts"
     ],
-    "exec": "DEBUG=worker ACCOUNT=maxsvargal PAIR=BTCUSD NODE_PATH=./src ts-node ./src/slowpoke/index.ts"
+    "exec": "DEBUG=worker ACCOUNT=maxsvargal PAIR=BTCUSD AMOUNT=0 NODE_PATH=./src ts-node ./src/mcstoch/index.ts"
   },
   "dependencies": {
     "autobahn": "^17.5.2",
-    "bitfinex-api-node": "https://github.com/MaxSvargal/bitfinex-api-node.git",
+    "bignumber.js": "^4.1.0",
+    "bitfinex-api-node": "1.2.1",
     "immutable": "^3.8.1",
     "pouchdb": "^6.3.4",
     "redux": "^3.7.2",
@@ -62,10 +64,10 @@
   "devDependencies": {
     "@types/autobahn": "^0.9.37",
     "@types/debug": "^0.0.30",
-    "@types/jest": "^20.0.8",
+    "@types/jest": "^21.1.2",
     "@types/node": "^8.0.28",
     "@types/pouchdb": "^6.3.0",
-    "debug": "^3.0.1",
+    "debug": "3.1.0",
     "jest": "^21.0.2",
     "jest-cli": "^21.1.0",
     "nodemon": "^1.12.1",

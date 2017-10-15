@@ -11,15 +11,15 @@ export type OrderbookState = {
   }
 }
 
-const orderBookReducer = createReducer<OrderbookState>({}, { bid: {}, ask: {} })
+const orderbookReducer = createReducer<OrderbookState>({}, { bid: {}, ask: {} })
 
-orderBookReducer.on(setOrderBook, (state, payload) =>
+orderbookReducer.on(setOrderBook, (state, payload) =>
   payload.reduce((prev, [ price, count, amount ]) => {
     const type = amount > 0 ? 'bid' : 'ask'
     return { ...prev, [type]: { ...prev[type], [price]: [ price, count, amount ] } }
   }, { bid: {}, ask: {} }))
 
-orderBookReducer.on(updateOrderBook, (state, [ price, count, amount ]) => {
+orderbookReducer.on(updateOrderBook, (state, [ price, count, amount ]) => {
   const type = amount > 0 ? 'bid' : 'ask'
   const partOfType = state[type]
 
@@ -33,4 +33,4 @@ orderBookReducer.on(updateOrderBook, (state, [ price, count, amount ]) => {
   return { ...state, [type]: count === 0 ? removeEntity() : updateEntity() }
 })
 
-export default orderBookReducer
+export default orderbookReducer

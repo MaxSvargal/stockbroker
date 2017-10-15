@@ -1,0 +1,79 @@
+import debug from 'debug'
+import { all, fork, put, select } from 'redux-saga/effects'
+
+import { execNewOrder, addMACDResult } from 'shared/actions'
+import { round } from 'shared/lib/helpers'
+import {
+  selectCandles, selectLowestLow, selectHighestHigh,
+  selectMACDResults, selectHighestBids, selectLowestAsks
+} from 'shared/sagas/selectors'
+
+import stochasticOscillator from 'shared/lib/stochasticOscillator'
+import { MACDHistogram } from 'shared/lib/macdHistogram'
+
+const symbol = `t${process.env.PAIR}`
+const candlesKey = `trade:5m:${symbol}`
+
+const stochasticLength = 39
+const MACDFastLength = 12
+const MACDLongLength = 26
+
+const checkMACDForSell = (macd: number[]) =>
+  macd[0] > 5 &&
+  macd[0] < macd[1] &&
+  macd[1] > macd[2] &&
+  macd[2] > macd[3] &&
+  macd[3] > macd[4]
+
+const checkMACDForBuy = (macd: number[]) =>
+  macd[0] < -5 &&
+  macd[0] > macd[1] &&
+  macd[1] < macd[2] &&
+  macd[2] < macd[3] &&
+  macd[3] < macd[4]
+
+export function* calcStochastic(closePrices: number[]) {
+  const lowestLow = yield select(selectLowestLow, candlesKey, stochasticLength)
+  const highestHigh = yield select(selectHighestHigh, candlesKey, stochasticLength)
+  return stochasticOscillator(closePrices.slice(-1)[0], lowestLow, highestHigh)
+}
+
+export function calcMACD(closePrices: number[]) {
+  return MACDHistogram(closePrices, MACDFastLength, MACDLongLength)
+}
+
+export default function* analyticSaga() {
+  const [ [ ask ] ] = yield select(selectLowestAsks)
+  const [ [ bid ] ] = yield select(selectHighestBids)
+  const candles = yield select(selectCandles, candlesKey, stochasticLength)
+  const closePrices = candles.map((c: number[]) => c[2])
+
+  const currentStochastic = yield calcStochastic(closePrices)
+  const currentMACD = calcMACD(closePrices)
+
+  yield put(addMACDResult({ symbol, value: currentMACD }))
+
+  const macdResults = yield select(selectMACDResults, symbol, 5)
+  const macd = macdResults.map((m: number) => round(m, 2))
+
+  debug('worker')(`===== ${symbol} ${bid}/${ask} | MACD ${macd.join('/')} | STH ${round(currentStochastic, 2)} =====`)
+
+  // TODO: check pos/neg volume is upper then previous ???
+  if (checkMACDForSell(macd)) {
+    debug('worker')('MACD signal to sell for', bid)
+    if (currentStochastic >= 60) {
+      debug('worker')('Stochastic approve sell on value', parseInt(currentStochastic))
+      return { status: true, exec: 'sell' }
+    }
+  }
+
+  if (checkMACDForBuy(macd)) {
+    debug('worker')('MACD signal to buy for', ask)
+    if (currentStochastic <= 40) {
+      debug('worker')('Stochastic approve buy on value', parseInt(currentStochastic))
+      return { status: true, exec: 'buy' }
+    }
+  }
+
+  return { status: false }
+}
