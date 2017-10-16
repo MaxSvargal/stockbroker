@@ -26,8 +26,10 @@ export function* doSellSaga() {
   yield put(execNewOrder({ symbol: SYMBOL, amount: -AMOUNT, price: price }))
 }
 
+// TODO: refactor this
 export function* requestOrder(execType: 'buy' | 'sell') {
-  yield select(selectHighestBids)
+  if (execType === 'sell') yield call(doSellSaga)
+  else if (execType === 'buy') yield call(doBuySaga)
 }
 
 export function* analyticsSaga() {
