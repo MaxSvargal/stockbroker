@@ -7,23 +7,22 @@ import { execNewOrder, clearMACDResults } from 'shared/actions'
 import { selectHighestBids, selectLowestAsks } from 'shared/sagas/selectors'
 import analyticSaga from './analytic'
 
-const { PAIR } = process.env
+const { PAIR, AMOUNT } = process.env
 if (!PAIR) throw Error('No pair or amount will passed by environment')
-// const AMOUNT = Number(AMOUNT)
+const amount = Number(AMOUNT)
 // TODO: calculate chunks
-const AMOUNT = 0.005
 const SYMBOL = `t${PAIR}`
 
 export function* doBuySaga() {
   const [ ask, reserveAsk ] = yield select(selectLowestAsks)
-  const price = ask[2] >= AMOUNT ? ask[0] : reserveAsk[0]
-  yield put(execNewOrder({ symbol: SYMBOL, amount: AMOUNT, price: price }))
+  const price = ask[2] >= amount ? ask[0] : reserveAsk[0]
+  yield put(execNewOrder({ symbol: SYMBOL, amount, price: price }))
 }
 
 export function* doSellSaga() {
   const [ bid, reserveBid ] = yield select(selectHighestBids)
-  const price = bid[2] >= AMOUNT ? bid[0] : reserveBid[0]
-  yield put(execNewOrder({ symbol: SYMBOL, amount: -AMOUNT, price: price }))
+  const price = bid[2] >= amount ? bid[0] : reserveBid[0]
+  yield put(execNewOrder({ symbol: SYMBOL, amount: -amount, price: price }))
 }
 
 // TODO: refactor this
