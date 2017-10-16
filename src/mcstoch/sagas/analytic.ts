@@ -11,22 +11,31 @@ import {
 import stochasticOscillator from 'shared/lib/stochasticOscillator'
 import { MACDHistogram } from 'shared/lib/macdHistogram'
 
-const symbol = `t${process.env.PAIR}`
+const pair = process.env.PAIR
+const symbol = `t${pair}`
 const candlesKey = `trade:5m:${symbol}`
+
+const MACDLimit = (() => {
+  switch (pair) {
+    case 'BTCUSD': return 4
+    case 'LTCUSD': return 0.05
+    default: return 0
+  }
+})()
 
 const stochasticLength = 39
 const MACDFastLength = 12
 const MACDLongLength = 26
 
 const checkMACDForSell = (macd: number[]) =>
-  macd[0] > 5 &&
+  macd[0] > MACDLimit &&
   macd[0] < macd[1] &&
   macd[1] > macd[2] &&
   macd[2] > macd[3] &&
   macd[3] > macd[4]
 
 const checkMACDForBuy = (macd: number[]) =>
-  macd[0] < -5 &&
+  macd[0] < -MACDLimit &&
   macd[0] > macd[1] &&
   macd[1] < macd[2] &&
   macd[2] < macd[3] &&
