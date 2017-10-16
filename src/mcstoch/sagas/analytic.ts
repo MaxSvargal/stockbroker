@@ -17,8 +17,8 @@ const candlesKey = `trade:5m:${symbol}`
 
 const MACDLimit = (() => {
   switch (pair) {
-    case 'BTCUSD': return 4
-    case 'LTCUSD': return 0.05
+    case 'BTCUSD': return 5
+    case 'LTCUSD': return 0.1
     default: return 0
   }
 })()
