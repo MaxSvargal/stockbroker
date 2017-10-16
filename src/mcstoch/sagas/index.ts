@@ -17,13 +17,13 @@ const SYMBOL = `t${PAIR}`
 export function* doBuySaga() {
   const [ ask, reserveAsk ] = yield select(selectLowestAsks)
   const price = ask[2] >= AMOUNT ? ask[0] : reserveAsk[0]
-  // yield put(execNewOrder({ symbol: SYMBOL, amount: AMOUNT, price: price }))
+  yield put(execNewOrder({ symbol: SYMBOL, amount: AMOUNT, price: price }))
 }
 
 export function* doSellSaga() {
   const [ bid, reserveBid ] = yield select(selectHighestBids)
   const price = bid[2] >= AMOUNT ? bid[0] : reserveBid[0]
-  // yield put(execNewOrder({ symbol: SYMBOL, amount: -AMOUNT, price: price }))
+  yield put(execNewOrder({ symbol: SYMBOL, amount: -AMOUNT, price: price }))
 }
 
 export function* requestOrder(execType: 'buy' | 'sell') {
