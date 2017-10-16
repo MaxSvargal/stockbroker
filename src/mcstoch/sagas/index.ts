@@ -37,7 +37,7 @@ export function* analyticsSaga() {
   while (true) {
     const { status, exec } = yield call(analyticSaga)
     if (status) yield fork(requestOrder, exec)
-    yield delay(5000)
+    yield delay(10000)
   }
 }
 
