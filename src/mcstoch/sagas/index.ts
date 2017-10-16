@@ -31,8 +31,8 @@ export function* requestOrder(execType: 'buy' | 'sell') {
 }
 
 export function* analyticsSaga() {
-  yield put(clearMACDResults({ symbol: SYMBOL }))
   yield delay(5000)
+  yield put(clearMACDResults({ symbol: SYMBOL }))
 
   while (true) {
     const { status, exec } = yield call(analyticSaga)
