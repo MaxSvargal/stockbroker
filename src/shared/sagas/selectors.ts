@@ -35,12 +35,12 @@ export const selectTickerBySymbol = ({ tickers }: State, symbol: string) => tick
 
 export const selectHighestBids = ({ bids }: State) => {
   const prices = Object.keys(bids).sort((a, b) => Number(b) - Number(a))
-  return [ bids[prices[0]], bids[prices[1]] ]
+  return [ bids[prices[0]] || [], bids[prices[1]] || [] ]
 }
 
 export const selectLowestAsks = ({ asks }: State) => {
   const prices = Object.keys(asks).sort((a, b) => Number(a) - Number(b))
-  return [ asks[prices[0]], asks[prices[1]] ]
+  return [ asks[prices[0]] || [], asks[prices[1]] || [] ]
 }
 
 export const selectLastBuy = ({ orders }: State, symbol: string, ) =>
