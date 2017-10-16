@@ -1,24 +1,31 @@
-require('events').EventEmitter.defaultMaxListeners = 30
-
 import debug from 'debug'
 import { applyMiddleware, compose, createStore } from 'redux'
-import { persistentStore } from 'redux-pouchdb-rethink'
 import createSagaMiddleware from 'redux-saga'
 
-import rootReducer from 'shared/reducers'
+import getRootReducer from 'shared/reducers'
 import rootSaga from './sagas'
 import connectToDB from 'shared/services/pouchdbService'
+
+import ReduxRedisPersist from 'shared/services/redisService'
 
 const { ACCOUNT = 'demo' } = process.env
 
 debug('worker')('Connect to database %s', ACCOUNT)
 
-const db = connectToDB(ACCOUNT)
 const sagaMiddleware = createSagaMiddleware()
-const middlewares = applyMiddleware(sagaMiddleware)
-const persist = persistentStore({ db })
-const store = createStore(rootReducer, compose(middlewares, persist))
+const persistDB = new ReduxRedisPersist({
+  prefix: ACCOUNT,
+  avalialbleToSet: [ 'asks', 'bids', 'wallet', 'candles', 'tickers' ],
+  avalialbleToSubscribe: [ 'macd' ]
+})
 
-sagaMiddleware.run(rootSaga)
+const rootReducer = getRootReducer(persistDB)
+const store = createStore(rootReducer, applyMiddleware(sagaMiddleware))
+
+persistDB.setStore(store)
+persistDB.publisher.on('ready', () => {
+  debug('worker')('Connection to Redis estableashed')
+  sagaMiddleware.run(rootSaga)
+})
 
 export default store

@@ -1,19 +1,21 @@
 import { symbolToPairArr } from 'shared/lib/helpers'
 
+import { AsksState } from 'shared/reducers/asks'
+import { BidsState } from 'shared/reducers/bids'
 import { CandlesState } from 'shared/reducers/candles'
-import { OrderbookState } from 'shared/reducers/orderbook'
+import { MACDState } from 'shared/reducers/macd'
 import { OrdersState } from 'shared/reducers/orders'
 import { TickersState } from 'shared/reducers/tickers'
 import { WalletState } from 'shared/reducers/wallet'
-import { MACDState } from 'shared/reducers/macd'
 
 export type State = {
+  asks: AsksState,
+  bids: BidsState,
   candles: CandlesState,
-  orderbook: OrderbookState,
+  macd: MACDState,
   orders: OrdersState,
   tickers: TickersState,
   wallet: WalletState,
-  macd: MACDState
 }
 
 const objKeysOfKey = (obj: { [key: string]: any }, key: string) => Object.keys((obj && obj[key]) || {}).sort((a, b) => Number(a) - Number(b))
@@ -31,15 +33,18 @@ export const selectHighestHigh = ({ candles }: State, key: string, num: number) 
 
 export const selectTickerBySymbol = ({ tickers }: State, symbol: string) => tickers[symbol]
 
-export const selectHighestBids = ({ orderbook: { bid } }: State) => {
-  const prices = Object.keys(bid).sort((a, b) => Number(b) - Number(a))
-  return [ bid[prices[0]], bid[prices[1]] ]
+export const selectHighestBids = ({ bids }: State) => {
+  const prices = Object.keys(bids).sort((a, b) => Number(b) - Number(a))
+  return [ bids[prices[0]], bids[prices[1]] ]
 }
 
-export const selectLowestAsks = ({ orderbook: { ask } }: State) => {
-  const prices = Object.keys(ask).sort((a, b) => Number(a) - Number(b))
-  return [ ask[prices[0]], ask[prices[1]] ]
+export const selectLowestAsks = ({ asks }: State) => {
+  const prices = Object.keys(asks).sort((a, b) => Number(a) - Number(b))
+  return [ asks[prices[0]], asks[prices[1]] ]
 }
+
+export const selectLastBuy = ({ orders }: State, symbol: string, ) =>
+  orders
 
 // export const selectActiveOrder = ({ orders }: State, symbol: string, type: 'buy' | 'sell') => {
 //   const activeOrder = Object.keys(orders).find(a => {
