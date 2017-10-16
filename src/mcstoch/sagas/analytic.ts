@@ -63,7 +63,7 @@ export default function* analyticSaga() {
   yield put(addMACDResult({ symbol, value: currentMACD }))
 
   const macdResults = yield select(selectMACDResults, symbol, 5)
-  const macd = macdResults.map((m: number) => round(m, 2))
+  const macd = macdResults.map((m: number) => round(m, 4))
 
   debug('worker')(`===== ${symbol} ${bid}/${ask} | MACD ${macd.join('/')} | STH ${round(currentStochastic, 2)} =====`)
 
