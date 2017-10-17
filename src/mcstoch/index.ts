@@ -2,30 +2,28 @@ import debug from 'debug'
 import { applyMiddleware, compose, createStore } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 
-import getRootReducer from 'shared/reducers'
 import rootSaga from './sagas'
-import connectToDB from 'shared/services/pouchdbService'
-
+import getRootReducer from 'shared/reducers'
 import ReduxRedisPersist from 'shared/services/redisService'
 
 const { ACCOUNT = 'demo' } = process.env
 
-debug('worker')('Connect to database as %s', ACCOUNT)
+debug('worker')('Welcome to stockbroker\'s Mc\'Stoch trader, %s!', ACCOUNT)
 
 const sagaMiddleware = createSagaMiddleware()
-const persistDB = new ReduxRedisPersist({
+const db = new ReduxRedisPersist({
   prefix: ACCOUNT,
   avalialbleToSet: [ 'macd' ],
   avalialbleToSubscribe: [ 'asks', 'bids', 'wallet', 'candles', 'tickers' ]
 })
 
-const rootReducer = getRootReducer(persistDB)
+const rootReducer = getRootReducer(db)
 const store = createStore(rootReducer, applyMiddleware(sagaMiddleware))
 
-persistDB.setStore(store)
-persistDB.subscriber.on('ready', () => {
+db.setStore(store)
+db.subscriber.on('ready', () => {
   debug('worker')('Connection to redis database established')
   sagaMiddleware.run(rootSaga)
 })
 
-export default store
+export { store, db }

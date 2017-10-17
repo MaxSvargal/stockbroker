@@ -1,10 +1,11 @@
 import { all, fork } from 'redux-saga/effects'
+import { db } from 'exchanger'
+import { watchForActions } from 'shared/sagas/redisRPC'
 import bitfinexSaga from './bitfinexSaga'
-import crossbarSaga from './crossbarSaga'
 
 export default function* rootSaga() {
   yield all([
     fork(bitfinexSaga),
-    fork(crossbarSaga)
+    fork(watchForActions, db)
   ])
 }

@@ -5,13 +5,13 @@ import debug from 'debug'
 const redis = require('redis')
 
 export default class ReduxRedisPersist {
-  publisher: RedisClient
-  subscriber: RedisClient
-  avalialbleToSet: string[]
-  avalialbleToSubscribe: string[]
-  store: Store<{}>
-  prefix: string
-  SET_REDUCER = '@@redux-redix-persist/SET_REDUCER'
+  public publisher: RedisClient
+  public subscriber: RedisClient
+  private avalialbleToSet: string[]
+  private avalialbleToSubscribe: string[]
+  private store: Store<{}>
+  private prefix: string
+  private SET_REDUCER = '@@redux-redix-persist/SET_REDUCER'
 
   constructor(options: { prefix: string, avalialbleToSet: string[], avalialbleToSubscribe: string[] }) {
     this.publisher = redis.createClient({ db: 1 })
@@ -19,13 +19,12 @@ export default class ReduxRedisPersist {
     this.prefix = options.prefix
     this.avalialbleToSet = options.avalialbleToSet
     this.avalialbleToSubscribe = options.avalialbleToSubscribe
-    this.persistentReducer = this.persistentReducer.bind(this)
     this.subscriber.on('message', this.onUpdateReceive. bind(this))
 
     return this
   }
 
-  onUpdateReceive(channel: string, type: string) {
+  private onUpdateReceive(channel: string, type: string) {
     const [ , prefix = null, reducer = null ] = channel.match(/__keyspace@1__:(.+)__(.+)/) || []
     if (prefix === this.prefix && reducer) {
       this.getReducer(`${prefix}__${reducer}`)
@@ -33,11 +32,7 @@ export default class ReduxRedisPersist {
     }
   }
 
-  setStore(store: Store<{}>) {
-    this.store = store
-  }
-
-  setReducer(name: string, state: any) {
+  private setReducer(name: string, state: any) {
     this.store.dispatch({
       type: this.SET_REDUCER,
       reducer: name,
@@ -45,17 +40,21 @@ export default class ReduxRedisPersist {
     })
   }
 
-  getReducer(selector: string) {
+  private getReducer(selector: string) {
     return new Promise((resolve, reject) =>
       (this.publisher || this.subscriber).get(selector, (err, doc) =>
         err ? reject(err) : resolve(JSON.parse(doc))))
   }
 
-  saveReducer(selector: string, state: any) {
+  private saveReducer(selector: string, state: any) {
     this.publisher.set(selector, JSON.stringify(state))
   }
 
-  persistentReducer(reducer: Reducer<any>, options: { name: string }) {
+  public setStore(store: Store<{}>) {
+    this.store = store
+  }
+
+  public persistentReducer = (reducer: Reducer<any>, options: { name: string }) => {
     const { avalialbleToSubscribe, avalialbleToSet, SET_REDUCER } = this
     const selector = `${this.prefix}__${options.name}`
 
@@ -82,5 +81,18 @@ export default class ReduxRedisPersist {
           }
       }
     }
+  }
+
+  public publish(channel: string, message: string | {}) {
+    this.publisher.publish(channel, typeof message === 'object' ? JSON.stringify(message) : message)
+  }
+
+  public subscribe(channel: string, cb: (msg: string) => void) {
+    this.subscriber.subscribe(channel)
+    this.subscriber.on('message', (chan: string, msg: string) => channel === chan && cb(msg))
+  }
+
+  public unsubscribe(channel: string) {
+    this.subscriber.unsubscribe(channel)
   }
 }

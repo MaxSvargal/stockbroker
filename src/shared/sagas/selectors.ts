@@ -31,8 +31,8 @@ export const selectLowestLow = ({ candles }: State, key: string, num: number) =>
 export const selectHighestHigh = ({ candles }: State, key: string, num: number) =>
   tailOfArray(objKeysOfKey(candles, key), num).map(id => candles[key][Number(id)][2]).reduce((a, b) => b > a ? b : a)
 
-export const selectTickerBySymbol = ({ tickers }: State, symbol: string) =>
-  tickers[symbol]
+// export const selectTickerBySymbol = ({ tickers }: State, symbol: string) =>
+//   tickers[symbol]
 
 export const selectCurrentPrice = ({ tickers }: State, symbol: string) =>
   tickers[symbol][6]
@@ -46,9 +46,6 @@ export const selectLowestAsks = ({ asks }: State) => {
   const prices = Object.keys(asks).sort((a, b) => Number(a) - Number(b))
   return [ asks[prices[0]] || [], asks[prices[1]] || [] ]
 }
-
-export const selectLastBuy = ({ orders }: State, symbol: string, ) =>
-  orders
 
 // export const selectActiveOrder = ({ orders }: State, symbol: string, type: 'buy' | 'sell') => {
 //   const activeOrder = Object.keys(orders).find(a => {
@@ -67,12 +64,6 @@ export const selectAmountToSell = ({ wallet }: State, symbol: string) => {
   const matches = symbolToPairArr(symbol)
   return matches && wallet.exchange ? wallet.exchange[matches[1]].balance : 0
 }
-//
-// export const selectCurrentBidPrice = ({ tickers }: State, symbol: string) =>
-//   tickers[symbol][0]
-//
-// export const selectTradePositionState = ({ tradePositions }: State, symbol: string) =>
-//   tradePositions[symbol]
 
 export const selectMACDResults = ({ macd }: State, symbol: string, length: number) =>
   macd[symbol].slice(-length)

@@ -2,15 +2,18 @@ import debug from 'debug'
 import { delay } from 'redux-saga'
 import { all, fork, put, call, select } from 'redux-saga/effects'
 
-import RPCSaga from 'shared/sagas/rpc'
+import { publishActions } from 'shared/sagas/redisRPC'
 import { execNewOrder, clearMACDResults } from 'shared/actions'
 import { selectHighestBids, selectLowestAsks } from 'shared/sagas/selectors'
 import analyticSaga from './analytic'
 import getChunkAmount from './wallet'
+import { db } from 'mcstoch'
 
 const { PAIR } = process.env
 const SYMBOL = `t${PAIR}`
 if (!PAIR) throw Error('No pair or amount will passed by environment')
+
+const enabledProcedures = [ execNewOrder ]
 
 export function* doBuySaga(stoch: number) {
   const [ ask, reserveAsk ] = yield select(selectLowestAsks)
@@ -52,7 +55,6 @@ export function* analyticsSaga() {
 export default function* rootSaga() {
   yield all([
     fork(analyticsSaga),
-    // TODO: remove, move to redis pub-sub
-    fork(RPCSaga)
+    fork(publishActions, db, enabledProcedures)
   ])
 }
