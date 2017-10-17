@@ -79,10 +79,10 @@ export default function* analyticSaga() {
   debug('worker')(`===== ${symbol} ${bid}/${ask} | MACD ${macd.join('/')} | STH ${round(currentStochastic, 2)} =====`)
 
   // TODO: check pos/neg volume is upper then previous ???
-  if (true && isPrevStochasticNotEqual(currentStochastic)) {
+  if (checkMACDForSell(macd) && isPrevStochasticNotEqual(currentStochastic)) {
     debug('worker')('MACD signal to sell for', bid)
     if (currentStochastic >= 60) {
-      debug('worker')('Stochastic approve sell on value', currentStochastic)
+      debug('worker')('Stochastic approve sell on value', currentStochastic.toFixed(2))
       return { status: true, exec: 'sell' }
     }
   }
@@ -90,7 +90,7 @@ export default function* analyticSaga() {
   if (checkMACDForBuy(macd) && isPrevStochasticNotEqual(currentStochastic)) {
     debug('worker')('MACD signal to buy for', ask)
     if (currentStochastic <= 40) {
-      debug('worker')('Stochastic approve buy on value', currentStochastic)
+      debug('worker')('Stochastic approve buy on value', currentStochastic.toFixed(2))
       return { status: true, exec: 'buy' }
     }
   }
