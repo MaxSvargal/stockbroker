@@ -26,16 +26,9 @@ const mcstoch = (account) => (pair, amount) => ({
 module.exports = {
   apps: [
     exchanger('maxsvargal', [ 'BTCUSD' ]),
-    exchanger('lesorub', [ 'LTCUSD' ]),
+    exchanger('lesorub', [ 'BTCUSD' ]),
 
     mcstoch('maxsvargal')('BTCUSD', 0.005),
-    mcstoch('lesorub')('LTCUSD', 0.5),
-
-    // slowpoke('maxsvargal')('DSHUSD', 0.05),
-    // slowpoke('maxsvargal')('ETHUSD', 0.05),
-    // slowpoke('maxsvargal')('LTCUSD', 1),
-    // slowpoke('maxsvargal')('ETCUSD', 1),
-    // slowpoke('lesorub')('BTCUSD', 0.02),
-    // slowpoke('lesorub')('ETCUSD', 1),
+    mcstoch('lesorub')('BTCUSD', 0.005),
   ]
 }
