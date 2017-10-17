@@ -60,12 +60,12 @@ export const selectLastBuy = ({ orders }: State, symbol: string, ) =>
 
 export const selectAmountToBuy = ({ wallet }: State, symbol: string) => {
   const matches = symbolToPairArr(symbol)
-  return matches ? wallet.exchange[matches[2]].balance : null
+  return matches && wallet.exchange ? wallet.exchange[matches[2]].balance : 0
 }
 
 export const selectAmountToSell = ({ wallet }: State, symbol: string) => {
   const matches = symbolToPairArr(symbol)
-  return matches ? wallet.exchange[matches[1]].balance : null
+  return matches && wallet.exchange ? wallet.exchange[matches[1]].balance : 0
 }
 //
 // export const selectCurrentBidPrice = ({ tickers }: State, symbol: string) =>
