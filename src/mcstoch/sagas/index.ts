@@ -13,16 +13,25 @@ const amount = Number(AMOUNT)
 // TODO: calculate chunks
 const SYMBOL = `t${PAIR}`
 
+let lastSellPrice: number
+let lastBuyPrice: number
+
 export function* doBuySaga() {
   const [ ask, reserveAsk ] = yield select(selectLowestAsks)
   const price = ask[2] >= amount ? ask[0] : reserveAsk[0]
-  yield put(execNewOrder({ symbol: SYMBOL, amount, price: price }))
+  if (price !== lastBuyPrice) {
+    yield put(execNewOrder({ symbol: SYMBOL, amount, price: price }))
+    lastBuyPrice = price
+  }
 }
 
 export function* doSellSaga() {
   const [ bid, reserveBid ] = yield select(selectHighestBids)
   const price = bid[2] >= amount ? bid[0] : reserveBid[0]
-  yield put(execNewOrder({ symbol: SYMBOL, amount: -amount, price: price }))
+  if (price !== lastSellPrice) {
+    yield put(execNewOrder({ symbol: SYMBOL, amount: -amount, price: price }))
+    lastSellPrice = price
+  }
 }
 
 // TODO: refactor this
@@ -45,6 +54,7 @@ export function* analyticsSaga() {
 export default function* rootSaga() {
   yield all([
     fork(analyticsSaga),
+    // TODO: remove, move to redis pub-sub
     fork(RPCSaga)
   ])
 }
