@@ -13,11 +13,11 @@ import { MACDHistogram } from 'shared/lib/macdHistogram'
 
 const pair = process.env.PAIR
 const symbol = `t${pair}`
-const candlesKey = `trade:5m:${symbol}`
+const candlesKey = `trade:1m:${symbol}`
 
 const MACDLimit = (() => {
   switch (pair) {
-    case 'BTCUSD': return 4
+    case 'BTCUSD': return 1
     case 'LTCUSD': return 0.02
     default: return 0
   }

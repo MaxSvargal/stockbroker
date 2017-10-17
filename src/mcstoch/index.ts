@@ -10,7 +10,7 @@ import ReduxRedisPersist from 'shared/services/redisService'
 
 const { ACCOUNT = 'demo' } = process.env
 
-debug('worker')('Connect to database %s', ACCOUNT)
+debug('worker')('Connect to database as %s', ACCOUNT)
 
 const sagaMiddleware = createSagaMiddleware()
 const persistDB = new ReduxRedisPersist({
@@ -24,7 +24,7 @@ const store = createStore(rootReducer, applyMiddleware(sagaMiddleware))
 
 persistDB.setStore(store)
 persistDB.subscriber.on('ready', () => {
-  debug('worker')('Connection to Redis estableashed')
+  debug('worker')('Connection to redis database established')
   sagaMiddleware.run(rootSaga)
 })
 
