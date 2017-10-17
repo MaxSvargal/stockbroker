@@ -75,25 +75,26 @@ export default function* analyticSaga() {
 
   const macdResults = yield select(selectMACDResults, symbol, 5)
   const macd = macdResults.map((m: number) => round(m, 4))
+  const stoch = round(currentStochastic, 4)
 
-  debug('worker')(`===== ${symbol} ${bid}/${ask} | MACD ${macd.join('/')} | STH ${round(currentStochastic, 2)} =====`)
+  debug('worker')(`===== ${symbol} ${bid}/${ask} | MACD ${macd.join('/')} | STH ${stoch} =====`)
 
   // TODO: check pos/neg volume is upper then previous ???
-  if (checkMACDForSell(macd) && isPrevStochasticNotEqual(currentStochastic)) {
+  if (checkMACDForSell(macd) && isPrevStochasticNotEqual(stoch)) {
     debug('worker')('MACD signal to sell for', bid)
-    if (currentStochastic >= 60) {
-      debug('worker')('Stochastic approve sell on value', currentStochastic.toFixed(2))
-      return { status: true, exec: 'sell' }
+    if (stoch >= 60) {
+      debug('worker')('Stochastic approve sell on value', stoch)
+      return { status: true, exec: 'sell', stoch }
     }
   }
 
-  if (checkMACDForBuy(macd) && isPrevStochasticNotEqual(currentStochastic)) {
+  if (checkMACDForBuy(macd) && isPrevStochasticNotEqual(stoch)) {
     debug('worker')('MACD signal to buy for', ask)
-    if (currentStochastic <= 40) {
-      debug('worker')('Stochastic approve buy on value', currentStochastic.toFixed(2))
-      return { status: true, exec: 'buy' }
+    if (stoch <= 40) {
+      debug('worker')('Stochastic approve buy on value', stoch)
+      return { status: true, exec: 'buy', stoch: stoch }
     }
   }
 
-  return { status: false }
+  return { status: false, stoch: stoch }
 }

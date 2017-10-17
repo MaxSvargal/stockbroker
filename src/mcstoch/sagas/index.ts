@@ -6,47 +6,43 @@ import RPCSaga from 'shared/sagas/rpc'
 import { execNewOrder, clearMACDResults } from 'shared/actions'
 import { selectHighestBids, selectLowestAsks } from 'shared/sagas/selectors'
 import analyticSaga from './analytic'
+import getChunkAmount from './wallet'
 
-const { PAIR, AMOUNT } = process.env
-if (!PAIR) throw Error('No pair or amount will passed by environment')
-const amount = Number(AMOUNT)
-// TODO: calculate chunks
+const { PAIR } = process.env
 const SYMBOL = `t${PAIR}`
+if (!PAIR) throw Error('No pair or amount will passed by environment')
 
-let lastSellPrice: number
-let lastBuyPrice: number
-
-export function* doBuySaga() {
+export function* doBuySaga(stoch: number) {
   const [ ask, reserveAsk ] = yield select(selectLowestAsks)
-  const price = ask[2] >= amount ? ask[0] : reserveAsk[0]
-  if (price !== lastBuyPrice) {
-    yield put(execNewOrder({ symbol: SYMBOL, amount, price: price }))
-    lastBuyPrice = price
-  }
+  const chunkAmount = yield call(getChunkAmount, SYMBOL, stoch)
+  const amount = chunkAmount < 0.005 ? 0.005 : chunkAmount
+  const price = ask[2] >= amount * 2 ? ask[0] : reserveAsk[0]
+
+  yield put(execNewOrder({ symbol: SYMBOL, amount, price: price }))
 }
 
-export function* doSellSaga() {
+export function* doSellSaga(stoch: number) {
   const [ bid, reserveBid ] = yield select(selectHighestBids)
-  const price = bid[2] >= amount ? bid[0] : reserveBid[0]
-  if (price !== lastSellPrice) {
-    yield put(execNewOrder({ symbol: SYMBOL, amount: -amount, price: price }))
-    lastSellPrice = price
-  }
+  const chunkAmount = yield call(getChunkAmount, SYMBOL, stoch)
+  const amount = chunkAmount < 0.005 ? 0.005 : chunkAmount
+  const price = bid[2] >= amount * 2 ? bid[0] : reserveBid[0]
+
+  yield put(execNewOrder({ symbol: SYMBOL, amount: -amount, price: price }))
 }
 
 // TODO: refactor this
-export function* requestOrder(execType: 'buy' | 'sell') {
-  if (execType === 'sell') yield call(doSellSaga)
-  else if (execType === 'buy') yield call(doBuySaga)
+export function* requestOrder(execType: 'buy' | 'sell', stoch: number) {
+  if (execType === 'sell') yield call(doSellSaga, stoch)
+  else if (execType === 'buy') yield call(doBuySaga, stoch)
 }
 
 export function* analyticsSaga() {
-  yield delay(5000)
+  yield delay(3000)
   yield put(clearMACDResults({ symbol: SYMBOL }))
 
   while (true) {
-    const { status, exec } = yield call(analyticSaga)
-    if (status) yield fork(requestOrder, exec)
+    const { status, exec, stoch } = yield call(analyticSaga)
+    if (status) yield fork(requestOrder, exec, stoch)
     yield delay(10000)
   }
 }
