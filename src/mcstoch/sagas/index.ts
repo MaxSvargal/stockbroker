@@ -19,6 +19,7 @@ export function* doBuySaga(stoch: number) {
   const price = ask[2] >= amount * 2 ? ask[0] : reserveAsk[0]
 
   yield put(execNewOrder({ symbol: SYMBOL, amount, price: price }))
+  debug('worker')(`Exchange ${amount} for ${price} of ${PAIR}`)
 }
 
 export function* doSellSaga(stoch: number) {
@@ -28,6 +29,7 @@ export function* doSellSaga(stoch: number) {
   const price = bid[2] >= amount * 2 ? bid[0] : reserveBid[0]
 
   yield put(execNewOrder({ symbol: SYMBOL, amount: -amount, price: price }))
+  debug('worker')(`Exchange ${-amount} for ${price} of ${PAIR}`)
 }
 
 // TODO: refactor this
