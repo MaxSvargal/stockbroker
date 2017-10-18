@@ -7,13 +7,13 @@ const redis = require('redis')
 export default class ReduxRedisPersist {
   public publisher: RedisClient
   public subscriber: RedisClient
-  private avalialbleToSet: string[]
-  private avalialbleToSubscribe: string[]
+  private avalialbleToSet?: string[] = []
+  private avalialbleToSubscribe?: string[] = []
   private store: Store<{}>
-  private prefix: string
+  private prefix?: string = ''
   private SET_REDUCER = '@@redux-redix-persist/SET_REDUCER'
 
-  constructor(options: { prefix: string, avalialbleToSet: string[], avalialbleToSubscribe: string[] }) {
+  constructor(options: { prefix?: string, avalialbleToSet?: string[], avalialbleToSubscribe?: string[] }) {
     this.publisher = redis.createClient({ db: 1 })
     this.subscriber = redis.createClient({ db: 1 })
     this.prefix = options.prefix
@@ -61,7 +61,7 @@ export default class ReduxRedisPersist {
     this.getReducer(selector)
       .then(state => this.setReducer(options.name, state))
 
-    if (avalialbleToSubscribe.includes(options.name))
+    if (avalialbleToSubscribe && avalialbleToSubscribe.includes(options.name))
       this.subscriber.subscribe(`__keyspace@1__:${selector}`)
 
     return (state: {}, action: { type: string, reducer?: string, state?: {} }) => {
@@ -75,7 +75,7 @@ export default class ReduxRedisPersist {
           if (state === nextState)
             return state
           else {
-            if (avalialbleToSet.includes(options.name))
+            if (avalialbleToSet && avalialbleToSet.includes(options.name))
               process.nextTick(() => this.saveReducer(selector, nextState))
             return nextState
           }
@@ -84,12 +84,12 @@ export default class ReduxRedisPersist {
   }
 
   public publish(channel: string, message: string | {}) {
-    this.publisher.publish(channel, typeof message === 'object' ? JSON.stringify(message) : message)
+    this.publisher.publish(`${this.prefix}_${channel}`, typeof message === 'object' ? JSON.stringify(message) : message)
   }
 
   public subscribe(channel: string, cb: (msg: string) => void) {
-    this.subscriber.subscribe(channel)
-    this.subscriber.on('message', (chan: string, msg: string) => channel === chan && cb(msg))
+    this.subscriber.subscribe(`${this.prefix}_${channel}`)
+    this.subscriber.on('message', (chan: string, msg: string) => `${this.prefix}_${channel}` === chan && cb(msg))
   }
 
   public unsubscribe(channel: string) {
