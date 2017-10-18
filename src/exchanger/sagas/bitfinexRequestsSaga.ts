@@ -7,7 +7,7 @@ const { ACCOUNT } = process.env
 
 export function* newOrderSaga(bws: BFX) {
   while (true) {
-    const { payload: { symbol, amount, price } } = yield take(execNewOrder)
+    const { payload: { symbol, amount, price } } = yield take(execNewOrder.toString())
     const req = [ 0, 'on', null, {
       gid: 1,
       cid: null,
