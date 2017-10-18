@@ -13,7 +13,7 @@ import { MACDHistogram } from 'shared/lib/macdHistogram'
 
 const pair = process.env.PAIR
 const symbol = `t${pair}`
-const candlesKey = `trade:1m:${symbol}`
+const candlesKey = `trade:5m:${symbol}`
 
 const MACDLimit = (() => {
   switch (pair) {
