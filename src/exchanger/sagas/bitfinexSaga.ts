@@ -27,8 +27,14 @@ export default function* bitfinexSaga(): any {
         bws.subscribeCandles(`t${pair}`, '5m')
       })
 
-    // bws.on('error', (err: Error) => { throw err })
-    // bws.on('close', () => { throw Error('Bitfinex connection closed') })
+    bws.on('error', (err: Error) => {
+      console.log('Error', err)
+      throw err
+    })
+    bws.on('close', () => {
+      console.log('Closed')
+      throw Error('Bitfinex connection closed')
+    })
 
     debug('worker')('Connection to bitfinex socket established')
     debug('worker')('Listen pairs: ', PAIRS)
