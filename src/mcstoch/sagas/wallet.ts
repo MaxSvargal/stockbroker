@@ -4,7 +4,7 @@ import { selectAmountToSell, selectAmountToBuy, selectCurrentPrice } from 'share
 export function getChunkAmountForStochastic(fullAmount: number, stochastic: number) {
   const stochPerc = stochastic / 100
   const stochKVal = stochPerc > 0.5 ? stochPerc : 1 - stochPerc
-  const numOfChunks = 10
+  const numOfChunks = 12
   const multiplier = 4
   const stabilizer = 1
 
