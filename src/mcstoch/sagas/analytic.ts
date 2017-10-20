@@ -82,7 +82,7 @@ export default function* analyticSaga() {
   // TODO: check pos/neg volume is upper then previous ???
   if (checkMACDForSell(macd) && isPrevStochasticNotEqual(stoch)) {
     debug('worker')('MACD signal to sell for', bid)
-    if (stoch >= 50) {
+    if (stoch >= 60) {
       debug('worker')('Stochastic approve sell on value', stoch)
       return { status: true, exec: 'sell', stoch }
     }
@@ -90,7 +90,7 @@ export default function* analyticSaga() {
 
   if (checkMACDForBuy(macd) && isPrevStochasticNotEqual(stoch)) {
     debug('worker')('MACD signal to buy for', ask)
-    if (stoch <= 50) {
+    if (stoch <= 40) {
       debug('worker')('Stochastic approve buy on value', stoch)
       return { status: true, exec: 'buy', stoch: stoch }
     }
