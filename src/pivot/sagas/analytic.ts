@@ -62,7 +62,7 @@ export function* getPricePivotPointsConclusion(closePrice: number) {
   const highestHigh = yield select(selectHighestHigh, candlesKey, stochasticLength)
   const pivotPoints = getPivotPoints(closePrice, lowestLow, highestHigh)
   const priceConclusions = pivotsConclusion(closePrice, pivotPoints)
-  return priceConclusions
+  return { priceConclusions, pivotPoints }
 }
 
 export function getOBVPivotConclusion(OBVs: number[]) {
@@ -70,7 +70,7 @@ export function getOBVPivotConclusion(OBVs: number[]) {
   const highestOBV = OBVs.reduce((a, b) => b > a ? b : a)
   const pivotPointsOBV = getPivotPoints(tail(OBVs), lowestOBV, highestOBV)
   const OBVConclusions = pivotsConclusion(tail(OBVs), pivotPointsOBV)
-  return OBVConclusions
+  return { OBVConclusions, pivotPointsOBV }
 }
 
 export default function* analyticSaga() {
@@ -87,8 +87,8 @@ export default function* analyticSaga() {
   const OBVs = onBalanceVolumes(closePricesWithVolumes)
   const currentOBV = tail(OBVs)
 
-  const priceConclusions = yield call(getPricePivotPointsConclusion, closePrice)
-  const OBVConclusions = getOBVPivotConclusion(OBVs)
+  const { priceConclusions, pivotPoints } = yield call(getPricePivotPointsConclusion, closePrice)
+  const { OBVConclusions, pivotPointsOBV } = getOBVPivotConclusion(OBVs)
 
   yield put(addMACDResult({ symbol, value: currentMACD }))
 
@@ -96,16 +96,18 @@ export default function* analyticSaga() {
   const macd = macdResults.map((m: number) => round(m, 4))
   const stoch = round(currentStochastic, 4)
 
-  debug('worker')(`=== ${symbol} ${bid}/${ask} | MACD ${macd.join('/')} | STH ${stoch} | OBV ${tail(OBVs)} ===`)
+  debug('worker')(`=== ${symbol} ${bid}/${ask} | MACD ${tail(macd)} | STH ${stoch} | OBV ${round(tail(OBVs), 0)} ===`)
+  debug('worker')(`== Price pivot: ${round(pivotPoints.pivot, 2)}, support: ${round(pivotPoints.support[0], 2)}, resistance: ${round(pivotPoints.resistance[0], 2)} ==`)
+  debug('worker')(`== OBV pivot: ${round(pivotPointsOBV.pivot, 2)}, support: ${round(pivotPointsOBV.support[0], 2)}, resistance: ${round(pivotPointsOBV.resistance[0], 2)} ==`)
 
   // logic for buy
   if (OBVConclusions.isAbovePivot) {
-    debug('worker')(`OBV is above pivot and approve buy`)
+    debug('worker')(`= OBV is above pivot and approve buy`)
     if (priceConclusions.isAbovePivot) {
-      debug('worker')(`Price is above pivot and approve buy (not enabled, maybe stop buy?)`)
+      debug('worker')(`= Price is above pivot and approve buy (not enabled, maybe stop buy?)`)
     }
     if (OBVConclusions.isUpwardFirstResistance) {
-      debug('worker')(`OBV is upward resistance level, stop buy.`)
+      debug('worker')(`= OBV is upward resistance level, stop buy.`)
       return { status: false, stoch: stoch }
     }
     if (stoch <= 50) {
@@ -119,12 +121,12 @@ export default function* analyticSaga() {
 
   // logic for sell
   if (OBVConclusions.isBelowPivot) {
-    debug('worker')(`OBV is below pivot and approve sell`)
+    debug('worker')(`= OBV is below pivot and approve sell`)
     if (priceConclusions.isBelowPivot) {
-      debug('worker')(`Price is below pivot and approve sell (not enabled)`)
+      debug('worker')(`= Price is below pivot and approve sell (not enabled)`)
     }
     if (OBVConclusions.isUnderFirstSupport) {
-      debug('worker')(`OBV is under support level, stop sell.`)
+      debug('worker')(`= OBV is under support level, stop sell.`)
       return { status: false, stoch: stoch }
     }
     if (stoch >= 50) {
@@ -136,5 +138,6 @@ export default function* analyticSaga() {
     }
   }
 
+  debug('worker')('======================================================================')
   return { status: false, stoch: stoch }
 }

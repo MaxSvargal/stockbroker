@@ -42,6 +42,6 @@ export function* doSellSaga(symbol: string, stoch: number) {
   const amount = -(chunkAmount < 0.005 ? 0.005 : chunkAmount)
   const price = bid[2] >= amount * 2 ? bid[0] : reserveBid[0]
 
-  // yield put(execNewOrder({ symbol, price, amount: -amount }))
+  // yield put(execNewOrder({ symbol, price, amount }))
   debug('worker')(`Exchange ${-amount} for ${price} of ${symbol}`)
 }
