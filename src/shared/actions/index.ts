@@ -8,3 +8,4 @@ export const requestNewPassiveOrder = createAction<Types.RequestNewPassiveOrderP
 export const requestOrdersSequence = createAction<Types.RequestOrderSequencePayload>('REQUEST_ORDER_SEQUENCE')
 export const addMACDResult = createAction<Types.AddMACDResultPayload>('ADD_MACD_RESULT')
 export const clearMACDResults = createAction<Types.ClearMACDResultsPayload>('CLEAR_MACD_RESULTS')
+export const setAccount = createAction<string>('SET_ACCOUNT')
