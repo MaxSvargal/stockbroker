@@ -17,3 +17,5 @@ export const signalLine = (prices: number[], fastPeriod: number, longPeriod: num
 
 export const MACDHistogram = (prices: number[], fastPeriod: number, longPeriod: number) =>
   MACD(prices, fastPeriod, longPeriod) - signalLine(prices, fastPeriod, longPeriod)
+
+export default MACDHistogram

@@ -84,12 +84,14 @@ export default class ReduxRedisPersist {
   }
 
   public publish(channel: string, message: string | {}) {
-    this.publisher.publish(`${this.prefix}_${channel}`, typeof message === 'object' ? JSON.stringify(message) : message)
+    this.publisher.publish(`${this.prefix}_${channel}`,
+      typeof message === 'object' ? JSON.stringify(message) : message)
   }
 
   public subscribe(channel: string, cb: (msg: string) => void) {
     this.subscriber.subscribe(`${this.prefix}_${channel}`)
-    this.subscriber.on('message', (chan: string, msg: string) => `${this.prefix}_${channel}` === chan && cb(msg))
+    this.subscriber.on('message', (chan: string, msg: string) =>
+      `${this.prefix}_${channel}` === chan && cb(msg))
   }
 
   public unsubscribe(channel: string) {

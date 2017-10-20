@@ -2,14 +2,14 @@ import debug from 'debug'
 import { all, fork, put, select } from 'redux-saga/effects'
 
 import { execNewOrder, addMACDResult } from 'shared/actions'
-import { round } from 'shared/lib/helpers'
+import { round, tail } from 'shared/lib/helpers'
 import {
   selectCandles, selectLowestLow, selectHighestHigh,
   selectMACDResults, selectHighestBids, selectLowestAsks
 } from 'shared/sagas/selectors'
 
 import stochasticOscillator from 'shared/lib/stochasticOscillator'
-import { MACDHistogram } from 'shared/lib/macdHistogram'
+import MACDHistogram from 'shared/lib/macdHistogram'
 
 const pair = process.env.PAIR
 const symbol = `t${pair}`
@@ -66,7 +66,12 @@ export default function* analyticSaga() {
   const [ [ ask ] ] = yield select(selectLowestAsks)
   const [ [ bid ] ] = yield select(selectHighestBids)
   const candles = yield select(selectCandles, candlesKey, stochasticLength)
+  const lowestLow = yield select(selectLowestLow, candlesKey, stochasticLength)
+  const highestHigh = yield select(selectHighestHigh, candlesKey, stochasticLength)
+
   const closePrices = candles.map((c: number[]) => c[2])
+  const closePricesWithVolumes = candles.map((c: number[]) => [ c[2], c[5] ])
+  const closePrice = tail(closePrices)
 
   const currentStochastic = yield calcStochastic(closePrices)
   const currentMACD = calcMACD(closePrices)
@@ -77,7 +82,7 @@ export default function* analyticSaga() {
   const macd = macdResults.map((m: number) => round(m, 4))
   const stoch = round(currentStochastic, 4)
 
-  debug('worker')(`===== ${symbol} ${bid}/${ask} | MACD ${macd.join('/')} | STH ${stoch} =====`)
+  debug('worker')(`=== ${symbol} ${bid}/${ask} | MACD ${macd.join('/')} | STH ${stoch} ===`)
 
   // TODO: check pos/neg volume is upper then previous ???
   if (checkMACDForSell(macd) && isPrevStochasticNotEqual(stoch)) {

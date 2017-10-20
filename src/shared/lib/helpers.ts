@@ -3,3 +3,5 @@ export const symbolToPairArr = (symbol: string): string[] | null =>
 
 export const round = (num: number, length: number): number =>
   parseFloat(num.toFixed(length))
+
+export const tail = (arr: any[], index?: number) => arr[arr.length - (index || 1)]

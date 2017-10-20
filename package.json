@@ -46,7 +46,7 @@
     "ignore": [
       "*.test.ts"
     ],
-    "exec": "DEBUG=worker ACCOUNT=maxsvargal PAIR=BTCUSD AMOUNT=0 NODE_PATH=./src ts-node ./src/mcstoch/index.ts"
+    "exec": "DEBUG=worker ACCOUNT=maxsvargal PAIR=BTCUSD NODE_PATH=./src ts-node ./src/pivot/index.ts"
   },
   "dependencies": {
     "autobahn": "^17.5.2",

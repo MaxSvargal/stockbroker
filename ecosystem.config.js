@@ -23,6 +23,19 @@ const mcstoch = (account) => (pair, amount) => ({
   }
 })
 
+const pivot = (account) => (pair, amount) => ({
+  name: `pivot_${account}_${pair}`,
+  script: "./src/pivot/index.ts",
+  watch: true,
+  env: {
+    "DEBUG": "worker",
+    "NODE_PATH": "./src",
+    "ACCOUNT": account,
+    "PAIR": pair,
+    "AMOUNT_MIN": String(amount)
+  }
+})
+
 module.exports = {
   apps: [
     exchanger('maxsvargal', [ 'BTCUSD' ]),
@@ -30,5 +43,8 @@ module.exports = {
 
     mcstoch('maxsvargal')('BTCUSD', 0.005),
     mcstoch('lesorub')('BTCUSD', 0.005),
+
+    pivot('maxsvargal')('BTCUSD', 0.005),
+    pivot('lesorub')('BTCUSD', 0.005),
   ]
 }
