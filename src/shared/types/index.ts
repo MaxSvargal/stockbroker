@@ -59,3 +59,5 @@ export type RequestOrderSequencePayload = { symbol: string, amount: AMOUNT, chun
 export type RequestNewPassiveOrderPayload = {}
 export type AddMACDResultPayload = { symbol: string, value: number }
 export type ClearMACDResultsPayload = { symbol: string }
+export type SetTradeSignalPayload = { symbol: string, name: 'macd' | 'rvi' }
+export type ChangePositionPayload = { symbol: string, id: ID, cid: CID, price: PRICE, amount: AMOUNT, mts: MTS }

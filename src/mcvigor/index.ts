@@ -3,7 +3,7 @@ import createStore from 'shared/store'
 import rootSaga from './sagas'
 
 const { ACCOUNT = 'demo' } = process.env
-debug('worker')(`Welcome to stockbroker\'s Pivot, ${ACCOUNT}!`)
+debug('worker')(`Hello, ${ACCOUNT}! I'm a MC Vigor!`)
 
 export default createStore({
   rootSaga,

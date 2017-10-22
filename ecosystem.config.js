@@ -23,9 +23,9 @@ const mcstoch = (account) => (pair, amount) => ({
   }
 })
 
-const pivot = (account) => (pair, amount) => ({
-  name: `pivot_${account}_${pair}`,
-  script: "./src/pivot/index.ts",
+const mcvigor = (account) => (pair, amount) => ({
+  name: `mcvigor_${account}_${pair}`,
+  script: "./src/mcvigor/index.ts",
   watch: true,
   env: {
     "DEBUG": "worker",
@@ -44,7 +44,7 @@ module.exports = {
     mcstoch('maxsvargal')('BTCUSD', 0.005),
     mcstoch('lesorub')('BTCUSD', 0.005),
 
-    pivot('maxsvargal')('BTCUSD', 0.005),
-    pivot('lesorub')('BTCUSD', 0.005),
+    mcvigor('maxsvargal')('BTCUSD', 0.005),
+    mcvigor('lesorub')('BTCUSD', 0.005),
   ]
 }
