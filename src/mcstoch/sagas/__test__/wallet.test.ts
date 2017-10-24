@@ -2,7 +2,7 @@ import { expectSaga, testSaga } from 'redux-saga-test-plan'
 import { selectAmountToBuy, selectAmountToSell, selectTickerBySymbol } from 'shared/sagas/selectors'
 import { getChunkAmountForStochastic } from '../wallet'
 
-test('getChunkAmountForStochastic should return chunks amount', () => {
+test.skip('getChunkAmountForStochastic should return chunks amount', () => {
   // TODO: Check avaliable amount to sell and buy separately?
   expect(getChunkAmountForStochastic(0.18, 0)).toEqual(0.027)
   expect(getChunkAmountForStochastic(0.18, 40)).toEqual(0.0126)

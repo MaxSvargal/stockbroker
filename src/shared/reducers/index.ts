@@ -8,9 +8,10 @@ import wallet from './wallet'
 import candles from './candles'
 import tickers from './tickers'
 import macd from './macd'
+import rvi from './rvi'
 
 const reducers: { [name: string]: Reducer<any> } = {
-  asks, bids, trades, wallet, candles, tickers, macd
+  asks, bids, trades, wallet, candles, tickers, macd, rvi
 }
 
 export default function getRootReducer(persistDB: ReduxRedisPersist) {

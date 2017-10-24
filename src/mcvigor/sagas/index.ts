@@ -20,8 +20,8 @@ export function* requestOrder(execType: 'buy' | 'sell', stoch: number) {
 }
 
 export function* analyticsSaga() {
-  yield delay(3000)
-  yield put(clearMACDResults({ symbol }))
+  yield delay(1000)
+  // yield put(clearMACDResults({ symbol }))
 
   while (true) {
     const { status, exec, stoch } = yield call(analyticSaga)

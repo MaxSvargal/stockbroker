@@ -1,81 +1,67 @@
 import debug from 'debug'
-import { all, call, fork, put, select } from 'redux-saga/effects'
+import { call, fork, put, select } from 'redux-saga/effects'
 
 import { CandleData } from 'shared/types'
-import { execNewOrder, addMACDResult } from 'shared/actions'
-import { round, tail } from 'shared/lib/helpers'
+import { execNewOrder, addMACDResult, addRVIResult } from 'shared/actions'
+import { round, tail, now } from 'shared/lib/helpers'
 import {
   selectCandles, selectLowestLow, selectHighestHigh,
-  selectMACDResults, selectHighestBids, selectLowestAsks
+  selectLastMACDResult, selectHighestBids, selectLowestAsks,
+  selectLastRVIResult
 } from 'shared/sagas/selectors'
 
 import stochasticOscillator from 'shared/lib/stochasticOscillator'
 import MACDHistogram from 'shared/lib/macdHistogram'
 import relativeVigorIndex from 'shared/lib/relativeVigorIndex'
 
-const pair = process.env.PAIR
-const symbol = `t${pair}`
+const { PAIR } = process.env
+const symbol = `t${PAIR}`
 const candlesKey = `trade:1m:${symbol}`
 
 const stochasticLength = 39
 const MACDFastLength = 12
 const MACDLongLength = 26
 
-type TradePositions = {
-  buy: boolean,
-  sell: boolean
-}
+import { __, and, all, lt, gt, ifElse, always, equals, propEq, last, nth } from 'ramda'
 
-// 6000 / 5970 = 1.005%
-// нереализованные чанки
+const conditionOfTradePosition =
+  ifElse(
+    propEq('buy', true),
+    always(1),
+    ifElse(
+      propEq('sell', true),
+      always(-1),
+      always(0)
+    ))
 
-export const checkRVISignal = (() => {
-  let prevA: number
-  let prevS: number
-  let buyState = true
-  let sellState = false
+export const checkRVIState =
+  (prevA: number, prevS: number, currA: number, currS: number): number =>
+    conditionOfTradePosition({
+      buy: and(lt(prevA, prevS), gt(currA, currS)),
+      sell: and(gt(prevA, prevS), lt(currA, currS))
+    })
 
-  return (currA: number, currS: number) => () => {
-    const localBuyState = prevA < prevS && currA > currS
-    const localSellState = prevA > prevS && currA < currS
+export const checkMACDState =
+  (prev: number, curr: number): number =>
+    conditionOfTradePosition({
+      buy: and(lt(prev, 0), gt(curr, 0)),
+      sell: and(gt(prev, 0), lt(curr, 0))
+    })
 
-    if (localBuyState !== buyState) debug('worker')(`RVI signal to buy from ${buyState} to ${localBuyState}`)
-    if (localSellState !== sellState) debug('worker')(`RVI signal to sell from: ${sellState} to ${localSellState}`)
+const isPositive = gt(__,  0)
+const isNegative = lt(__,  0)
+const isAboveOne = gt(__, 1)
+const isTrue = equals(__, true)
+const isLower = (val: number) => lt(__, val)
+const isGreater = (val: number) => gt(__, val)
 
-    buyState = localSellState ? false : (localBuyState || buyState)
-    sellState = localBuyState ? false : (localSellState || sellState)
-
-    const conclj = {
-      buy: buyState || localBuyState,
-      sell: sellState || localSellState
-    }
-
-    prevA = currA
-    prevS = currS
-    return conclj
-  }
-})()
-
-export const approveMACDSignal = (() => {
-  let prev: number
-  return (curr: number) =>
-    ({ buy, sell }: TradePositions) => () => {
-      const result = {
-        buy: (buy && (prev < 0 && curr > 0)),
-        sell: (sell && (prev > 0 && curr < 0)) // may be instantly?
-      }
-      prev = curr
-      return result
-    }
-})()
-
-const logResults = (stoch: number) => ({ buy, sell }: TradePositions) => {
-  debug('worker')(`Functional Signal. Buy: ${buy}, Sell: ${sell}`)
-  return { status: (buy || sell), stoch }
-}
-
-const waterfall = (...fns: Function[]) =>
-  fns.reduce((a, b) => b(a()))
+type GetDecision = { macd: number, rvi: number, rviValue: number, stochValue: number, macdValue: number }
+export const getDecision =
+  ({ macd, rvi, rviValue, stochValue, macdValue }: GetDecision): number =>
+    conditionOfTradePosition({
+      buy: all(isTrue, [ isPositive(macd), isNegative(rviValue), isLower(85)(stochValue) ]),
+      sell: all(isTrue, [ isNegative(rvi), isPositive(rviValue), isGreater(50)(stochValue), isAboveOne(macdValue) ])
+    })
 
 export default function* analyticSaga() {
   const [ [ ask ] ] = yield select(selectLowestAsks)
@@ -83,6 +69,8 @@ export default function* analyticSaga() {
   const candles = yield select(selectCandles, candlesKey, stochasticLength)
   const lowestLow = yield select(selectLowestLow, candlesKey, stochasticLength)
   const highestHigh = yield select(selectHighestHigh, candlesKey, stochasticLength)
+  const [ , prevMACDResult ] = yield select(selectLastMACDResult, symbol)
+  const [ , prevRVIAverage, prevRVISignal ] = yield select(selectLastRVIResult, symbol)
 
   const closePrices = candles.map((c: number[]) => c[2])
   const closePricesWithVolumes = candles.map((c: number[]) => [ c[2], c[5] ])
@@ -92,17 +80,22 @@ export default function* analyticSaga() {
   const currentMACD = MACDHistogram(closePrices, MACDFastLength, MACDLongLength)
   const [ RVIaverage, RVIsignal ] = relativeVigorIndex(candles)
 
-  yield put(addMACDResult({ symbol, value: currentMACD }))
+  // TODO: check enabled signal from RVI and then buy on MACD signal
+  //// then turn off rvi state and wait for next RVI signal
+  const decision = getDecision({
+    macd: checkMACDState(prevMACDResult, currentMACD),
+    rvi: checkRVIState(prevRVIAverage, prevRVISignal, RVIaverage, RVIsignal),
+    rviValue: RVIaverage,
+    stochValue: currentStochastic,
+    macdValue: prevMACDResult
+  })
 
-  const macdResults = yield select(selectMACDResults, symbol, 5)
-  const macd = macdResults.map((m: number) => round(m, 4))
-  const currMACD = tail(macd)
-  const stoch = round(currentStochastic, 4)
+  yield put(addMACDResult({ symbol, time: now(), value: currentMACD }))
+  yield put(addRVIResult({ symbol, time: now(), average: RVIaverage, signal: RVIsignal }))
 
-  debug('worker')(`=== ${symbol} ${bid} / ${ask} / ${closePrice} | MACD ${tail(macd)} | STH ${stoch} | RVI ${round(RVIaverage)} / ${round(RVIsignal)}`)
+  debug('worker')(`=== ${symbol} ${bid} / ${ask} / ${closePrice} | MACD ${round(currentMACD)} | STH ${round(currentStochastic)} | RVI ${round(RVIaverage)} / ${round(RVIsignal)}`)
+  decision === 1 && debug('worker')(`Buy signal for ${bid}`)
+  decision === -1 && debug('worker')(`Sell signal for ${ask}`)
 
-  return waterfall(
-    checkRVISignal(RVIaverage, RVIsignal),
-    approveMACDSignal(currMACD),
-    logResults(stoch))
+  return { status: false }
 }

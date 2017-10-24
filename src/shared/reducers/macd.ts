@@ -1,20 +1,14 @@
-import { combineReducers } from 'redux'
 import { createReducer } from 'redux-act'
+import { append, assoc, prop } from 'ramda'
 import { addMACDResult, clearMACDResults } from 'shared/actions'
-import { TickerData } from 'shared/types'
 
-export type MACDState = {
-  [symbol: string]: number[]
-}
-
+export type MACDState = { [symbol: string]: [ number, number ][] }
 const macdReducer = createReducer<MACDState>({}, {})
 
-macdReducer.on(addMACDResult, (state, { symbol, value }) =>
-  state[symbol].slice(-1)[0] !== value ?
-    { ...state, [symbol]: [ ...state[symbol], value ] } :
-    state)
+macdReducer.on(addMACDResult, (state, { symbol, time, value }) =>
+  assoc(symbol, append([ time, value ], prop(symbol, state)), state))
 
 macdReducer.on(clearMACDResults, (state, { symbol }) =>
-  ({ ...state, [symbol]: [] }))
+  assoc(symbol, [], state))
 
 export default macdReducer

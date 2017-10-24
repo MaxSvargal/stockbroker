@@ -1,5 +1,10 @@
 {
   "compilerOptions": {
+    "paths": {
+      "rambda": [
+        "node_modules/npm-ramda/index"
+      ]
+    },
     "module": "commonjs",
     "target": "esnext",
     "baseUrl": "./src",

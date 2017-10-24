@@ -14,7 +14,7 @@ const sagaMiddleware = createSagaMiddleware()
 const db = new ReduxRedisPersist({
   prefix: ACCOUNT,
   avalialbleToSet: [ 'asks', 'bids', 'wallet', 'candles', 'tickers' ],
-  avalialbleToSubscribe: [ 'macd' ]
+  avalialbleToSubscribe: [ 'macd', 'rsi' ]
 })
 
 const rootReducer = getRootReducer(db)

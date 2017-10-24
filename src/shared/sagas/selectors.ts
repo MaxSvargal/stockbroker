@@ -1,9 +1,11 @@
 import { symbolToPairArr } from 'shared/lib/helpers'
+import { pathOr, last, ifElse } from 'ramda'
 
 import { AsksState } from 'shared/reducers/asks'
 import { BidsState } from 'shared/reducers/bids'
 import { CandlesState } from 'shared/reducers/candles'
 import { MACDState } from 'shared/reducers/macd'
+import { RVIState } from 'shared/reducers/rvi'
 import { OrdersState } from 'shared/reducers/orders'
 import { TickersState } from 'shared/reducers/tickers'
 import { WalletState } from 'shared/reducers/wallet'
@@ -13,6 +15,7 @@ export type State = {
   bids: BidsState,
   candles: CandlesState,
   macd: MACDState,
+  rvi: RVIState,
   orders: OrdersState,
   tickers: TickersState,
   wallet: WalletState,
@@ -65,5 +68,8 @@ export const selectAmountToSell = ({ wallet }: State, symbol: string) => {
   return matches && wallet.exchange ? wallet.exchange[matches[1]].balance : 0
 }
 
-export const selectMACDResults = ({ macd }: State, symbol: string, length: number) =>
-  macd[symbol].slice(-length)
+export const selectLastMACDResult = ({ macd }: State, symbol: string) =>
+  last(<number[]>pathOr([ [] ], [ symbol ], macd))
+
+export const selectLastRVIResult = ({ rvi }: State, symbol: string) =>
+  last(<number[]>pathOr([ [] ], [ symbol ], rvi))

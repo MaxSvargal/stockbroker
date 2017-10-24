@@ -1,7 +1,6 @@
 import { expectSaga } from 'redux-saga-test-plan'
 
 import tradesReducer from 'shared/reducers/trades'
-import orderBookReducer from 'shared/reducers/orderbook'
 import candlesReducer from 'shared/reducers/candles'
 import walletReducer from 'shared/reducers/wallet'
 import * as channelsSagas from '../bitfinexChannelsSaga'
@@ -32,21 +31,6 @@ test('tradeChannelSaga should store update correctly', () => {
       tBTCUSD: {
         69345500: [ 1506028430000, -0.1, 3662.6 ]
       }
-    })
-    .run()
-})
-
-test('orderBookChannelSaga should store snapshot correctly', () => {
-  const args = [ 'tBTCUSD', [ [ 3660.2, 1, 1.9978 ], [ 3660, 2, 0.50199077 ] ] ]
-
-  return expectSaga(channelsSagas.orderBookChannelSaga, ...args)
-    .withReducer(orderBookReducer)
-    .hasFinalState({
-      bid: {
-        '3660.2': [ 3660.2, 1, 1.9978 ],
-        '3660': [ 3660, 2, 0.50199077 ]
-      },
-      ask: {}
     })
     .run()
 })
