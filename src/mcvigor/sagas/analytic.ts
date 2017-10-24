@@ -66,11 +66,12 @@ export const getDecision =
 export default function* analyticSaga() {
   const [ [ ask ] ] = yield select(selectLowestAsks)
   const [ [ bid ] ] = yield select(selectHighestBids)
+  const [ , prevMACDResult ] = yield select(selectLastMACDResult, symbol)
+  const [ , prevRVIAverage, prevRVISignal ] = yield select(selectLastRVIResult, symbol)
+
   const candles = yield select(selectCandles, candlesKey, stochasticLength)
   const lowestLow = yield select(selectLowestLow, candlesKey, stochasticLength)
   const highestHigh = yield select(selectHighestHigh, candlesKey, stochasticLength)
-  const [ , prevMACDResult ] = yield select(selectLastMACDResult, symbol)
-  const [ , prevRVIAverage, prevRVISignal ] = yield select(selectLastRVIResult, symbol)
 
   const closePrices = candles.map((c: number[]) => c[2])
   const closePricesWithVolumes = candles.map((c: number[]) => [ c[2], c[5] ])
@@ -82,6 +83,7 @@ export default function* analyticSaga() {
 
   // TODO: check enabled signal from RVI and then buy on MACD signal
   //// then turn off rvi state and wait for next RVI signal
+  //// because double buys executed
   const decision = getDecision({
     macd: checkMACDState(prevMACDResult, currentMACD),
     rvi: checkRVIState(prevRVIAverage, prevRVISignal, RVIaverage, RVIsignal),
@@ -94,8 +96,8 @@ export default function* analyticSaga() {
   yield put(addRVIResult({ symbol, time: now(), average: RVIaverage, signal: RVIsignal }))
 
   debug('worker')(`=== ${symbol} ${bid} / ${ask} / ${closePrice} | MACD ${round(currentMACD)} | STH ${round(currentStochastic)} | RVI ${round(RVIaverage)} / ${round(RVIsignal)}`)
-  decision === 1 && debug('worker')(`Buy signal for ${bid}`)
-  decision === -1 && debug('worker')(`Sell signal for ${ask}`)
+  decision === 1 && debug('worker')(`Buy signal for ${ask}`)
+  decision === -1 && debug('worker')(`Sell signal for ${bid}`)
 
   return { status: false }
 }
