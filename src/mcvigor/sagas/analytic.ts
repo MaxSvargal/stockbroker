@@ -1,28 +1,32 @@
 import debug from 'debug'
 import { call, fork, put, select } from 'redux-saga/effects'
+import { __, either, reduce, concat, map, append, chain, curry, partial, apply, isEmpty, both, cond, compose, and, all, any, lt, gt, ifElse, always, equals, propEq, last, nth } from 'ramda'
 
 import { CandleData } from 'shared/types'
-import { execNewOrder, addMACDResult, addRVIResult } from 'shared/actions'
+import { execNewOrder, addMACDResult, addRVIResult, addStochResult } from 'shared/actions'
 import { round, tail, now } from 'shared/lib/helpers'
 import {
   selectCandles, selectLowestLow, selectHighestHigh,
-  selectLastMACDResult, selectHighestBids, selectLowestAsks,
-  selectLastRVIResult
+  selectLastMACDResults, selectHighestBids, selectLowestAsks,
+  selectLastRVIResults, selectActivePositions, selectLastStochasticResults
 } from 'shared/sagas/selectors'
 
 import stochasticOscillator from 'shared/lib/stochasticOscillator'
 import MACDHistogram from 'shared/lib/macdHistogram'
 import relativeVigorIndex from 'shared/lib/relativeVigorIndex'
 
-const { PAIR } = process.env
-const symbol = `t${PAIR}`
-const candlesKey = `trade:1m:${symbol}`
-
-const stochasticLength = 39
+const candlesLength = 39
 const MACDFastLength = 12
 const MACDLongLength = 26
 
-import { __, and, all, lt, gt, ifElse, always, equals, propEq, last, nth } from 'ramda'
+const isPositive = gt(__,  0)
+const isNegative = lt(__,  0)
+const isTrue = equals(__, true)
+const isLower = (val: number) => lt(__, val)
+const isGreater = (val: number) => gt(__, val)
+
+const getValueOfPrev = compose(nth(1), nth(0))
+const getValueOfCurr = compose(nth(1), either(nth(1), nth(0)))
 
 const conditionOfTradePosition =
   ifElse(
@@ -48,56 +52,61 @@ export const checkMACDState =
       sell: and(gt(prev, 0), lt(curr, 0))
     })
 
-const isPositive = gt(__,  0)
-const isNegative = lt(__,  0)
-const isAboveOne = gt(__, 1)
-const isTrue = equals(__, true)
-const isLower = (val: number) => lt(__, val)
-const isGreater = (val: number) => gt(__, val)
-
 type GetDecision = { macd: number, rvi: number, rviValue: number, stochValue: number, macdValue: number }
 export const getDecision =
   ({ macd, rvi, rviValue, stochValue, macdValue }: GetDecision): number =>
     conditionOfTradePosition({
       buy: all(isTrue, [ isPositive(macd), isNegative(rviValue), isLower(85)(stochValue) ]),
-      sell: all(isTrue, [ isNegative(rvi), isPositive(rviValue), isGreater(50)(stochValue), isAboveOne(macdValue) ])
+      sell: all(isTrue, [ isNegative(rvi), isPositive(rviValue), isGreater(50)(stochValue), isGreater(1)(macdValue) ])
     })
 
-export default function* analyticSaga() {
-  const [ [ ask ] ] = yield select(selectLowestAsks)
-  const [ [ bid ] ] = yield select(selectHighestBids)
-  const [ , prevMACDResult ] = yield select(selectLastMACDResult, symbol)
-  const [ , prevRVIAverage, prevRVISignal ] = yield select(selectLastRVIResult, symbol)
-
-  const candles = yield select(selectCandles, candlesKey, stochasticLength)
-  const lowestLow = yield select(selectLowestLow, candlesKey, stochasticLength)
-  const highestHigh = yield select(selectHighestHigh, candlesKey, stochasticLength)
+export function* saveAnalyticsSaga(symbol: string) {
+  const candlesKey = `trade:1m:${symbol}`
+  const candles = yield select(selectCandles, candlesKey, candlesLength)
+  const lowestLow = yield select(selectLowestLow, candlesKey, candlesLength)
+  const highestHigh = yield select(selectHighestHigh, candlesKey, candlesLength)
 
   const closePrices = candles.map((c: number[]) => c[2])
-  const closePricesWithVolumes = candles.map((c: number[]) => [ c[2], c[5] ])
-  const closePrice = tail(closePrices)
-
-  const currentStochastic = stochasticOscillator(tail(closePrices), lowestLow, highestHigh)
-  const currentMACD = MACDHistogram(closePrices, MACDFastLength, MACDLongLength)
+  const stochValue = stochasticOscillator(tail(closePrices), lowestLow, highestHigh)
+  const macdValue = MACDHistogram(closePrices, MACDFastLength, MACDLongLength)
   const [ RVIaverage, RVIsignal ] = relativeVigorIndex(candles)
 
-  // TODO: check enabled signal from RVI and then buy on MACD signal
-  //// then turn off rvi state and wait for next RVI signal
-  //// because double buys executed
-  const decision = getDecision({
-    macd: checkMACDState(prevMACDResult, currentMACD),
-    rvi: checkRVIState(prevRVIAverage, prevRVISignal, RVIaverage, RVIsignal),
-    rviValue: RVIaverage,
-    stochValue: currentStochastic,
-    macdValue: prevMACDResult
-  })
-
-  yield put(addMACDResult({ symbol, time: now(), value: currentMACD }))
+  yield put(addStochResult({ symbol, time: now(), value: stochValue }))
+  yield put(addMACDResult({ symbol, time: now(), value: macdValue }))
   yield put(addRVIResult({ symbol, time: now(), average: RVIaverage, signal: RVIsignal }))
 
-  debug('worker')(`=== ${symbol} ${bid} / ${ask} / ${closePrice} | MACD ${round(currentMACD)} | STH ${round(currentStochastic)} | RVI ${round(RVIaverage)} / ${round(RVIsignal)}`)
-  decision === 1 && debug('worker')(`Buy signal for ${ask}`)
-  decision === -1 && debug('worker')(`Sell signal for ${bid}`)
+  yield fork(logResults, symbol, stochValue, macdValue, [ RVIaverage, RVIsignal ])
+}
 
-  return { status: false }
+export function* logResults(symbol: string, stoch: number, macd: number, rvi: number[]) {
+  const [ bid ] = yield select(selectHighestBids)
+  const [ ask ] = yield select(selectLowestAsks)
+  debug('worker')(`=== ${symbol} ${bid[0]} / ${ask[0]} | MACD ${round(macd)} | STH ${round(stoch)} | RVI ${round(rvi[0])} / ${round(rvi[1])}`)
+}
+
+export function* analyticSaga(symbol: string) {
+  const candlesKey = `trade:1m:${symbol}`
+  const stochResults = yield select(selectLastStochasticResults, symbol, 1)
+  const macdResults = yield select(selectLastMACDResults, symbol, 2)
+  const rviResults = yield select(selectLastRVIResults, symbol, 2)
+
+  return  {
+    status:
+      any(isEmpty)([ macdResults, rviResults, stochResults ]) ? 0 :
+        <-1|0|1>getDecision({
+          macd: checkMACDState(
+            getValueOfPrev(macdResults),
+            getValueOfCurr(macdResults)
+          ),
+          rvi: checkRVIState(
+            nth(0, getValueOfPrev(rviResults)),
+            nth(1, getValueOfPrev(rviResults)),
+            nth(0, getValueOfCurr(rviResults)),
+            nth(1, getValueOfCurr(rviResults))
+          ),
+          macdValue: getValueOfCurr(macdResults),
+          rviValue: nth(0, getValueOfCurr(rviResults)),
+          stochValue: getValueOfPrev(stochResults)
+        })
+  }
 }

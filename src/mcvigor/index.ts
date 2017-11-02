@@ -9,7 +9,7 @@ export default createStore({
   rootSaga,
   db: {
     prefix: ACCOUNT,
-    avalialbleToSet: [ 'macd', 'rsi' ],
+    avalialbleToSet: [ 'macd', 'rvi', 'stoch', 'positions' ],
     avalialbleToSubscribe: [ 'asks', 'bids', 'wallet', 'candles', 'tickers' ]
   },
   account: ACCOUNT

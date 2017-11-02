@@ -16,12 +16,12 @@ export const RVIofPeriod = (candles: CandleData[]) => {
   const movAverage = (
     (firstCandle[2] - firstCandle[1]) +
     (lastCandle[2] - lastCandle[1]) +
-    middleCandles.map(c => 2 * (c[2] - c[1])).reduce((a, b) => a + b))
+    middleCandles.length === 0 ? 0 : middleCandles.map(c => 2 * (c[2] - c[1])).reduce((a, b) => a + b, 0))
 
   const rangeAverage = (
     (firstCandle[3] - firstCandle[4]) +
     (lastCandle[3] - lastCandle[4]) +
-    middleCandles.map(c => 2 * (c[3] - c[4])).reduce((a, b) => a + b))
+    middleCandles.length === 0 ? 0 : middleCandles.map(c => 2 * (c[3] - c[4])).reduce((a, b) => a + b, 0))
 
   const RVIaverage = movAverage / rangeAverage
   return RVIaverage

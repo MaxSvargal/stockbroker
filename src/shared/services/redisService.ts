@@ -11,11 +11,13 @@ export default class ReduxRedisPersist {
   private avalialbleToSubscribe?: string[] = []
   private store: Store<{}>
   private prefix?: string = ''
+  private dbIndex?: number = 0
+  private channelRegExp = new RegExp(`__keyspace@${this.dbIndex}__:(.+)__(.+)`)
   private SET_REDUCER = '@@redux-redix-persist/SET_REDUCER'
 
   constructor(options: { prefix?: string, avalialbleToSet?: string[], avalialbleToSubscribe?: string[] }) {
-    this.publisher = redis.createClient({ db: 1 })
-    this.subscriber = redis.createClient({ db: 1 })
+    this.publisher = redis.createClient({ db: this.dbIndex })
+    this.subscriber = redis.createClient({ db: this.dbIndex })
     this.prefix = options.prefix
     this.avalialbleToSet = options.avalialbleToSet
     this.avalialbleToSubscribe = options.avalialbleToSubscribe
@@ -25,7 +27,7 @@ export default class ReduxRedisPersist {
   }
 
   private onUpdateReceive(channel: string, type: string) {
-    const [ , prefix = null, reducer = null ] = channel.match(/__keyspace@1__:(.+)__(.+)/) || []
+    const [ , prefix = null, reducer = null ] = this.channelRegExp.exec(channel) || []
     if (prefix === this.prefix && reducer) {
       this.getReducer(`${prefix}__${reducer}`)
         .then(state => this.setReducer(reducer, state))
@@ -75,7 +77,7 @@ export default class ReduxRedisPersist {
           if (state === nextState)
             return state
           else {
-            if (avalialbleToSet && avalialbleToSet.includes(options.name))
+            if (state && avalialbleToSet && avalialbleToSet.includes(options.name))
               process.nextTick(() => this.saveReducer(selector, nextState))
             return nextState
           }

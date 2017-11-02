@@ -1,12 +1,14 @@
+import { __, takeLast, chain, allPass, propEq, propSatisfies, not, pathOr, last, filter, has, prop, compose, map, concat, reduce, curry, contains } from 'ramda'
 import { symbolToPairArr } from 'shared/lib/helpers'
-import { pathOr, last, ifElse } from 'ramda'
 
 import { AsksState } from 'shared/reducers/asks'
 import { BidsState } from 'shared/reducers/bids'
 import { CandlesState } from 'shared/reducers/candles'
 import { MACDState } from 'shared/reducers/macd'
-import { RVIState } from 'shared/reducers/rvi'
 import { OrdersState } from 'shared/reducers/orders'
+import { PositionsState } from 'shared/reducers/positions'
+import { RVIState } from 'shared/reducers/rvi'
+import { StochState } from 'shared/reducers/stoch'
 import { TickersState } from 'shared/reducers/tickers'
 import { WalletState } from 'shared/reducers/wallet'
 
@@ -15,11 +17,28 @@ export type State = {
   bids: BidsState,
   candles: CandlesState,
   macd: MACDState,
-  rvi: RVIState,
   orders: OrdersState,
+  positions: PositionsState,
+  rvi: RVIState,
+  stoch: StochState,
   tickers: TickersState,
   wallet: WalletState,
 }
+
+export const selectActivePositions = ({ positions }: State, symbol: string) =>
+  chain(
+    curry((ids: number[]) =>
+      filter(allPass([
+        propEq('symbol', symbol),
+        propSatisfies(not, 'covered'),
+        propSatisfies(compose(not, contains(__, ids)), 'id')
+      ])
+    )),
+    compose(
+      reduce(concat, []),
+      map(prop('covered')),
+      filter(has('covered')))
+  )(positions)
 
 const objKeysOfKey = (obj: { [key: string]: any }, key: string) => Object.keys((obj && obj[key]) || {}).sort((a, b) => Number(a) - Number(b))
 const tailOfArray = (arr: any[], limit: number) => arr.slice(arr.length - 1 - limit, arr.length)
@@ -50,14 +69,6 @@ export const selectLowestAsks = ({ asks }: State) => {
   return [ asks[prices[0]] || [], asks[prices[1]] || [] ]
 }
 
-// export const selectActiveOrder = ({ orders }: State, symbol: string, type: 'buy' | 'sell') => {
-//   const activeOrder = Object.keys(orders).find(a => {
-//     const o = orders[a]
-//     return o[3] === symbol && o[13] === 'ACTIVE' && (type === 'buy' ? o[6] > 0 : o[6] < 0)
-//   })
-//   return activeOrder ? orders[activeOrder] : null
-// }
-
 export const selectAmountToBuy = ({ wallet }: State, symbol: string) => {
   const matches = symbolToPairArr(symbol)
   return matches && wallet.exchange ? wallet.exchange[matches[2]].balance : 0
@@ -68,8 +79,15 @@ export const selectAmountToSell = ({ wallet }: State, symbol: string) => {
   return matches && wallet.exchange ? wallet.exchange[matches[1]].balance : 0
 }
 
-export const selectLastMACDResult = ({ macd }: State, symbol: string) =>
-  last(<number[]>pathOr([ [] ], [ symbol ], macd))
+const getArrayPartOfObj =
+  curry((symbol: string, length: number) =>
+    compose(takeLast(length), pathOr([], [ symbol ])))
 
-export const selectLastRVIResult = ({ rvi }: State, symbol: string) =>
-  last(<number[]>pathOr([ [] ], [ symbol ], rvi))
+export const selectLastMACDResults = ({ macd }: State, symbol: string, length: number) =>
+  getArrayPartOfObj(symbol)(length)(macd)
+
+export const selectLastRVIResults = ({ rvi }: State, symbol: string, length: number) =>
+  getArrayPartOfObj(symbol)(length)(rvi)
+
+export const selectLastStochasticResults = ({ stoch }: State, symbol: string, length: number) =>
+  getArrayPartOfObj(symbol)(length)(stoch)

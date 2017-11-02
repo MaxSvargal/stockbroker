@@ -1,9 +1,10 @@
 import { all, call, take, fork, put } from 'redux-saga/effects'
 import { eventChannel, delay, END, SagaIterator } from 'redux-saga'
 import { BFX } from 'bitfinex-api-node'
-import { OrderBookData, TradeData, WalletData, CandleData, TickerData, OrderData, PAIR } from 'shared/types'
+import { OrderBookData, TradeData, WalletData, CandleData, TickerData, OrderData, MyTradeData, PAIR } from 'shared/types'
 import debug from 'debug'
 import * as actions from '../actions'
+import { updateMyTrade } from 'shared/actions'
 
 export const channel = (bws: BFX, name: string) => eventChannel(emitter => {
   bws.on(name, (...data: any[]) => emitter(data))
@@ -76,9 +77,9 @@ export function* orderCancelChannelSaga(data: OrderData) {
 //   yield put(actions.newMyTrade)
 // }
 //
-// export function* updateMyTradeChannelSaga(data: MyTradesData) {
-//   yield put(actions.updateMyTrade)
-// }
+export function* updateMyTradeChannelSaga(data: MyTradeData) {
+  yield put(updateMyTrade(data))
+}
 
 export default function* runChannels(bws: BFX) {
   yield all([
@@ -93,6 +94,6 @@ export default function* runChannels(bws: BFX) {
     fork(channelSaga, bws, 'ou', orderUpdateChannelSaga),
     fork(channelSaga, bws, 'oc', orderCancelChannelSaga),
     // fork(channelSaga, bws, 'te', newMyTradeChannelSaga),
-    // fork(channelSaga, bws, 'tu', updateMyTradeChannelSaga),
+    fork(channelSaga, bws, 'tu', updateMyTradeChannelSaga),
   ])
 }

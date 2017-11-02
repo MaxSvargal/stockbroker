@@ -1,4 +1,66 @@
-import { checkRVIState, checkMACDState, getDecision } from '../analytic'
+import { expectSaga } from 'redux-saga-test-plan'
+
+import { analyticSaga, checkRVIState, checkMACDState, getDecision } from '../analytic'
+
+test('analyticSaga should return buy signal correctly', () => {
+  const symbol = 'tBTCUSD'
+  const candlesKey = `trade:1m:${symbol}`
+  const storeState = {
+    macd: {
+      [symbol]: [
+        [ 1509027483635, -2 ],
+        [ 1509027483636, 2 ]
+      ]
+    },
+    stoch: {
+      [symbol]: [
+        [ 1509027483635, 30 ],
+        [ 1509027483636, 39 ]
+      ]
+    },
+    rvi: {
+      [symbol]: [
+        [ 1509027483635, [ -1, -1.1 ] ],
+        [ 1509027483636, [ -2, -1.9 ] ]
+      ]
+    }
+  }
+
+  return expectSaga(analyticSaga, symbol)
+    .withState(storeState)
+    .returns({ status: 1 })
+    .run()
+})
+
+test('analyticSaga should return sell signal correctly', () => {
+  const symbol = 'tBTCUSD'
+  const candlesKey = `trade:1m:${symbol}`
+  const storeState = {
+    macd: {
+      [symbol]: [
+        [ 1509027483635, -1 ],
+        [ 1509027483636, 2 ]
+      ]
+    },
+    stoch: {
+      [symbol]: [
+        [ 1509027483635, 50 ],
+        [ 1509027483636, 51 ]
+      ]
+    },
+    rvi: {
+      [symbol]: [
+        [ 1509027483635, [ 1, -2 ] ],
+        [ 1509027483636, [ 1, 2 ] ],
+      ]
+    }
+  }
+
+  return expectSaga(analyticSaga, symbol)
+    .withState(storeState)
+    .returns({ status: -1 })
+    .run()
+})
 
 test('checkRVI should work correctly', () => {
   expect(checkRVIState(1, 2, 2, 1)).toEqual(1)
@@ -41,6 +103,3 @@ test('getDecision shouldn\'t return sell signal (0) when RVI signal cross up the
 test('getDecision shouldn\'t return sell signal (0) when Stochastic is lower then 50', () => {
   expect(getDecision({ macd: 0, rvi: -1, rviValue: 1, stochValue: 51, macdValue: 0 })).toEqual(0)
 })
-
-test.skip('getDecision should return sell signal (false) when MACD cross down the zero')
-test.skip('getDecision should return buy signal (true) when RVI near zero and cross down the average twice')

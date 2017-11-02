@@ -1,16 +1,13 @@
 import { createReducer } from 'redux-act'
-import { append, assoc, prop } from 'ramda'
+import { __, append, assoc, prop, find, propEq, and, map, contains, merge, always, ifElse, compose } from 'ramda'
 
-import { openPosition, closePosition } from 'shared/actions'
-import { PosisionPayload } from 'shared/types'
+import { createPosition } from 'shared/actions'
+import { PositionPayload } from 'shared/types'
 
-export type PositionsState = PosisionPayload[]
-const positionsReducer = createReducer<PositionsState>({}, [])
+export type PositionsState = PositionPayload[]
+const positionsReducer = createReducer({}, <PositionsState>[])
 
-positionsReducer.on(openPosition, (state, payload: PosisionPayload) =>
-  append(payload, state))
-
-positionsReducer.on(closePosition, (state, payload: PosisionPayload) =>
+positionsReducer.on(createPosition, (state, payload: PositionPayload) =>
   append(payload, state))
 
 export default positionsReducer
