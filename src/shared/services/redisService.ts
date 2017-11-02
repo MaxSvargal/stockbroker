@@ -11,7 +11,7 @@ export default class ReduxRedisPersist {
   private avalialbleToSubscribe?: string[] = []
   private store: Store<{}>
   private prefix?: string = ''
-  private dbIndex?: number = 0
+  private dbIndex?: number = 1
   private channelRegExp = new RegExp(`__keyspace@${this.dbIndex}__:(.+)__(.+)`)
   private SET_REDUCER = '@@redux-redix-persist/SET_REDUCER'
 
@@ -69,9 +69,8 @@ export default class ReduxRedisPersist {
     return (state: {}, action: { type: string, reducer?: string, state?: {} }) => {
       switch (action.type) {
         case SET_REDUCER:
-          if (action.reducer === options.name && action.state) {
-            return reducer(action.state, action)
-          }
+          return action.reducer === options.name && action.state ?
+            reducer(action.state, action) : state
         default:
           const nextState = reducer(state, action)
           if (state === nextState)
