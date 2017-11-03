@@ -73,12 +73,14 @@ export function* orderCancelChannelSaga(data: OrderData) {
   yield put(actions.cancelOrder(data))
 }
 
-// export function* newMyTradeChannelSaga(data: MyTradesData) {
-//   yield put(actions.newMyTrade)
-// }
-//
+export function* newMyTradeChannelSaga(data: MyTradeData) {
+  yield put(updateMyTrade(data)) // TODO
+  debug('worker')(data, 'newMyTradeChannelSaga')
+}
+
 export function* updateMyTradeChannelSaga(data: MyTradeData) {
   yield put(updateMyTrade(data))
+  debug('worker')(data, 'updateMyTradeChannelSaga')
 }
 
 export default function* runChannels(bws: BFX) {
@@ -93,7 +95,7 @@ export default function* runChannels(bws: BFX) {
     fork(channelSaga, bws, 'on', orderNewChannelSaga),
     fork(channelSaga, bws, 'ou', orderUpdateChannelSaga),
     fork(channelSaga, bws, 'oc', orderCancelChannelSaga),
-    // fork(channelSaga, bws, 'te', newMyTradeChannelSaga),
+    fork(channelSaga, bws, 'te', newMyTradeChannelSaga),
     fork(channelSaga, bws, 'tu', updateMyTradeChannelSaga),
   ])
 }
