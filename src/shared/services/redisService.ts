@@ -13,7 +13,7 @@ export default class ReduxRedisPersist {
   private prefix?: string = ''
   private dbIndex?: number = 1
   private channelRegExp = new RegExp(`__keyspace@${this.dbIndex}__:(.+)__(.+)`)
-  private SET_REDUCER = '@@redux-redix-persist/SET_REDUCER'
+  private SET_REDUCER = '@@redux-redis-persist/SET_REDUCER'
 
   constructor(options: { prefix?: string, avalialbleToSet?: string[], avalialbleToSubscribe?: string[] }) {
     this.publisher = redis.createClient({ db: this.dbIndex })
