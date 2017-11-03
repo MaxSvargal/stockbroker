@@ -31,12 +31,12 @@ export function getChunkAmountForStochastic(fullAmount: number, stochastic: numb
   return Math.round(chunkAmount * 1e4) / 1e4
 }
 
-export function* getChunkAmount(symbol: string, stoch: number) {
+export function* getChunkAmount(symbol: string, stoch?: number) {
   const amountToSell = yield select(selectAmountToSell, symbol)
   const amountToBuy = yield select(selectAmountToBuy, symbol)
   const currentPrice = yield select(selectCurrentPrice, symbol)
   const fullAmount = amountToSell + (amountToBuy / currentPrice)
-  return getChunkAmountForStochastic(fullAmount, stoch)
+  return Math.round((fullAmount / 5) * 1e4) / 1e4 // getChunkAmountForStochastic(fullAmount, stoch)
 }
 
 export function* doBuySaga(symbol: string, time = now()) {
@@ -45,29 +45,43 @@ export function* doBuySaga(symbol: string, time = now()) {
   const amount = chunkAmount < 0.005 ? 0.005 : chunkAmount
   const price = ask[2] >= amount * 2 ? ask[0] : reserveAsk[0]
 
+  debug('worker')(`Request to buy ${amount} for ${price} of ${symbol}...`)
+
   yield put(execNewOrder({ symbol, amount, price }))
-  // const { payload } = yield take(updateMyTrade)
-  // const [ id, mts ] = [ nth(0, payload), nth(4, payload) ]
-  // await for cid and mts?
-  yield put(createPosition({ symbol, price, amount, cid: 0, id: time, mts: time }))
+  const { payload } = yield take(updateMyTrade)
+  const [ id, tradeSymbol, mts, orderId, tradeAmount,
+    tradePrice, orderType, orderPrice, maker, fee, feeCurrency ] = payload
+
+  if (tradeSymbol === symbol && orderPrice === price) {
+    if (tradeAmount !== amount) yield take(updateMyTrade)
+    yield put(createPosition({
+      id, symbol, amount, mts, fee, feeCurrency, maker, price: tradePrice
+    }))
+  }
+
   debug('worker')(`Exchange ${amount} for ${price} of ${symbol}`)
 }
 
 export function* doSellSaga(symbol: string, coverPos: PositionPayload) {
   const [ bid, reserveBid ] = yield select(selectHighestBids)
   const coverProp = prop(__, coverPos)
-  // const chunkAmount = -0.005 // yield call(getChunkAmount, symbol, stoch)
   const amount = coverProp('amount')
   const price = bid[2] >= amount * 2 ? bid[0] : reserveBid[0]
   const profit = getProfit(coverProp('price'))(price)(amount)(0.002)
 
+  debug('worker')(`Request to sell ${amount} for ${price} of ${symbol}...`)
+
   yield put(execNewOrder({ symbol, price, amount: -amount }))
-  // const { payload } = yield take(updateMyTrade)
-  // const [ id, mts ] = [ nth(0, payload), nth(4, payload) ]
-  // [ ID, GID, CID, SYMBOL, MTS_CREATE, MTS_UPDATE, AMOUNT, AMOUNT_ORIG, TYPE, TYPE_PREV, FLAGS, ORDER_STATUS, PRICE, PRICE_AVG, PRICE_TRAILING, PRICE_AUX_LIMIT, NOTIFY, HIDDEN, PLACED_ID ]
-  // TODO: await for cid, mts, fee(profit), coverPrice(profit) ?
-  // yield take(createOrder)
-  // id as sha hash?
-  yield put(createPosition({ symbol, price, amount: -amount, profit, cid: 0, id: now(), mts: now(), covered: [ coverProp('id') ] }))
-  debug('worker')(`Exchange ${-amount} for ${price} of ${symbol}, covered ${coverProp('price')}, profit ${profit}`)
+  const { payload } = yield take(updateMyTrade)
+  const [ id, tradeSymbol, mts, orderId, tradeAmount,
+    tradePrice, orderType, orderPrice, maker, fee, feeCurrency ] = payload
+
+  if (tradeSymbol === symbol && orderPrice === price) {
+    if (tradeAmount !== amount) yield take(updateMyTrade)
+    yield put(createPosition({
+      id, symbol, amount: -amount, mts, fee, feeCurrency, maker, profit, price: tradePrice, covered: [ coverProp('id') ]
+    }))
+  }
+
+  debug('worker')(`Exchange ${-amount} for ${price} of ${symbol}, covered ${coverProp('price')}, profit ${profit}, fee ${fee} ${feeCurrency}`)
 }

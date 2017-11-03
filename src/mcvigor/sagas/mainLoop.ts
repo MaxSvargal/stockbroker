@@ -10,7 +10,7 @@ import { clearMACDResults, clearRVIResults, clearStochResults, tooMuchOpenedPosi
 import { selectActivePositions, selectHighestBids } from 'shared/sagas/selectors'
 
 import { analyticSaga, saveAnalyticsSaga } from './analytic'
-import { doSellSaga, doBuySaga } from './wallet'
+import { doSellSaga, doBuySaga, getChunkAmount } from './wallet'
 
 const getThreshold = converge(add, [ multiply(0.005), identity ])
 
@@ -61,6 +61,8 @@ export default function* mainLoopSaga(symbol: string) {
   yield fork(logNoPositionsToCover)
   yield call(delay, 5000)
   yield call(clearPreviousAnalytics, symbol)
+  const chunkAmount = yield call(getChunkAmount, symbol)
+  debug('worker')({ chunkAmount })
 
   while (true) {
     yield call(saveAnalyticsSaga, symbol)
