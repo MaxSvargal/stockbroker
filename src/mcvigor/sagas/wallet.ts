@@ -41,7 +41,7 @@ export function* getChunkAmount(symbol: string, stoch?: number) {
 
 export function* doBuySaga(symbol: string, time = now()) {
   const [ ask, reserveAsk ] = yield select(selectLowestAsks)
-  const chunkAmount = 0.005 // yield call(getChunkAmount, symbol, stoch)
+  const chunkAmount = yield call(getChunkAmount, symbol)
   const amount = chunkAmount < 0.005 ? 0.005 : chunkAmount
   const price = ask[2] >= amount * 2 ? ask[0] : reserveAsk[0]
 
