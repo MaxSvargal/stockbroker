@@ -59,7 +59,7 @@ export function* clearPreviousAnalytics(symbol: string) {
 
 export default function* mainLoopSaga(symbol: string) {
   yield fork(logNoPositionsToCover)
-  yield call(delay, 5000)
+  yield call(delay, 2000)
   yield call(clearPreviousAnalytics, symbol)
   const chunkAmount = yield call(getChunkAmount, symbol)
   debug('worker')({ chunkAmount })
@@ -69,6 +69,6 @@ export default function* mainLoopSaga(symbol: string) {
     const positions = yield select(selectActivePositions, symbol)
     const { status } = yield call(analyticSaga, symbol)
     yield call(getSagaByStatus(status), symbol, positions)
-    yield call(delay, 5000)
+    yield call(delay, 10000)
   }
 }
