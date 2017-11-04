@@ -36,7 +36,7 @@ export function* getChunkAmount(symbol: string, stoch?: number) {
   const amountToBuy = yield select(selectAmountToBuy, symbol)
   const currentPrice = yield select(selectCurrentPrice, symbol)
   const fullAmount = amountToSell + (amountToBuy / currentPrice)
-  return Math.round((fullAmount / 5) * 1e4) / 1e4 // getChunkAmountForStochastic(fullAmount, stoch)
+  return Math.round((fullAmount / 4.5) * 1e4) / 1e4 // getChunkAmountForStochastic(fullAmount, stoch)
 }
 
 export function* doBuySaga(symbol: string, time = now()) {
