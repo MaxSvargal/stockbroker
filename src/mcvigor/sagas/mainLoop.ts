@@ -12,7 +12,7 @@ import { selectActivePositions, selectHighestBids } from 'shared/sagas/selectors
 import { analyticSaga, saveAnalyticsSaga } from './analytic'
 import { doSellSaga, doBuySaga, getChunkAmount } from './wallet'
 
-const getThreshold = converge(add, [ multiply(0.005), identity ])
+const getThreshold = converge(add, [ multiply(0.004), identity ])
 
 const findPositionToCover = curry((bid: number) =>
   find(compose(gte(bid), compose(getThreshold, prop('price')))))
