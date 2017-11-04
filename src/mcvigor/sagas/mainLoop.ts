@@ -68,7 +68,7 @@ export default function* mainLoopSaga(symbol: string) {
     yield call(saveAnalyticsSaga, symbol)
     const positions = yield select(selectActivePositions, symbol)
     const { status } = yield call(analyticSaga, symbol)
-    yield call(getSagaByStatus(status), symbol, positions)
+    yield fork(getSagaByStatus(status), symbol, positions)
     yield call(delay, 10000)
   }
 }
