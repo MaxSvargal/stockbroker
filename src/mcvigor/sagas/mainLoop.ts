@@ -28,7 +28,7 @@ const getSagaByStatus = cond([
 export function* checkBuyConditionSaga(symbol: string, positions: any[]) {
   yield ifElse(
     compose(gt(5), length),
-    always(call(doBuySaga, symbol)),
+    always(fork(doBuySaga, symbol)),
     always(put(tooMuchOpenedPositions()))
   )(positions)
 }
@@ -40,7 +40,7 @@ export function* checkSellConditionSaga(symbol: string, positions: any[]) {
   yield ifElse(
     isNil,
     always(put(noPositionsToCover())),
-    always(call(doSellSaga, symbol, posToCover))
+    always(fork(doSellSaga, symbol, posToCover))
   )(posToCover)
 }
 
