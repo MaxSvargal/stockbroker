@@ -33,7 +33,7 @@ export default function* bitfinexSaga(): any {
       throw err
     })
     bws.on('close', () => {
-      debug('worker')('Bitfinex connection closed')
+      throw Error('Bitfinex connection closed')
     })
 
     debug('worker')('Connection to bitfinex socket established')
@@ -42,8 +42,6 @@ export default function* bitfinexSaga(): any {
     yield delay(2 * 60 * 60 * 1000)
     debug('worker')('Planned restart connection for save consistency')
     bws.close()
-    yield fork(bitfinexSaga)
-
   } catch (err) {
     debug('worker')('Connection to bitfinex failed with error: ', err)
     yield delay(10000)
