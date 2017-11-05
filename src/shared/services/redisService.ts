@@ -11,7 +11,7 @@ export default class ReduxRedisPersist {
   private avalialbleToSubscribe?: string[] = []
   private store: Store<{}>
   private prefix?: string = ''
-  private dbIndex?: number = 1
+  private dbIndex?: number = 0
   private channelRegExp = new RegExp(`__keyspace@${this.dbIndex}__:(.+)__(.+)`)
   private SET_REDUCER = '@@redux-redis-persist/SET_REDUCER'
 
