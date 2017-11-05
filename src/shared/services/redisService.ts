@@ -31,6 +31,7 @@ export default class ReduxRedisPersist {
     if (prefix === this.prefix && reducer) {
       this.getReducer(`${prefix}__${reducer}`)
         .then(state => this.setReducer(reducer, state))
+        .catch(err => console.error(err))
     }
   }
 
@@ -62,9 +63,10 @@ export default class ReduxRedisPersist {
 
     this.getReducer(selector)
       .then(state => this.setReducer(options.name, state))
+      .catch(err => console.error(err))
 
     if (avalialbleToSubscribe && avalialbleToSubscribe.includes(options.name))
-      this.subscriber.subscribe(`__keyspace@1__:${selector}`)
+      this.subscriber.subscribe(`__keyspace@${this.dbIndex}__:${selector}`)
 
     return (state: {}, action: { type: string, reducer?: string, state?: {} }) => {
       switch (action.type) {
