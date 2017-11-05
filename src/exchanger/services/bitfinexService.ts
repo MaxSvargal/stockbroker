@@ -14,10 +14,11 @@ const { key, secret } = accountsKeys[ACCOUNT]
 
 export default () => {
   const { ws } = new BFX(key, secret, { version: 2 })
-  return new Promise((resolve, reject) =>
+  return new Promise((resolve, reject) => {
+    ws.on('error', (err: string) => reject(err))
     ws.on('open', () => {
-      ws.on('auth', () => resolve(ws))
-      ws.on('error', (err: string) => reject(err))
+      resolve(ws)
       ws.auth()
-    }))
+    })
+  })
 }
