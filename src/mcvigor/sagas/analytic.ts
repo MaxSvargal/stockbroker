@@ -56,7 +56,7 @@ type GetDecision = { macd: number, rvi: number, rviValue: number, stochValue: nu
 export const getDecision =
   ({ macd, rvi, rviValue, stochValue, macdValue }: GetDecision): number =>
     conditionOfTradePosition({
-      buy: all(isTrue, [ isPositive(macd), isNegative(rviValue), isLower(85)(stochValue) ]),
+      buy: all(isTrue, [ isPositive(macd), isNegative(rviValue), isLower(50)(stochValue) ]),
       sell: all(isTrue, [ isNegative(rvi), isPositive(rviValue), isGreater(50)(stochValue), isGreater(1)(macdValue) ])
     })
 
