@@ -25,7 +25,7 @@ export default function* bitfinexSaga(): any {
         // bws.subscribeTrades(pair)
         bws.subscribeTicker(pair)
         bws.subscribeCandles(`t${pair}`, '1m')
-        bws.subscribeCandles(`t${pair}`, '5m')
+        // bws.subscribeCandles(`t${pair}`, '5m')
       })
 
     bws.on('error', (err: Error) => {

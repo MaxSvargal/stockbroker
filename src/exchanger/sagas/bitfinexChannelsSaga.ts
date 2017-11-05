@@ -39,6 +39,7 @@ export function* tradeChannelSaga(pair: PAIR, data: [ string, TradeData ] & Trad
 }
 
 export function* walletSnapshotChannelSaga(data: WalletData[]) {
+  debug('worker')('SET WALLET', data)
   yield put(actions.setWallet(data))
 }
 
