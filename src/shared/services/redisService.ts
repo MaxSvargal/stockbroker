@@ -50,6 +50,7 @@ export default class ReduxRedisPersist {
   }
 
   private saveReducer(selector: string, state: any) {
+    if (selector.match(/positions/)) debug('worker')('saveReducer', selector, state)
     this.publisher.set(selector, JSON.stringify(state))
   }
 
