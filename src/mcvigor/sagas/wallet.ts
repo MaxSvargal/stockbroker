@@ -52,6 +52,8 @@ export function* doBuySaga(symbol: string, time = now()) {
   const [ id, tradeSymbol, mts, orderId, tradeAmount,
     tradePrice, orderType, orderPrice, maker, fee, feeCurrency ] = payload
 
+  debug('worker')(`Reponse ${tradeAmount} for ${tradePrice} of ${symbol}...`, { payload })
+
   if (tradeSymbol === symbol && orderPrice === price) {
     if (tradeAmount !== amount) yield take(updateMyTrade)
     yield put(createPosition({
@@ -75,6 +77,8 @@ export function* doSellSaga(symbol: string, coverPos: PositionPayload) {
   const { payload } = yield take(updateMyTrade)
   const [ id, tradeSymbol, mts, orderId, tradeAmount,
     tradePrice, orderType, orderPrice, maker, fee, feeCurrency ] = payload
+
+  debug('worker')(`Reponse ${tradeAmount} for ${tradePrice} of ${symbol}...`, { payload })
 
   if (tradeSymbol === symbol && orderPrice === price) {
     if (tradeAmount !== amount) yield take(updateMyTrade)
