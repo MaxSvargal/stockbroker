@@ -1,9 +1,12 @@
 import debug from 'debug'
-import { applyMiddleware, compose, createStore } from 'redux'
+import { Action, applyMiddleware, compose, createStore } from 'redux'
 import createSagaMiddleware, { SagaIterator } from 'redux-saga'
+import { Epic, createEpicMiddleware, createStateStreamEnhancer } from 'redux-most'
 import ReduxRedisPersist from 'shared/services/redisService'
 import getRootReducer from 'shared/reducers'
 import { setAccount } from 'shared/actions'
+
+const createLogger = require('redux-node-logger')
 
 interface CreateStoreOptions {
   db: {
@@ -12,6 +15,7 @@ interface CreateStoreOptions {
     avalialbleToSubscribe?: string[]
   },
   rootSaga: () => SagaIterator,
+  rootEpic: Epic<Action, {}>,
   account?: string
 }
 
@@ -20,7 +24,14 @@ export default function createSrore(options: CreateStoreOptions) {
   const db = new ReduxRedisPersist(options.db)
 
   const rootReducer = getRootReducer(db)
-  const store = createStore(rootReducer, applyMiddleware(sagaMiddleware))
+  const epicMiddleware = createEpicMiddleware(options.rootEpic)
+  const loggerMiddleware = createLogger()
+  const storeEnhancers = compose(
+    createStateStreamEnhancer(epicMiddleware),
+    applyMiddleware(sagaMiddleware),
+    applyMiddleware(loggerMiddleware)
+  )
+  const store = createStore(rootReducer, storeEnhancers)
 
   db.setStore(store)
   db.publisher.on('ready', () => {

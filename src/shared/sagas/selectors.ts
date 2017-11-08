@@ -1,4 +1,4 @@
-import { __, takeLast, chain, allPass, propEq, propSatisfies, not, pathOr, last, filter, has, prop, compose, map, concat, reduce, curry, contains } from 'ramda'
+import { __, nth, defaultTo, path, head, reverse, sort, ascend, takeLast, chain, allPass, propEq, propSatisfies, not, pathOr, last, filter, has, prop, compose, map, concat, reduce, curry, contains, keys } from 'ramda'
 import { symbolToPairArr } from 'shared/lib/helpers'
 
 import { AsksState } from 'shared/reducers/asks'
@@ -63,6 +63,18 @@ export const selectHighestBids = ({ bids }: State) => {
   const prices = Object.keys(bids).sort((a, b) => Number(b) - Number(a))
   return [ bids[prices[0]] || [], bids[prices[1]] || [] ]
 }
+
+export const selectHighestBid = ({ bids }: State) =>
+  chain(prop, compose(head, sort(reverse), keys))(bids)
+
+export const selectLowestAsk = ({ bids }: State) =>
+  chain(prop, compose(head, keys))(bids)
+
+export const selectMeansToBuy = ({ wallet }: State, symbol: string) =>
+  path([ 'exchange', nth(2)(defaultTo([], symbolToPairArr(symbol))), 'balance' ])(wallet)
+
+export const selectMeansToSell = ({ wallet }: State, symbol: string) =>
+  path([ 'exchange', nth(1)(defaultTo([], symbolToPairArr(symbol))), 'balance' ])(wallet)
 
 export const selectLowestAsks = ({ asks }: State) => {
   const prices = Object.keys(asks).sort((a, b) => Number(a) - Number(b))

@@ -20,7 +20,7 @@ const findPositionToCover = curry((bid: number) =>
 const doNothing = (symbol: string, positions: any[]) => {}
 
 const getSagaByStatus = cond([
-  [ equals(0), always(doNothing) ],
+  [ equals(0), always(checkSellConditionSaga) ],
   [ equals(1), always(checkBuyConditionSaga) ],
   [ equals(-1), always(checkSellConditionSaga) ]
 ])

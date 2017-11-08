@@ -15,8 +15,7 @@ debug('worker')('Welcome to stockbroker\'s exchanger, %s!', ACCOUNT)
 const sagaMiddleware = createSagaMiddleware()
 const db = new ReduxRedisPersist({
   prefix: ACCOUNT,
-  avalialbleToSet: [ 'asks', 'bids', 'wallet', 'candles', 'tickers' ],
-  avalialbleToSubscribe: [ 'macd', 'rvi', 'stoch' ]
+  avalialbleToSet: [ 'asks', 'bids', 'wallet', 'candles', 'tickers' ]
 })
 
 const rootReducer = getRootReducer(db)

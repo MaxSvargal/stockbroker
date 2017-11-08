@@ -7,18 +7,20 @@ import { newOrder } from 'exchanger/actions'
 import { OrderData } from 'shared/types'
 import { selectActiveOrder, selectHighestBids, selectLowestAsks } from 'shared/sagas/selectors'
 
+type OrderAsObject = { id: number, symbol: string, amount: number, price: number }
+const orderToObj = applySpec({ id: nth(0), symbol: nth(3), amount: nth(6), price: nth(16) })
+const isBidGotDown = curry((bid: number, price: number) => not(equals(subtract(bid, price), 0)))
+
+
 export const checkIntervalChannel = eventChannel(emitter => {
   const iv = setInterval(() => emitter({ type: 'TICK' }), 2000)
   return () => clearInterval(iv)
 })
 
 export function* updateBuyOrderSaga(order: OrderData) {
-  const orderId = order[0]
-  const orderSymbol = order[3]
-  const orderAmount = order[6]
-  const orderPrice = order[16]
+  const { id, symbol, amount, price } = <OrderAsObject>orderToObj(order)
+  const isGotDown = isBidGotDown(highestBid, price)
 
-  const [ [ highestBid ], [ nextHighestBid ] ] = yield select(selectHighestBids)
   const isOurBidGotDown = highestBid - orderPrice !== 0
   const isOurBidTooExpensive = new DecimalPrice(orderPrice).substractIsMoreThenBit(nextHighestBid)
 

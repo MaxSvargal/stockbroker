@@ -17,7 +17,7 @@ export function* newOrderSaga(bws: BFX) {
       price: `${price}`,
       hidden: 0
     } ]
-    yield call([ bws, 'send' ], req)
+    // yield call([ bws, 'send' ], req)
     debug('trade')({ action: 'newOrder', symbol, amount, price })
   }
 }

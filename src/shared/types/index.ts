@@ -72,3 +72,4 @@ export type SetTradeSignalPayload = { symbol: string, name: 'macd' | 'rvi' }
 export type TickerPayload = { pair: PAIR, data: TickerData }
 export type TradePayload = { pair: PAIR, data: TradeData }
 export type TradesPayload = { pair: PAIR, data: TradeData[] }
+export type RequestExecPositionPayload = { pair: PAIR, exec: boolean }

@@ -43,7 +43,7 @@ export function* doBuySaga(symbol: string, time = now()) {
   const [ ask, reserveAsk ] = yield select(selectLowestAsks)
   const chunkAmount = yield call(getChunkAmount, symbol)
   const amount = chunkAmount < 0.005 ? 0.005 : chunkAmount
-  const price = ask[2] >= amount * 2 ? ask[0] : reserveAsk[0]
+  const price = 7000 // ask[2] >= amount * 2 ? ask[0] : reserveAsk[0]
 
   debug('worker')(`Request to buy ${amount} for ${price} of ${symbol}...`)
 
@@ -68,7 +68,7 @@ export function* doSellSaga(symbol: string, coverPos: PositionPayload) {
   const [ bid, reserveBid ] = yield select(selectHighestBids)
   const coverProp = prop(__, coverPos)
   const amount = coverProp('amount')
-  const price = bid[2] >= amount * 2 ? bid[0] : reserveBid[0]
+  const price = 7100 // bid[2] >= amount * 2 ? bid[0] : reserveBid[0]
   const profit = getProfit(coverProp('price'))(price)(amount)(0.002)
 
   debug('worker')(`Request to sell ${amount} for ${price} of ${symbol}...`)

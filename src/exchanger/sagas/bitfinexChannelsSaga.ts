@@ -44,10 +44,12 @@ export function* walletSnapshotChannelSaga(data: WalletData[]) {
 }
 
 export function* walletUpdateChannelSaga(data: WalletData) {
+  console.log('updateWallet', data)
   yield put(actions.updateWallet(data))
 }
 
 export function* candlesChannelSaga(key: string, data: CandleData & CandleData[]) {
+  // debug('worker')('CANDLES', data)
   if (Array.isArray(data[0]))
     yield put(actions.setCandles({ key, data }))
   else
@@ -56,6 +58,9 @@ export function* candlesChannelSaga(key: string, data: CandleData & CandleData[]
 
 export function* tickerUpdateChannelSaga(pair: PAIR, data: TickerData) {
   yield put(actions.updateTicker({ pair, data }))
+  // TODO
+  // yield put(updateMyTrade([ new Date().getTime(), 'tBTCUSD', 1509967816000, 4904773502, 0.0073, 7000, 'EXCHANGE LIMIT', 7000, 1, -0.04681472, 'USD' ]))
+  yield put(updateMyTrade([ new Date().getTime(), 'tBTCUSD', 1509967816000, 4904773502, -0.0073, 7100, 'EXCHANGE LIMIT', 7100, 1, -0.04681472, 'USD' ]))
 }
 
 export function* ordersSnapshotChannelSaga(data: OrderData[]) {
@@ -99,4 +104,7 @@ export default function* runChannels(bws: BFX) {
     fork(channelSaga, bws, 'te', newMyTradeChannelSaga),
     fork(channelSaga, bws, 'tu', updateMyTradeChannelSaga),
   ])
+
+  // bws.on('message', (msg: any) => console.log(msg))
+  bws.on('ws', (msg: any) => console.log('WS', msg))
 }
