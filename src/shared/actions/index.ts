@@ -18,3 +18,9 @@ export const tooMuchOpenedPositions = createAction('TOO_MUCH_OPENED_POSITIONS')
 export const noPositionsToCover = createAction('NO_POSITIONS_TO_COVER')
 export const updateMyTrade = createAction<Types.MyTradeData>('UPDATE_MY_TRADE')
 export const requestExecPosition = createAction<Types.RequestExecPositionPayload>('REQUEST_EXEC_POSITION')
+
+
+export const bitfinexConnect = createAction('BITFINEX_CONNECT')
+export const bitfinexConnected = createAction<any>('BITFINEX_CONNECTED')
+export const bitfinexRejected = createAction('BITFINEX_REJECTED')
+export const bitfinexAuthorized = createAction('BITFINEX_AUTHORIZED')
