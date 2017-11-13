@@ -3,7 +3,11 @@ import configureMockStore from 'redux-mock-store'
 
 import { bitfinexConnect, bitfinexConnected } from 'shared/actions'
 
-import connect from '../bitfinex'
+import { connect } from '../bitfinex'
+
+import { TestScheduler } from 'rxjs'
+
+console.log({ TestScheduler })
 
 const epicMiddleware = createEpicMiddleware(connect)
 const mockStore = configureMockStore([ epicMiddleware ])
