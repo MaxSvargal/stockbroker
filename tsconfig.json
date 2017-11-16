@@ -6,7 +6,7 @@
       ]
     },
     "module": "commonjs",
-    "target": "esnext",
+    "target": "es2017",
     "baseUrl": "./src",
     "moduleResolution": "node",
     "outDir": "build",

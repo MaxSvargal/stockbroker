@@ -78,7 +78,7 @@
 
 "@types/ramda@types/npm-ramda#dist":
   version "0.25.0"
-  resolved "https://codeload.github.com/types/npm-ramda/tar.gz/a891bbfc2d8260c1eb59bfd29b0189649c76e1a6"
+  resolved "https://codeload.github.com/types/npm-ramda/tar.gz/8553ae490092eb2f12235693a5ceec4b60188b0f"
 
 "@types/redis@^2.6.1":
   version "2.8.1"

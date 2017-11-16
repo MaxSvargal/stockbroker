@@ -1,8 +1,8 @@
 import { combineEpics } from 'redux-observable'
 
 // import positionsEpic, { testEpic } from './positions'
-import { connect, auth } from './bitfinex'
+import { connect, auth, watchChannels, newOrder } from './bitfinex'
 
-const rootEpic = combineEpics(connect, auth)
+const rootEpic = combineEpics(newOrder, watchChannels, auth, connect)
 
 export default rootEpic

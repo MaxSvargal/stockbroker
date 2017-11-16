@@ -19,8 +19,15 @@ export const noPositionsToCover = createAction('NO_POSITIONS_TO_COVER')
 export const updateMyTrade = createAction<Types.MyTradeData>('UPDATE_MY_TRADE')
 export const requestExecPosition = createAction<Types.RequestExecPositionPayload>('REQUEST_EXEC_POSITION')
 
-
+export const initialized = createAction('INITIALIZED')
 export const bitfinexConnect = createAction('BITFINEX_CONNECT')
 export const bitfinexConnected = createAction<any>('BITFINEX_CONNECTED')
-export const bitfinexRejected = createAction('BITFINEX_REJECTED')
+export const bitfinexRejected = createAction<Error>('BITFINEX_REJECTED')
+export const bitfinexAuthRejected = createAction<Error>('BITFINEX_AUTH_REJECTED')
 export const bitfinexAuthorized = createAction('BITFINEX_AUTHORIZED')
+export const bitfinexHeartbeat = createAction('BITFINEX_HEARTBEAT')
+
+export const setWallet = createAction<Types.WalletData[]>('SET_WALLET')
+export const updateWallet = createAction<Types.WalletData>('UPDATE_WALLET')
+export const setOrders = createAction<any[]>('SET_ORDERS')
+export const orderUpdate = createAction<any[]>('ORDER_UPDATE')

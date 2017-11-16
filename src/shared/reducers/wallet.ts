@@ -1,5 +1,5 @@
 import { createReducer } from 'redux-act'
-import { setWallet, updateWallet } from 'exchanger/actions'
+import { setWallet, updateWallet } from 'shared/actions'
 
 export type WalletState = {
   [walletType: string]: {
