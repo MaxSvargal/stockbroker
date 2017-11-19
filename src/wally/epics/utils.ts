@@ -1,22 +1,23 @@
-import { apply, filter, curry, prop, propEq } from 'ramda'
-import { Epic, ActionsObservable, combineEpics } from 'redux-observable'
-import { Observable } from 'rxjs'
-import 'rxjs/add/operator/filter'
-import 'rxjs/add/operator/mapTo'
 import { Store } from 'redux'
+import { apply, curry, prop, compose, invoker } from 'ramda'
+import { Epic, ActionsObservable, ofType } from 'redux-observable'
+import { map } from 'rxjs/operators'
+import { Observable } from 'rxjs'
 
-export { Store } from 'redux'
-export { Epic, ActionsObservable } from 'redux-observable'
-
+type Selector = (payload: any) => any
 type CreateEpicWithState = (
-  selectorFn: (selector: Function) => any,
+  selectorFn: Selector,
   epic: ActionsObservable<Action>
 ) => any
 
-export const fromStore = curry(
-  (store: Store<any>, selectorFn: (state: any, payload: any) => any, payload: any) =>
-    apply(selectorFn, [ store.getState(), payload ]))
+export const fromStore = (store: Store<any>) => (selectorFn: Selector, payload: any) =>
+  compose(selectorFn(payload), invoker(0, 'getState'))(store)
 
 export const createEpicWithState = (epic: CreateEpicWithState) =>
   (action$: ActionsObservable<Action>, store: Store<any>) =>
     epic(fromStore(store), action$)(action$)
+
+export const payloadProp = <any>prop('payload')
+
+export const payloadOfType = (...keys: any[]) => (action$: Observable<Action>) =>
+  compose(map(payloadProp), ofType(...keys))(action$)

@@ -3,8 +3,7 @@ import { Action, applyMiddleware, compose, createStore } from 'redux'
 import createSagaMiddleware, { SagaIterator } from 'redux-saga'
 import ReduxRedisPersist from 'shared/services/redisService'
 import getRootReducer from 'shared/reducers'
-import { setAccount } from 'shared/actions'
-
+import { setAccount, initialized } from 'shared/actions'
 import { createEpicMiddleware } from 'redux-observable'
 
 const createLogger = require('redux-node-logger')
@@ -35,6 +34,7 @@ export default function createSrore(options: CreateStoreOptions) {
     debug('worker')('Connection to redis server estableashed')
     // sagaMiddleware.run(options.rootSaga)
     if (options.account) store.dispatch(setAccount(options.account))
+    store.dispatch(initialized())
   })
 
   return { store, db }
