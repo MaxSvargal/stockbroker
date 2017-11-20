@@ -62,9 +62,9 @@ export default class ReduxRedisPersist {
     const { avalialbleToSubscribe, avalialbleToSet, SET_REDUCER } = this
     const selector = `${this.prefix}__${options.name}`
 
-    // this.getReducer(selector)
-    //   .then(state => this.setReducer(options.name, state))
-    //   .catch(err => console.error(err))
+    this.getReducer(selector)
+      .then(state => this.setReducer(options.name, state))
+      .catch(err => console.error(err))
 
     if (avalialbleToSubscribe && avalialbleToSubscribe.includes(options.name))
       this.subscriber.subscribe(`__keyspace@${this.dbIndex}__:${selector}`)

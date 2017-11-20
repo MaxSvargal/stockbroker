@@ -90,6 +90,7 @@ export const newOrder = pipe(createComposeActions, (composeActions: Function) =>
     ),
     switchMap((ws: BFX) =>
       composeActions(
+        // TODO: pass CID
         map(either(<any>compose(invokeSend(ws), formatNewOrderRequest), identity)),
         payloadOfType(<typeof signalRequestResolved>signalRequestResolved)
       )

@@ -9,6 +9,7 @@ export default createStore({
   rootEpic,
   db: {
     prefix: ACCOUNT,
+    avalialbleToSubscribe: [ 'asks', 'bids', 'tickers' ],
     avalialbleToSet: [ 'wallet', 'positions' ]
   },
   account: ACCOUNT

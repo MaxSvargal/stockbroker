@@ -46,7 +46,7 @@
     "ignore": [
       "*.test.ts"
     ],
-    "exec": "DEBUG=worker ACCOUNT=maxsvargal PAIR=BTCUSD NODE_PATH=./src ts-node ./src/wally/index.ts"
+    "exec": "DEBUG=* ACCOUNT=maxsvargal PAIR=BTCUSD NODE_PATH=./src ts-node ./src/wally/index.ts"
   },
   "dependencies": {
     "@most/core": "^0.15.0",

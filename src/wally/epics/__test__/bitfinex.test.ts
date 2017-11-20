@@ -49,12 +49,15 @@ test('Bifinex connect should open connection', () => {
 })
 
 test('newOrderRequest should approve when funds avaliable', () => {
+  const requestOptions = {
+    usePercentOfFund: 1,
+    maxChunksNumber: 4,
+    minChunkAmount: 0.5,
+    minThreshold: 0.01
+  }
   run(
     newOrderRequest,
     {
-      maxChunksNumber: 4,
-      minChunkAmount: 0.5,
-      minThreshold: 0.01,
       wallet: { exchange: { BTC: { balance: 2.98 }, USD: { balance: 100 } } },
       bids: {
         99: [ 99, 1, 20 ],
@@ -70,23 +73,73 @@ test('newOrderRequest should approve when funds avaliable', () => {
     '-a-b',
     '-a-b',
     {
-      a: signalRequest({ type: 'buy', symbol: 'tBTCUSD', from: 'mcrasta' }),
-      b: signalRequest({ type: 'sell', symbol: 'tBTCUSD', from: 'mcrasta' })
+      a: signalRequest({ type: 'buy', symbol: 'tBTCUSD', from: 'mcrasta', options: requestOptions }),
+      b: signalRequest({ type: 'sell', symbol: 'tBTCUSD', from: 'mcrasta', options: requestOptions })
     },
     {
-      a: signalRequestResolved({ type: 'buy', symbol: 'tBTCUSD', from: 'mcrasta', meta: { status: true, amount: 0.98, price: 100 } }),
-      b: signalRequestResolved({ type: 'sell', symbol: 'tBTCUSD', from: 'mcrasta', meta: { status: true, amount: 1, price: 100, covered: [ 100500 ] } })
+      a: signalRequestResolved({
+        type: 'buy',
+        symbol: 'tBTCUSD',
+        from: 'mcrasta',
+        options: requestOptions,
+        meta: { status: true, amount: 0.98, price: 100 }
+      }),
+      b: signalRequestResolved({
+        type: 'sell',
+        symbol: 'tBTCUSD',
+        from: 'mcrasta',
+        options: requestOptions,
+        meta: { status: true, amount: 1, price: 100, covered: [ 100500 ] }
+      })
+    }
+  )
+})
+
+test('newOrderRequest should demo works correctly', () => {
+  const requestOptions = {
+    usePercentOfFund: 1,
+    maxChunksNumber: 5,
+    minChunkAmount: 158,
+    minThreshold: 0.001
+  }
+  run(
+    newOrderRequest,
+    {
+      wallet: { exchange: { USD: { balance: 0 }, DAT: { balance: 500 } } },
+      bids: {
+        '0.0779': [ 0.0779, 1, 1 ]
+      },
+      positions: [
+        { symbol: 'tDATUSD', id: 1509970483580, mts: 1511020433555, price: 0.05, amount: 158 }
+      ]
+    },
+    '-a',
+    '-a',
+    {
+      a: signalRequest({ type: 'sell', symbol: 'tDATUSD', from: 'mcrasta', options: requestOptions })
+    },
+    {
+      a: signalRequestResolved({
+        type: 'sell',
+        symbol: 'tDATUSD',
+        from: 'mcrasta',
+        options: requestOptions,
+        meta: { status: true, amount: 158, price: 0.0779, covered: [ 1509970483580 ] }
+      })
     }
   )
 })
 
 test('newOrderRequest should reject when no funds avaliable', () => {
+  const requestOptions = {
+    usePercentOfFund: 1,
+    maxChunksNumber: 4,
+    minChunkAmount: 0.5,
+    minThreshold: 0.1
+  }
   run(
     newOrderRequest,
     {
-      maxChunksNumber: 4,
-      minChunkAmount: 0.5,
-      minThreshold: 0.1,
       wallet: { exchange: { BTC: { balance: 2.9 }, USD: { balance: 10 } } },
       bids: {
         99: [ 99, 1, 20 ],
@@ -100,12 +153,24 @@ test('newOrderRequest should reject when no funds avaliable', () => {
     '-a-b',
     '-a-b',
     {
-      a: signalRequest({ type: 'buy', symbol: 'tBTCUSD', from: 'mcrasta' }),
-      b: signalRequest({ type: 'sell', symbol: 'tBTCUSD', from: 'mcrasta' })
+      a: signalRequest({ type: 'buy', symbol: 'tBTCUSD', from: 'mcrasta', options: requestOptions }),
+      b: signalRequest({ type: 'sell', symbol: 'tBTCUSD', from: 'mcrasta', options: requestOptions })
     },
     {
-      a: signalRequestRejected({ type: 'buy', symbol: 'tBTCUSD', from: 'mcrasta', meta: { status: false, reason: 'No funds avaliable' } }),
-      b: signalRequestRejected({ type: 'sell', symbol: 'tBTCUSD', from: 'mcrasta', meta: { status: false, reason: 'No position to cover' } })
+      a: signalRequestRejected({
+        type: 'buy',
+        symbol: 'tBTCUSD',
+        from: 'mcrasta',
+        options: requestOptions,
+        meta: { status: false, reason: 'No funds avaliable' }
+      }),
+      b: signalRequestRejected({
+        type: 'sell',
+        symbol: 'tBTCUSD',
+        from: 'mcrasta',
+        options: requestOptions,
+        meta: { status: false, reason: 'No position to cover' }
+      })
     }
   )
 })

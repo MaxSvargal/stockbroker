@@ -14,8 +14,8 @@ export const fromStore = (store: Store<any>) => (selectorFn: Selector, payload: 
   compose(selectorFn(payload), invoker(0, 'getState'))(store)
 
 export const createEpicWithState = (epic: CreateEpicWithState) =>
-  (action$: ActionsObservable<Action>, store: Store<any>) =>
-    epic(fromStore(store), action$)(action$)
+  (action$: ActionsObservable<Action>, store: Store<any>): ActionsObservable<Action> =>
+    epic(<any>fromStore(store), action$)(action$)
 
 export const payloadProp = <any>prop('payload')
 

@@ -1,25 +1,36 @@
 import {
   __, compose, chain, concat, curry, filter, allPass, propEq, path, propIs, propOr,
-  propSatisfies, contains, reduce, map, prop, has, not, isNil, defaultTo, lte,
-  head, reverse, keys, sort, nth, multiply, lt, length, divide, unless, always,
-  add, sum, subtract, gte, and, cond, find, converge, identity, is, ifElse, both
+  propSatisfies, contains, reduce, map, prop, has, not, isNil, defaultTo, lte, slice,
+  head, reverse, keys, sort, nth, multiply, lt, length, divide, unless, always, match,
+  add, sum, subtract, gte, and, cond, find, converge, identity, is, ifElse, both, negate
 } from 'ramda'
 
-type FromStore = (selector: Function, payload?: any) => any
-export interface OrderRequest { type: 'buy' | 'sell', symbol: string, from: string }
-export interface OrderResponse extends OrderRequest {
-  meta: { status: boolean, amount?: number, price?: number, reason?: string, covered?: number[] }
+export interface OrderRequest {
+  type: 'buy' | 'sell',
+  symbol: string,
+  from: string,
+  options: {
+    usePercentOfFund: number,
+    maxChunksNumber: number,
+    minChunkAmount: number,
+    minThreshold: number
+  }
 }
+interface OrderResponseResolved { status: boolean, amount?: number, price?: number, covered?: number[] }
+interface OrderResponseRejected { status: boolean, reason?: string }
+export type OrderResponseMeta = OrderResponseResolved | OrderResponseRejected
+export interface OrderResponse extends OrderRequest { meta: OrderResponseMeta }
+type FromStore = (selector: Function, payload?: any) => any
 
+const symbolToPair = compose(slice(1, 3), match(/^t(\w{1,3})(\w{1,3})$/))
+const round = (num: number) => Math.round(num * 1e4) / 1e4
+const getReqOption = (name: string) => path([ 'options', name ])
 const selectFundsAvaliable = (curr: string) =>
   <() => number>path([ 'wallet', 'exchange', curr, 'balance' ])
-
-const round = (num: number) => Math.round(num * 1e4) / 1e4
-const selectMaxActivePositions = () => prop('maxChunksNumber')
-const selectMinChunkAmount = () => prop('minChunkAmount')
-const selectMinThreshold = () => prop('minThreshold')
-const selectHighestBid = () => compose(chain(prop, compose(head, sort(<any>reverse), keys)), <any>prop('bids'))
-const selectHighestBidPrice = () => compose(nth(0), selectHighestBid())
+const selectHighestBid = () =>
+  compose(chain(prop, compose(head, sort(<any>reverse), keys)), <any>prop('bids'))
+const selectHighestBidPrice = () =>
+  compose(nth(0), defaultTo([]), selectHighestBid())
 const selectActivePositions = (symbol: string) =>
   compose(
     chain(
@@ -39,15 +50,16 @@ const selectActivePositions = (symbol: string) =>
   )
 
 export const checkOrderAvaliable = curry((fromStore: FromStore, request: OrderRequest): OrderResponse => {
+  const symbol = prop('symbol', request)
+  const pair = symbolToPair(symbol)
   const bidPrice: number = fromStore(selectHighestBidPrice)
-  const activePositions = fromStore(selectActivePositions, prop('symbol', request))
-  const fundsAvaliableToSell: number = fromStore(selectFundsAvaliable, 'BTC')
+  const activePositions = fromStore(selectActivePositions, symbol)
+  const fundsAvaliableToSell: number = fromStore(selectFundsAvaliable, nth(0, pair))
+  const fundsAvaliableToBuy: number = fromStore(selectFundsAvaliable, nth(1, pair))
 
-
-  const compileResponseForBuy = (): OrderResponse['meta'] => {
-    const maxActivePositions = fromStore(selectMaxActivePositions)
-    const minChunksAmount = fromStore(selectMinChunkAmount)
-    const fundsAvaliableToBuy: number = fromStore(selectFundsAvaliable, 'USD')
+  function compileResponseForBuy(): OrderResponseMeta {
+    const maxActivePositions = <number>getReqOption('maxChunksNumber')(request)
+    const minChunksAmount = <number>getReqOption('minChunkAmount')(request)
 
     const fundsAvaliableToBuyInFunds = divide(fundsAvaliableToBuy, bidPrice)
     const fundsAvaliable = add(fundsAvaliableToSell, fundsAvaliableToBuyInFunds)
@@ -73,9 +85,8 @@ export const checkOrderAvaliable = curry((fromStore: FromStore, request: OrderRe
     )({ isPositionAvaliable, isFundsAvaliable })
   }
 
-
-  const compileResponseForSell = (): OrderResponse['meta'] => {
-    const minThreshold = fromStore(selectMinThreshold)
+  function compileResponseForSell(): OrderResponseMeta {
+    const minThreshold = <number>getReqOption('minThreshold')(request)
 
     const getValWithPercent = (perc: number) => converge(add, [ multiply(perc), identity ])
     const findPositionToCover = (current: number, threshold: number, positions: any) =>
@@ -83,6 +94,7 @@ export const checkOrderAvaliable = curry((fromStore: FromStore, request: OrderRe
 
     const toCover: any = findPositionToCover(bidPrice, minThreshold, activePositions)
     const isFundsAvaliable: boolean = gte(fundsAvaliableToSell, prop('amount')(toCover))
+
     const allConditionsPass = allPass([
       propEq('isFundsAvaliable', true),
       propIs(Object, 'toCover')
@@ -97,7 +109,7 @@ export const checkOrderAvaliable = curry((fromStore: FromStore, request: OrderRe
       always({
         status: true,
         price: bidPrice,
-        amount: prop('amount', toCover),
+        amount: compose(negate, <any>prop('amount'))(toCover),
         covered: [ prop('id', toCover) ]
       }),
       curry((conditions: {}) => ({ status: false, reason: condErrors(conditions) }))
@@ -108,6 +120,7 @@ export const checkOrderAvaliable = curry((fromStore: FromStore, request: OrderRe
     type: prop('type', request),
     symbol: prop('symbol', request),
     from: prop('from', request),
+    options: prop('options', request),
     meta: cond([
       [ propEq('type', 'buy'), compileResponseForBuy ],
       [ propEq('type', 'sell'), compileResponseForSell ]
