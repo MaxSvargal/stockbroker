@@ -4,7 +4,7 @@ import { SimpleActionCreator } from 'redux-act'
 import { BFX } from 'bitfinex-api-node'
 import { Action, NewOrderPayload, OrderData } from 'shared/types'
 
-import { checkOrderAvaliable, OrderResponse } from './positions'
+import { checkOrderAvaliable, formatNewPosition, OrderResponse } from './positions'
 import { createEpicWithState, payloadOfType } from './utils'
 
 import {
@@ -23,19 +23,17 @@ import {
   bitfinexConnected, bitfinexRejected,
   bitfinexAuthorized, bitfinexAuthRejected,
   setWallet, updateWallet, setOrders, orderUpdate,
-  execNewOrder, createPosition, updateMyTrade,
+  execNewOrder, orderCancel, createPosition, updateMyTrade,
   signalRequest, signalRequestResolved, signalRequestRejected
 } from 'shared/actions'
 
 const Bfx = require('bitfinex-api-node')
-
 const key = 'o7yl00PaXcqt6SiNtinCLW2GeEWGMXlaCxAp7sIv6J8'
 const secret = 'SD1xukgXJVFEDAhLr3L0f13J06VRWFHDhtWCubPJHLQ'
 
 const BfxConstructor = construct(Bfx)
 const invokeAuth: any = invoker(0, 'auth')
 const invokeSend = flip(invoker(1, 'send'))
-const payloadProp = <any>prop('payload')
 const orderSymbol = nth(3)
 const spawnAction = (action: SimpleActionCreator<any, any>) => compose(Observable.of, action)
 const responseKeyEq = (val: string) => compose(equals(val), nth(1))
@@ -43,9 +41,11 @@ const responseData = (action: any) => compose(action, nth(2))
 const keyToAction = (key: string, action: SimpleActionCreator<any, any>) => [ responseKeyEq(key), responseData(action) ]
 const onMessageChannel = (ws: any) => Observable.fromEvent(ws, 'message')
 const createComposeActions = ($: ActionsObservable<Action>) => (...args: Function[]) => compose(any => any, ...args)($)
+const proxyPayload = curry((req: any, res: any) => [ req, res ])
 
-const symbolEquals = compose(<any>propEq('symbol'), nth(1, <any>__))
-const amountEquals = compose(<any>pathEq([ 'meta', 'amount' ]), nth(2, <any>__))
+const pairToSymbol = (pair: string) => `t${pair}`
+const symbolEquals = compose(<any>propEq('symbol'), pairToSymbol, nth(1, <any>__))
+const amountEquals = compose(<any>pathEq([ 'meta', 'amount' ]), nth(3, <any>__))
 const priceEquals = compose(<any>pathEq([ 'meta', 'price' ]), nth(6, <any>__))
 const allEquals = [ symbolEquals, amountEquals, priceEquals ]
 const mapApplyTo: Function = compose(rmap, applyTo)
@@ -72,34 +72,41 @@ const formatNewOrderRequest = ({ symbol, meta: { amount, price } }: any) => [
   }
 ]
 
+const checkTradeEqualsOrder = curry((orderPayload: any, tradePaylaod: any) =>
+  equals(nth(0, orderPayload), nth(4, tradePaylaod)))
+
 export const newOrder = pipe(createComposeActions, (composeActions: Function) =>
   composeActions(
     catchError(spawnAction(bitfinexRejected)),
-    mergeMap((orderPayload: any) =>
+    mergeMap(([ requestPayload, orderPayload ]) =>
       composeActions(
         map(createPosition),
-        // filter(),
+        map(formatNewPosition(requestPayload, orderPayload)),
+        // TODO: change to filter and merge multiple trades
+        first(checkTradeEqualsOrder(orderPayload)),
         payloadOfType(updateMyTrade)
       )
     ),
     mergeMap((requestPayload: any) =>
       composeActions(
+        map(proxyPayload(requestPayload)),
         first(checkOrderEqualsRequest(requestPayload)),
-        payloadOfType(orderUpdate),
+        payloadOfType(orderCancel),
       )
     ),
     switchMap((ws: BFX) =>
       composeActions(
-        // TODO: pass CID
+        // TODO: bump order in order book
+        // OR: pass CID ???
         map(either(<any>compose(invokeSend(ws), formatNewOrderRequest), identity)),
-        payloadOfType(<typeof signalRequestResolved>signalRequestResolved)
+        payloadOfType(signalRequestResolved)
       )
     ),
     payloadOfType(bitfinexConnected)
   )
 )
 
-export const newOrderRequest = createEpicWithState(fromStore =>
+export const resolveOrderRequest = createEpicWithState(fromStore =>
   compose(
     map(ifElse(<() => boolean>path([ 'meta', 'status' ]), signalRequestResolved, signalRequestRejected)),
     map(<() => OrderResponse>checkOrderAvaliable(fromStore)),
@@ -112,12 +119,13 @@ export const watchChannels = compose(
     keyToAction('ws', setWallet),
     keyToAction('wu', updateWallet),
     keyToAction('os', setOrders),
+    keyToAction('oc', orderCancel),
     keyToAction('ou', orderUpdate),
+    keyToAction('tu', updateMyTrade),
     [ T, responseData(bitfinexHeartbeat) ]
   ]))),
   map(onMessageChannel),
-  map(<typeof bitfinexConnected>payloadProp),
-  ofType(bitfinexConnected)
+  payloadOfType(bitfinexConnected)
 )
 
 export const auth = compose(
@@ -125,8 +133,7 @@ export const auth = compose(
   map(bitfinexAuthorized),
   switchMap(handleWsEvent('auth')),
   map(either(invokeAuth, identity)),
-  map(prop<string>('payload')),
-  ofType(bitfinexConnected)
+  payloadOfType(bitfinexConnected)
 )
 
 export const connect = compose(

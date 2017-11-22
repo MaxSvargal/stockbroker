@@ -1,8 +1,8 @@
 import {
-  __, compose, chain, concat, curry, filter, allPass, propEq, path, propIs, propOr,
-  propSatisfies, contains, reduce, map, prop, has, not, isNil, defaultTo, lte, slice,
-  head, reverse, keys, sort, nth, multiply, lt, length, divide, unless, always, match,
-  add, sum, subtract, gte, and, cond, find, converge, identity, is, ifElse, both, negate
+  __, compose, chain, concat, curry, filter, allPass, propEq, path, propIs, propOr, join, props,
+  propSatisfies, contains, reduce, map, prop, has, not, isNil, defaultTo, lte, slice, assoc, o,
+  head, reverse, keys, sort, nth, multiply, lt, length, divide, unless, always, match, zipObj,
+  add, sum, subtract, gte, and, cond, find, converge, identity, is, ifElse, both, negate, drop
 } from 'ramda'
 
 export interface OrderRequest {
@@ -22,21 +22,30 @@ export type OrderResponseMeta = OrderResponseResolved | OrderResponseRejected
 export interface OrderResponse extends OrderRequest { meta: OrderResponseMeta }
 type FromStore = (selector: Function, payload?: any) => any
 
-const symbolToPair = compose(slice(1, 3), match(/^t(\w{1,3})(\w{1,3})$/))
+const symbolToPair = <(s: string) => string[]>compose(slice(1, 3), match(/^t(\w{1,3})(\w{1,3})$/))
 const round = (num: number) => Math.round(num * 1e4) / 1e4
 const getReqOption = (name: string) => path([ 'options', name ])
 const selectFundsAvaliable = (curr: string) =>
   <() => number>path([ 'wallet', 'exchange', curr, 'balance' ])
+
 const selectHighestBid = () =>
   compose(chain(prop, compose(head, sort(<any>reverse), keys)), <any>prop('bids'))
+
+const selectLowestAsk = () =>
+  compose(chain(prop, compose(head, /* sort here? */ keys)), <any>prop('asks'))
+
 const selectHighestBidPrice = () =>
   compose(nth(0), defaultTo([]), selectHighestBid())
-const selectActivePositions = (symbol: string) =>
+
+const selectLowestAskPrice = () =>
+  compose(nth(0), defaultTo([]), selectLowestAsk())
+
+const selectActivePositions = (pair: string) =>
   compose(
     chain(
       curry((ids: number[]) =>
         filter(allPass([
-          propEq('symbol', symbol),
+          propEq('pair', pair),
           propSatisfies(not, 'covered'),
           propSatisfies(compose(not, contains(__, ids)), 'id')
         ])
@@ -52,8 +61,9 @@ const selectActivePositions = (symbol: string) =>
 export const checkOrderAvaliable = curry((fromStore: FromStore, request: OrderRequest): OrderResponse => {
   const symbol = prop('symbol', request)
   const pair = symbolToPair(symbol)
-  const bidPrice: number = fromStore(selectHighestBidPrice)
-  const activePositions = fromStore(selectActivePositions, symbol)
+  const askPrice = fromStore(selectLowestAskPrice)
+  const bidPrice = fromStore(selectHighestBidPrice)
+  const activePositions = fromStore(selectActivePositions, join('', pair))
   const fundsAvaliableToSell: number = fromStore(selectFundsAvaliable, nth(0, pair))
   const fundsAvaliableToBuy: number = fromStore(selectFundsAvaliable, nth(1, pair))
 
@@ -61,7 +71,7 @@ export const checkOrderAvaliable = curry((fromStore: FromStore, request: OrderRe
     const maxActivePositions = <number>getReqOption('maxChunksNumber')(request)
     const minChunksAmount = <number>getReqOption('minChunkAmount')(request)
 
-    const fundsAvaliableToBuyInFunds = divide(fundsAvaliableToBuy, bidPrice)
+    const fundsAvaliableToBuyInFunds = divide(fundsAvaliableToBuy, askPrice)
     const fundsAvaliable = add(fundsAvaliableToSell, fundsAvaliableToBuyInFunds)
     const amountInPositions = compose(<() => number>sum, map(<any>prop('amount')))(activePositions)
     const fundsAvaliableWithoutUsed = subtract(fundsAvaliable, amountInPositions)
@@ -80,7 +90,7 @@ export const checkOrderAvaliable = curry((fromStore: FromStore, request: OrderRe
 
     return ifElse(
       allConditionsPass,
-      always({ status: true, price: bidPrice, amount: chunkAmount }),
+      always({ status: true, price: askPrice, amount: chunkAmount }),
       curry((conditions: {}) => ({ status: false, reason: condErrors(conditions) }))
     )({ isPositionAvaliable, isFundsAvaliable })
   }
@@ -106,13 +116,16 @@ export const checkOrderAvaliable = curry((fromStore: FromStore, request: OrderRe
 
     return ifElse(
       allConditionsPass,
-      always({
+      () => ({
         status: true,
         price: bidPrice,
-        amount: compose(negate, <any>prop('amount'))(toCover),
-        covered: [ prop('id', toCover) ]
+        amount: o(negate, <any>prop('amount'))(toCover),
+        covered: [ props([ 'id', 'amount', 'price'], toCover) ]
       }),
-      curry((conditions: {}) => ({ status: false, reason: condErrors(conditions) }))
+      curry((conditions: {}) => ({
+        status: false,
+        reason: condErrors(conditions)
+      }))
     )({ isFundsAvaliable, toCover })
   }
 
@@ -127,3 +140,16 @@ export const checkOrderAvaliable = curry((fromStore: FromStore, request: OrderRe
     ])(request)
   }
 })
+
+const calcProfit = (tradePayload: any) => 0 // console.log({ orderPayload: nth(7, orderPayload), tradePayload: nth() }) || 0
+
+const whenTypeIsSell = curry((then: (v: any) => any) =>
+  ifElse(propEq('type', 'sell'), then, always(identity)))
+
+export const formatNewPosition = curry((requestPayload: any, orderPayload: any, tradePayload: any) =>
+  compose(
+    whenTypeIsSell(always(compose(assoc('profit', calcProfit(tradePayload)))))(requestPayload),
+    whenTypeIsSell(compose(assoc('covered'), path([ 'meta', 'covered' ])))(requestPayload),
+    <any>zipObj([ 'id', 'pair', 'mts', 'orderId', 'amount', 'price', 'orderType', 'orderPrice', 'fee', 'feeCurrency' ]),
+    drop(1)
+  )(tradePayload))
