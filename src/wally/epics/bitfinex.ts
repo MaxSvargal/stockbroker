@@ -8,7 +8,7 @@ import { checkOrderAvaliable, formatNewPosition, OrderResponse } from './positio
 import { createEpicWithState, payloadOfType } from './utils'
 
 import {
-  __, apply, curry, compose, construct, prop, invoker, either, flip, identity,
+  __, apply, curry, compose, constructN, prop, invoker, either, flip, identity,
   equals, nth, cond, T, pipe, always, and, propEq, allPass, applyTo, map as rmap,
   gt, not, isNil, ifElse, path, pathEq
 } from 'ramda'
@@ -31,7 +31,7 @@ const Bfx = require('bitfinex-api-node')
 const key = 'o7yl00PaXcqt6SiNtinCLW2GeEWGMXlaCxAp7sIv6J8'
 const secret = 'SD1xukgXJVFEDAhLr3L0f13J06VRWFHDhtWCubPJHLQ'
 
-const BfxConstructor = construct(Bfx)
+const BfxConstructor = constructN(3, Bfx)
 const invokeAuth: any = invoker(0, 'auth')
 const invokeSend = flip(invoker(1, 'send'))
 const orderSymbol = nth(3)

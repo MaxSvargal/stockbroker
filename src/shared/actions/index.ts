@@ -20,6 +20,7 @@ export const noPositionsToCover = createAction('NO_POSITIONS_TO_COVER')
 export const requestExecPosition = createAction<Types.RequestExecPositionPayload>('REQUEST_EXEC_POSITION')
 
 export const initialized = createAction('INITIALIZED')
+export const bitfinexSubscribed = createAction('BITFINEX_SUBSCRIBED')
 export const bitfinexConnected = createAction<any>('BITFINEX_CONNECTED')
 export const bitfinexRejected = createAction<Error>('BITFINEX_REJECTED')
 export const bitfinexAuthRejected = createAction<Error>('BITFINEX_AUTH_REJECTED')
@@ -37,3 +38,10 @@ export const updateMyTrade = createAction<any>('UPDATE_MY_TRADE')
 export const signalRequest = createAction<any>('SIGNAL_REQUEST')
 export const signalRequestResolved = createAction<any>('SIGNAL_REQUEST_RESOLVED')
 export const signalRequestRejected = createAction<any>('SIGNAL_REQUEST_REJECTED')
+
+export const setCandles = createAction<Types.CandlesPayload>('SET_CANDLES')
+export const updateCandle = createAction<Types.CandlePayload>('UPDATE_CANDLE')
+export const setOrderBook = createAction<Types.OrderBookData[]>('SET_ORDER_BOOK')
+export const updateOrderBook = createAction<Types.OrderBookData>('UPDATE_ORDER_BOOK')
+
+export const updateTicker = createAction<Types.TickerPayload>('UPDATE_TICKER')

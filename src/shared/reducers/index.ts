@@ -1,8 +1,7 @@
 import { Reducer, Action, combineReducers } from 'redux'
 import ReduxRedisPersist from 'shared/services/redisService'
 
-import asks from './asks'
-import bids from './bids'
+import book from './orderBook'
 import candles from './candles'
 import macd from './macd'
 import positions from './positions'
@@ -13,7 +12,7 @@ import trades from './trades'
 import wallet from './wallet'
 
 const reducers: { [name: string]: Reducer<any> } = {
-  asks, bids, candles, macd, positions, rvi, stoch, tickers, trades, wallet
+  book, candles, macd, positions, rvi, stoch, tickers, trades, wallet
 }
 
 export default function getRootReducer(persistDB: ReduxRedisPersist) {

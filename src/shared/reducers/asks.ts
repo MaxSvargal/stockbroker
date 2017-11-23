@@ -1,5 +1,5 @@
 import { createReducer } from 'redux-act'
-import { setOrderBook, updateOrderBook } from 'exchanger/actions'
+import { setOrderBook, updateOrderBook } from 'shared/actions'
 import { OrderBookData } from 'shared/types'
 
 export type AsksState = {

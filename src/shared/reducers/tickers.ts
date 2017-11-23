@@ -1,5 +1,5 @@
 import { createReducer } from 'redux-act'
-import { updateTicker } from 'exchanger/actions'
+import { updateTicker } from 'shared/actions'
 import { TickerData } from 'shared/types'
 
 export type TickersState = {
