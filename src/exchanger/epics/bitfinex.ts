@@ -21,9 +21,9 @@ const keyToAction = (key: string, action: SimpleActionCreator<any, any>) => [ re
 const orderbookChannel = (ws: any) => Observable.fromEvent(ws, 'orderbook', (chan, msg) => msg)
 const tickerChannel = (ws: any) => Observable.fromEvent(ws, 'ticker', (chan, msg) => msg)
 const candlesChannel = (ws: any) => Observable.fromEvent(ws, 'candles', (chan, msg) => [ chan, msg ])
-const invokeSubscribeOrderBook: any = invoker(1, 'subscribeOrderBook')
-const invokeSubscribeTicker: any = invoker(1, 'subscribeTicker')
-const invokeSubscribeCandles: any = invoker(2, 'subscribeCandles')
+const invokeSubscribeOrderBook: (s: string) => any = invoker(1, 'subscribeOrderBook')
+const invokeSubscribeTicker: (s: string) => any = invoker(1, 'subscribeTicker')
+const invokeSubscribeCandles: (s: string, t: string) => any = invoker(2, 'subscribeCandles')
 const pairToSymbol = (pair: string) => `t${pair}`
 
 const Bfx = require('bitfinex-api-node')

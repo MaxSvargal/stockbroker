@@ -4,7 +4,7 @@ declare module 'bitfinex-api-node' {
       close(): void
     }
     constructor(key: string, secret: string, options?: { version?: number }): BFX
-    on(event: string, cb: function): void
+    on(event: string, cb: function): any
     auth(): void
     send(res: any): void
   }

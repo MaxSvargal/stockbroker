@@ -1,22 +1,18 @@
-import { Reducer, Action, combineReducers } from 'redux'
-import ReduxRedisPersist from 'shared/services/redisService'
+import {
+  map, split, xprod, compose, fromPairs, flatten,
+  converge, zip, join, nth, keys, values, merge, curry
+} from 'ramda'
 
-import book from './orderBook'
-import candles from './candles'
-import macd from './macd'
-import positions from './positions'
-import rvi from './rvi'
-import stoch from './stoch'
-import tickers from './tickers'
-import trades from './trades'
-import wallet from './wallet'
+const keyValuePair = converge(zip, [ keys, values ])
+const joinNames = (v: any[]) => [ join('__', [ nth(0, v), nth(1, v) ]), nth(2, v) ]
 
-const reducers: { [name: string]: Reducer<any> } = {
-  book, candles, macd, positions, rvi, stoch, tickers, trades, wallet
-}
+export const prefixArrWith = (prefix: string, arr: string[]) =>
+  map((name: string) => `${prefix}__${name}`, arr)
 
-export default function getRootReducer(persistDB: ReduxRedisPersist) {
-  const persistentReducers = Object.keys(reducers).reduce((obj, name) =>
-    ({ ...obj, [name]: persistDB.persistentReducer(reducers[name], { name }) }), {})
-  return combineReducers(persistentReducers)
-}
+export const reducersPrularity = (pairs: string[]) =>
+  compose(<any>fromPairs, map(joinNames), map(<any>flatten), <any>xprod(pairs), keyValuePair)
+
+export const keysPlularity = (pairs: string[]) =>
+  compose(map(join('__')), <(v: string[]) => string[][]>xprod(pairs), keys)
+
+export const pairsToArr = (pairs: string) => split(',', pairs)

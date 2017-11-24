@@ -7,30 +7,32 @@ const redis = require('redis')
 export default class ReduxRedisPersist {
   public publisher: RedisClient
   public subscriber: RedisClient
-  private avalialbleToSet?: string[] = []
-  private avalialbleToSubscribe?: string[] = []
+  private publishTo: string[] = []
+  private subscribeTo: string[] = []
   private store: Store<{}>
   private prefix?: string = ''
   private dbIndex?: number = 0
   private channelRegExp = new RegExp(`__keyspace@${this.dbIndex}__:(.+)__(.+)`)
   private SET_REDUCER = '@@redux-redis-persist/SET_REDUCER'
 
-  constructor(options: { prefix?: string, avalialbleToSet?: string[], avalialbleToSubscribe?: string[] }) {
+  constructor(options: { prefix?: string, publishTo: string[], subscribeTo: string[] }) {
     this.publisher = redis.createClient({ db: this.dbIndex })
     this.subscriber = redis.createClient({ db: this.dbIndex })
     this.prefix = options.prefix
-    this.avalialbleToSet = options.avalialbleToSet
-    this.avalialbleToSubscribe = options.avalialbleToSubscribe
-    this.subscriber.on('message', this.onUpdateReceive. bind(this))
+    this.publishTo = options.publishTo
+    this.subscribeTo= options.subscribeTo
+    this.subscriber.on('message', this.onUpdateReceive.bind(this))
 
     return this
   }
 
   private onUpdateReceive(channel: string, type: string) {
-    const [ , prefix = null, reducer = null ] = this.channelRegExp.exec(channel) || []
-    if (prefix === this.prefix && reducer) {
-      this.getReducer(`${prefix}__${reducer}`)
-        .then(state => this.setReducer(reducer, state))
+    const [ , prefix = null, name = null ] = this.channelRegExp.exec(channel) || []
+    const reducerName = this.getSelector(name, prefix)
+
+    if (this.subscribeTo.includes(reducerName)) {
+      this.getReducer(reducerName)
+        .then(state => this.setReducer(name, state))
         .catch(err => console.error(err))
     }
   }
@@ -45,13 +47,16 @@ export default class ReduxRedisPersist {
 
   private getReducer(selector: string) {
     return new Promise((resolve, reject) =>
-      (this.publisher || this.subscriber).get(selector, (err, doc) =>
+      this.publisher.get(selector, (err, doc) =>
         err ? reject(err) : resolve(JSON.parse(doc))))
   }
 
   private saveReducer(selector: string, state: any) {
-    if (selector.match(/positions/)) debug('worker')('saveReducer', selector, state)
     this.publisher.set(selector, JSON.stringify(state))
+  }
+
+  private getSelector(name: string, prefix = this.prefix) {
+    return prefix ? `${prefix}__${name}` : name
   }
 
   public setStore(store: Store<{}>) {
@@ -59,14 +64,14 @@ export default class ReduxRedisPersist {
   }
 
   public persistentReducer = (reducer: Reducer<any>, options: { name: string }) => {
-    const { avalialbleToSubscribe, avalialbleToSet, SET_REDUCER } = this
-    const selector = `${this.prefix}__${options.name}`
+    const { subscribeTo, publishTo, SET_REDUCER } = this
+    const selector = this.getSelector(options.name)
 
     this.getReducer(selector)
       .then(state => this.setReducer(options.name, state))
       .catch(err => console.error(err))
 
-    if (avalialbleToSubscribe && avalialbleToSubscribe.includes(options.name))
+    if (subscribeTo && subscribeTo.includes(options.name))
       this.subscriber.subscribe(`__keyspace@${this.dbIndex}__:${selector}`)
 
     return (state: {}, action: { type: string, reducer?: string, state?: {} }) => {
@@ -79,7 +84,7 @@ export default class ReduxRedisPersist {
           if (state === nextState)
             return state
           else {
-            if (state && avalialbleToSet && avalialbleToSet.includes(options.name))
+            if (state && publishTo && publishTo.includes(options.name))
               process.nextTick(() => this.saveReducer(selector, nextState))
             return nextState
           }
