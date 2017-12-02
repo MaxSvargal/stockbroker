@@ -6,12 +6,12 @@ import createStore from 'shared/store'
 import rootEpic from './epics'
 
 import book from 'shared/reducers/orderBook'
-import candles from 'shared/reducers/positions'
-import tickers from 'shared/reducers/wallet'
+import candles from 'shared/reducers/candles'
+import tickers from 'shared/reducers/tickers'
 
 const { PAIR = 'BTCUSD' } = process.env
 
-debug('worker')(`Hello, i'm a Exchanger!`)
+debug('worker')(`Hello, i'm Exchanger! ${PAIR}`)
 
 const toPublish = { book, candles, tickers }
 

@@ -20,7 +20,7 @@ interface OrderResponseResolved { status: boolean, amount?: number, price?: numb
 interface OrderResponseRejected { status: boolean, reason?: string }
 export type OrderResponseMeta = OrderResponseResolved | OrderResponseRejected
 export interface OrderResponse extends OrderRequest { meta: OrderResponseMeta }
-type FromStore = (selector: Function, payload?: any) => any
+export type FromStore = (selector: Function, payload?: any) => any
 
 const symbolToPair = <(s: string) => string[]>compose(slice(1, 3), match(/^t(\w{1,3})(\w{1,3})$/))
 const round = (num: number) => Math.round(num * 1e4) / 1e4

@@ -11,7 +11,7 @@ import wallet from 'shared/reducers/wallet'
 
 const { ACCOUNT = 'demo', PAIRS = 'BTCUSD,ETHUSD' } = process.env
 
-debug('worker')(`Hello, ${ACCOUNT}! I'm a Wally!`)
+debug('worker')(`Hello, ${ACCOUNT}! I'm Wally! ${PAIRS}`)
 
 const pairs = pairsToArr(PAIRS)
 const toSubscribe = { book }

@@ -40,8 +40,10 @@ export const signalRequestResolved = createAction<any>('SIGNAL_REQUEST_RESOLVED'
 export const signalRequestRejected = createAction<any>('SIGNAL_REQUEST_REJECTED')
 
 export const setCandles = createAction<Types.CandlesPayload>('SET_CANDLES')
-export const updateCandle = createAction<Types.CandlePayload>('UPDATE_CANDLE')
-export const setOrderBook = createAction<Types.OrderBookData[]>('SET_ORDER_BOOK')
-export const updateOrderBook = createAction<Types.OrderBookData>('UPDATE_ORDER_BOOK')
+export const updateCandle = createAction<any>('UPDATE_CANDLE')
+export const setOrderBook = createAction<Types.SetOrderBookPayload>('SET_ORDER_BOOK')
+export const updateOrderBook = createAction<Types.UpdateOrderBookPayload>('UPDATE_ORDER_BOOK')
 
 export const updateTicker = createAction<Types.TickerPayload>('UPDATE_TICKER')
+
+export const addRSIResult = createAction<Types.AddRSIPayload>('ADD_RSI_RESULT')
