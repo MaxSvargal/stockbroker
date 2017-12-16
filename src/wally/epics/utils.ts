@@ -10,8 +10,8 @@ type CreateEpicWithState = (
   epic: ActionsObservable<Action>
 ) => any
 
-export const fromStore = (store: Store<any>) => (selectorFn: Selector, payload: any) =>
-  compose(selectorFn(payload), invoker(0, 'getState'))(store)
+export const fromStore = curry((store: Store<any>, selector: Selector) =>
+  compose(selector, invoker(0, 'getState'))(store))
 
 export const createEpicWithState = (epic: CreateEpicWithState) =>
   (action$: ActionsObservable<Action>, store: Store<any>): ActionsObservable<Action> =>

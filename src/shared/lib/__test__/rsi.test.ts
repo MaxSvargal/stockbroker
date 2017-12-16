@@ -1,4 +1,4 @@
-import RSI from './rsi'
+import RSI from '../rsi'
 
 test('RSI', () => {
   // [ MTS, OPEN, CLOSE, HIGHT, LOW, VOLUME ]

@@ -11,7 +11,7 @@ export const prefixArrWith = (prefix: string, arr: string[]) =>
   map((name: string) => `${prefix}__${name}`, arr)
 
 export const reducersPrularity = (pairs: string[]) =>
-  compose(<any>fromPairs, map(joinNames), map(bindPair), map(<any>flatten), <any>xprod(pairs), keyValuePair)
+  compose(<any>fromPairs, map(joinNames), map(<any>flatten), <any>xprod(pairs), keyValuePair)
 
 export const keysPlularity = (pairs: string[]) =>
   compose(map(join('__')), <(v: string[]) => string[][]>xprod(pairs), keys)

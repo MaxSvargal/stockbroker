@@ -46,7 +46,7 @@
     "ignore": [
       "*.test.ts"
     ],
-    "exec": "DEBUG=* ACCOUNT=maxsvargal PAIRS=BTCUSD,DATUSD NODE_PATH=./src ts-node ./src/wally/index.ts"
+    "exec": "DEBUG=* ACCOUNT=maxsvargal PAIR=BTCUSD NODE_PATH=./src ts-node ./src/composig/index.ts"
   },
   "dependencies": {
     "@most/core": "^0.15.0",
@@ -59,6 +59,7 @@
     "most": "^1.7.2",
     "most-subject": "^6.0.0",
     "ramda": "^0.25.0",
+    "ramda-fantasy": "^0.8.0",
     "redis": "^2.8.0",
     "redux": "^3.7.2",
     "redux-act": "^1.4.0",

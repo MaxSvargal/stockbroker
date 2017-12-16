@@ -63,7 +63,7 @@ export type TickerData = [ BID, BID_SIZE, ASK, ASK_SIZE, DAILY_CHANGE, DAILY_CHA
 export type TradeData = [ ID, MTS, AMOUNT, PRICE ]
 export type WalletData = [ WALLET_TYPE, CURRENCY, BALANCE, UNSETTLED_INTEREST, BALANCE_AVAILABLE ]
 
-export type AddMACDResultPayload = { symbol: string, time: number, value: number }
+export type AddMACDResultPayload = { pair: string, interval: string, time: number, value: number }
 export type AddRVIResultPayload = { symbol: string, time: number, average: number, signal: number }
 export type AddStochResultPayload = { symbol: string, time: number, value: number }
 export type CancelOrderPayload = { id: ID }
@@ -82,4 +82,5 @@ export type TickerPayload = { pair: PAIR, data: TickerData }
 export type TradePayload = { pair: PAIR, data: TradeData }
 export type TradesPayload = { pair: PAIR, data: TradeData[] }
 export type RequestExecPositionPayload = { pair: PAIR, exec: boolean }
-export type AddRSIPayload = [ PAIR, MTS, SIGNAL_VALUE ]
+export type AddRSIPayload = { pair: PAIR, mts: MTS, value: SIGNAL_VALUE }
+export type RSIData = [ MTS, SIGNAL_VALUE ]

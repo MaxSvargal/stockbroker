@@ -9,25 +9,23 @@ import candles from 'shared/reducers/positions'
 import macd from 'shared/reducers/macd'
 import rsi from 'shared/reducers/rsi'
 
-const { PAIRS = 'BTCUSD,ETHUSD' } = process.env
+const { PAIR = 'BTCUSD' } = process.env
 
-debug('worker')(`Hello, i'm CompSig! ${PAIRS}`)
+debug('worker')(`Hello, i'm CompSig! ${PAIR}`)
 
-const pairs = pairsToArr(PAIRS)
 const toSubscribe = { candles }
 const toPublish = { macd, rsi }
 
-const pairsKeys = keysPlularity(pairs)
-const pairsReducers = reducersPrularity(pairs)
+const pairsReducers = reducersPrularity([ PAIR ])
 
 export default createStore({
-  rootEpic: rootEpic(pairs),
+  rootEpic: rootEpic(PAIR),
   reducers: merge(
     pairsReducers(toPublish),
     pairsReducers(toSubscribe)
   ),
   db: {
-    subscribeTo: pairsKeys(toSubscribe),
-    publishTo: pairsKeys(toPublish)
+    subscribeTo: prefixArrWith(PAIR, keys(toSubscribe)),
+    publishTo: prefixArrWith(PAIR, keys(toPublish))
   }
 })
