@@ -5,7 +5,7 @@ import { Responder } from 'cote'
 
 type storeGetAllRequest = { type: 'storeGetAll', key: string }
 const hash = o(<(a: any[]) => storeGetAllRequest>prop('key'), nth(0))
-const replyFn = o(flip, nth(1))
+const replyFn = nth(1)
 
 type Hvals = (a: string, b: Function, c: RedisClient) => void
 const hvals: Hvals = invoker(2, 'hvals')

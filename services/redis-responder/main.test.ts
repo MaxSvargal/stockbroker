@@ -27,12 +27,12 @@ describe('Redis Responder', () => {
     const storeGetAll = listenersCalls[0][1]
 
     expect(listenersCalls).toBeCalled
-    storeGetAll([ { type: 'storeGetAll', key: 'candles:trade:15m:tBTCUSD' }, responseCb ])
+    storeGetAll([ { type: 'storeGetAll', key: 'candles:15m:tBTCUSD' }, responseCb ])
 
     setTimeout(() => {
       expect(redis.hvals).toBeCalled()
       // TODO: check it deeper
-      expect(redis.hvals.mock.calls[0][0]).toBe('candles:trade:15m:tBTCUSD')
+      expect(redis.hvals.mock.calls[0][0]).toBe('candles:15m:tBTCUSD')
       expect(typeof redis.hvals.mock.calls[0][1]).toBe('function')
       done()
     })

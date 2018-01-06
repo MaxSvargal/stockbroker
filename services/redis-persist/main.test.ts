@@ -29,14 +29,14 @@ describe('Redis Persist', () => {
     const storeSet = listenersCalls[0][1]
     const storeUpdate = listenersCalls[1][1]
 
-    storeSet([ 'candles:trade:15m:tBTCUSD', [ [ 0, 1 ], [ 2, 3 ] ] ])
-    storeUpdate([ 'candles:trade:1m:tBTCUSD', [ 9, 10 ] ])
+    storeSet([ 'candles:15m:tBTCUSD', [ [ 0, 1 ], [ 2, 3 ] ] ])
+    storeUpdate([ 'candles:1m:tBTCUSD', [ 9, 10 ] ])
 
     setTimeout(() => {
       expect(redis.hset.mock.calls.length).toBe(1)
       expect(redis.hmset.mock.calls.length).toBe(1)
-      expect(redis.hset.mock.calls[0]).toEqual([ 'candles:trade:1m:tBTCUSD', '9', '[9,10]' ])
-      expect(redis.hmset.mock.calls[0]).toEqual([ 'candles:trade:15m:tBTCUSD', [ '0', '[0,1]', '2', '[2,3]' ] ])
+      expect(redis.hset.mock.calls[0]).toEqual([ 'candles:1m:tBTCUSD', '9', '[9,10]' ])
+      expect(redis.hmset.mock.calls[0]).toEqual([ 'candles:15m:tBTCUSD', [ '0', '[0,1]', '2', '[2,3]' ] ])
       done()
     })
   })
