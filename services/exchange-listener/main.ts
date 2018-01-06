@@ -12,7 +12,6 @@ const publishOf = curry((event: string, publisher: any, key: string, value: any)
 // Pure
 const candles = 'candles'
 const orderbook = 'orderbook'
-
 const isShapshot = compose(is(Array), nth(0), nth(1))
 const subscribeOrderBook = invoker(1, 'subscribeOrderBook')
 const subscribeCandles = invoker(2, 'subscribeCandles')
