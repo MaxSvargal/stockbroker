@@ -13,7 +13,7 @@ const candles = 'candles'
 const candlesFrames = [ '1m', '5m', '15m' ]
 const makeRequestOptions = curry((limit: number, symbol: string, interval: string) => ({ limit, symbol, interval }))
 const requestCandles = flip(invoker(1, candles))
-const candlesProps: (a: Candle) => any[] = props([ 'openTime', 'open', 'close', 'high', 'low', 'volume' ])
+const candlesProps: (a: Candle) => any[] = props([ 'openTime', 'open', 'high', 'low', 'close', 'volume' ])
 const formatCandles = o(map, map, candlesProps)
 const publishSet = publishOf('storeSet')
 

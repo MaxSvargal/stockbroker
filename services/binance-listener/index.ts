@@ -12,6 +12,6 @@ const exitProcess = (err: Error) => {
 }
 const binance = binanceCons({})
 const publisher = publisherCons({ name, broadcasts })
-const stream = periodic(10000)
+const stream = periodic(20000)
 
 main(exitProcess, stream, binance, publisher, SYMBOL)
