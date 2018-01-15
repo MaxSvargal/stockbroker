@@ -1,17 +1,17 @@
 import { periodic } from 'most'
-import { publisherCons, binanceCons } from '../utils/cote'
+import { requesterCons, binanceCons } from '../utils/cote'
 import main from './main'
 
 const { SYMBOL = 'BNBUSDT' } = process.env
 const name = `Binance Exchange Listener ${SYMBOL}`
-const broadcasts = [ 'storeSet', 'storeUpdate' ]
+const requests = [ 'cacheHashMultiSet' ]
 
 const exitProcess = (err: Error) => {
   console.error(err)
   process.exit(1)
 }
 const binance = binanceCons({})
-const publisher = publisherCons({ name, broadcasts })
-const stream = periodic(20000)
+const requester = requesterCons({ name, requests })
+const stream = periodic(30000)
 
-main(exitProcess, stream, binance, publisher, SYMBOL)
+main(exitProcess, stream, binance, requester, SYMBOL)
