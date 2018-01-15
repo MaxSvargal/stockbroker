@@ -1,16 +1,19 @@
 import { constructN } from 'ramda'
-import { subscriberCons } from '../utils/cote'
+import { responderCons } from '../utils/cote'
 import { createClient } from 'redis'
 
 import main from './main'
 
 // Options
-const name = 'Redis Persist Subscriber'
-const subscribesTo = [ 'storeSet', 'storeUpdate' ]
+const name = 'Redis Persist'
+const respondsTo = [ 'cacheHashSet', 'cacheHashMultiSet' ]
 
 // Constructors
-const exitProcess = () => process.exit(1)
+const exitProcess = (err: Error) => {
+  console.error(err)
+  process.exit(1)
+}
 const redis = createClient()
-const subscriber = subscriberCons({ name, subscribesTo })
+const responder = responderCons({ name, respondsTo })
 
-main(exitProcess, redis, subscriber)
+main(exitProcess, redis, responder)
