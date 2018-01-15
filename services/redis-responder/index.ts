@@ -6,7 +6,7 @@ import main from './main'
 
 // Options
 const name = 'Redis Responder'
-const respondsTo = [ 'storeGetAll' ]
+const respondsTo = [ 'cacheHashGetValues' ]
 
 // Constructors
 const exitProcess = () => process.exit(1)

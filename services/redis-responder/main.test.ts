@@ -18,7 +18,6 @@ describe('Redis Responder', () => {
     const exitProcess = jest.fn()
     const responder = makeResponder()
     const redis = makeRedisClient()
-    const stream = fromEvent('storeGetAll', responder)
     const responseCb = jest.fn(function(err, value) { return value })
 
     main(exitProcess, redis, responder)
@@ -27,7 +26,7 @@ describe('Redis Responder', () => {
     const storeGetAll = listenersCalls[0][1]
 
     expect(listenersCalls).toBeCalled
-    storeGetAll([ { type: 'storeGetAll', key: 'candles:15m:tBTCUSD' }, responseCb ])
+    storeGetAll([ { type: 'cacheHashGetValues', key: 'candles:15m:tBTCUSD' }, responseCb ])
 
     setTimeout(() => {
       expect(redis.hvals).toBeCalled()

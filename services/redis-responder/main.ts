@@ -3,7 +3,7 @@ import { fromEvent, observe } from 'most'
 import { RedisClient } from 'redis'
 import { Responder } from 'cote'
 
-type storeGetAllRequest = { type: 'storeGetAll', key: string }
+type storeGetAllRequest = { type: 'cacheHashGetValues', key: string }
 const hash = o(<(a: any[]) => storeGetAllRequest>prop('key'), nth(0))
 const replyFn = nth(1)
 
@@ -18,7 +18,7 @@ const eventToRequest: EventToRequest = flip(uncurryN(2, applyHvals))
 
 type Main = (a: (a: Event) => void, b: RedisClient, c: Responder) => void
 const main: Main = (exitProcess, redis, responder) => {
-  const storeGetAllStream = fromEvent('storeGetAll', responder)
+  const storeGetAllStream = fromEvent('cacheHashGetValues', responder)
   observe(eventToRequest(redis), storeGetAllStream)
 }
 
