@@ -6,11 +6,14 @@ import main from './main'
 // Options
 const { SYMBOL = 'BNBUSDT' } = process.env
 const name = `Signal Publisher ${SYMBOL}`
-const requests = [ 'getCandles', 'getOrderbook' ]
+const requests = [ 'cacheHashGetValues' ]
 const broadcasts = [ 'propagateSignal' ]
 
 // Constructors
-const exitProcess = () => process.exit(1)
+const exitProcess = (err: Error) => {
+  console.error(err)
+  process.exit(1)
+}
 const requester = requesterCons({ name, requests })
 const publisher = publisherCons({ name, broadcasts })
 const loopStream = periodic(20000)

@@ -13,11 +13,17 @@ const makePublisher = () => ({
 })
 
 describe('Signal Publisher', () => {
-  test('should be done', async () => {
+  test('should be send buy signal', async () => {
     const candles = [
-      '[1514990110000, 22.20, 20.80, 22.5, 20.8, 10]',
-      '[1514990120000, 20.30, 19.80, 20.30, 19.8, 10]',
-      '[1514990130000, 20.70, 21.58, 20.7, 21.58, 10]',
+      //  time, open, high, low, close, volume
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 8, 7, 6, 0]',
+      '[1514990110000, 0, 7, 6, 5, 0]',
+      '[1514990110000, 0, 6, 5, 4, 0]',
+      '[1514990110000, 0, 5, 4, 3, 0]',
+      '[1514990110000, 0, 4, 3, 2, 0]',
+      '[1514990110000, 0, 3, 2, 1, 0]',
+      '[1514990110000, 0, 19, 18, 17, 0]',
     ]
     const symbol = 'BTCUSD'
     const exitProcess = (err: Error) => { throw err }
@@ -30,12 +36,35 @@ describe('Signal Publisher', () => {
     await run(loopStream).tick(1)
 
     // expect(requester.send.mock.calls.length).toBe(2)
-    expect(publisher.publish).toBeCalledWith('newIndicatorsResults', {
-      time: 1514990130000,
-      bearish: false,
-      bullish: true,
-      close: 21.58
+    expect(publisher.publish).toBeCalledWith('newSignal', {
+      price: 17,
+      type: 'BUY',
+      time: expect.any(Number)
     })
+  })
 
+  test('should NOT be send any messages', async () => {
+    const candles = [
+      //  time, open, high, low, close, volume
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 8, 7, 6, 0]',
+      '[1514990110000, 0, 7, 6, 5, 0]',
+      '[1514990110000, 0, 6, 5, 4, 0]',
+      '[1514990110000, 0, 5, 4, 3, 0]',
+      '[1514990110000, 0, 4, 3, 2, 0]',
+      '[1514990110000, 0, 3, 2, 1, 0]',
+      '[1514990110000, 0, 2, 1, 0, 0]',
+    ]
+    const symbol = 'BTCUSD'
+    const exitProcess = (err: Error) => { throw err }
+    const requester = makeRequester({ candles })
+    const publisher = makePublisher()
+    const loopStream = just(null)
+
+    main(exitProcess, loopStream, requester, publisher, symbol)
+
+    await run(loopStream).tick(1)
+
+    expect(publisher.publish).toHaveBeenCalledTimes(0)
   })
 })
