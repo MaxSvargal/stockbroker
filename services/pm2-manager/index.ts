@@ -4,7 +4,7 @@ import * as pm2 from 'pm2'
 import main from './main'
 
 // Options
-const name = 'Redis Persist Subscriber'
+const name = 'PM2 Manager'
 const respondsTo = [ 'processStart', 'processStop', 'processDelete' ]
 
 // Constructors

@@ -20,17 +20,17 @@ const invokeDisconnect = invoker(0, 'disconnect')
 const connect = (pm2: PM2) => new Promise((resolve, reject) =>
   invokeConnect((err: Error) => err ? reject(err) : resolve())(pm2))
 
-type StartProcess = (a: PM2) => (xs: [ { options: StartOptions }, (b: {}) => {} ]) => void
+type StartProcess = (a: PM2) => (xs: [ { options: StartOptions }, (b: Error, c: any) => {} ]) => void
 const startProcess: StartProcess = pm2 => ([ { options }, reply ]) =>
-  invokeStart(options, (err: Error, apps: {}) => reply(err || apps))(pm2)
+  invokeStart(options, (err: Error, apps: {}) => reply(err, apps))(pm2)
 
-type StopProcess = (a: PM2) => (xs: [ { name: string }, (b: any) => {} ]) => void
+type StopProcess = (a: PM2) => (xs: [ { name: string }, (b: Error, c: any) => {} ]) => void
 const stopProcess: StopProcess = pm2 => ([ { name }, reply ]) =>
-  invokeStop(name, (err: Error) => reply(err || name))(pm2)
+  invokeStop(name, (err: Error) => reply(err, name))(pm2)
 
-type DeleteProcess = (a: PM2) => (xs: [ { name: string }, (b: any) => {} ]) => void
+type DeleteProcess = (a: PM2) => (xs: [ { name: string }, (b: Error, c: any) => {} ]) => void
 const deleteProcess: DeleteProcess = pm2 => ([ { name }, reply ]) =>
-  invokeDelete(name, (err: Error) => reply(err || name))(pm2)
+  invokeDelete(name, (err: Error) => reply(err, name))(pm2)
 
 type Main = (a: (a: Event) => void, b: PM2, c: Responder) => void
 const main: Main = async (exitProcess, pm2, responder) => {

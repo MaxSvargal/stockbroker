@@ -64,7 +64,7 @@ describe('PM2 Manager', () => {
 
     await tick()
 
-    expect(responseCb).toBeCalledWith({ app: 'data' })
+    expect(responseCb).toBeCalledWith(null, { app: 'data' })
   })
   test('processDelete should work correctly', async () => {
     const exitProcess = jest.fn()
@@ -102,6 +102,6 @@ describe('PM2 Manager', () => {
     pm2DeleteCalls[0][1](null) // exec callback
 
     await tick()
-    expect(responseCb).toBeCalledWith('Signal Publisher BTGETH')
+    expect(responseCb).toBeCalledWith(null, 'Signal Publisher BTGETH')
   })
 })
