@@ -37,6 +37,7 @@ describe('Signal Publisher', () => {
 
     // expect(requester.send.mock.calls.length).toBe(2)
     expect(publisher.publish).toBeCalledWith('newSignal', {
+      symbol,
       price: 17,
       type: 'BUY',
       time: expect.any(Number)

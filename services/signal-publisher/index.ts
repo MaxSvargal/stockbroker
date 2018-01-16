@@ -16,6 +16,6 @@ const exitProcess = (err: Error) => {
 }
 const requester = requesterCons({ name, requests })
 const publisher = publisherCons({ name, broadcasts })
-const loopStream = periodic(20000)
+const loopStream = periodic(10000)
 
 main(exitProcess, loopStream, requester, publisher, SYMBOL)

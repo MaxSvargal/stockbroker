@@ -22,7 +22,7 @@ const main: Main = (exitProcess, loopStream, requester, publisher, symbol) => {
   const send = invokeSend(requester)
   const publish = invokePublishNewSignal(publisher)
   const requests = makeRequests(symbol)(candlesFrames)
-  const evalAnalysis = compose(when(o(not, isNil), publish), makeAnalysis, map(parseCandles))
+  const evalAnalysis = compose(when(o(not, isNil), publish), makeAnalysis(symbol), map(parseCandles))
   const tick = () => Promise.all(map(send, requests)).then(evalAnalysis).catch(exitProcess)
 
   observe(tick, loopStream)
