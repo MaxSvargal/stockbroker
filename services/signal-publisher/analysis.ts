@@ -22,14 +22,14 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m ]) => {
   const buySignal = wrIsUp
   const sellSignal = wrIsDrop
 
-  debug('dev')({
-    now: new Date().toLocaleString(),
-    t: new Date(last(time)).toLocaleString(),
-    close: last(close),
-    buySignal,
-    sellSignal,
-    wrList: takeLast(4, wr)
-  })
+  // debug('dev')({
+  //   now: new Date().toLocaleString(),
+  //   t: new Date(last(time)).toLocaleString(),
+  //   close: last(close),
+  //   buySignal,
+  //   sellSignal,
+  //   wrList: takeLast(4, wr)
+  // })
 
   if(any(equals(true))([ buySignal, sellSignal ])) {
     debug('dev')(`SIG ${buySignal ? '🚀  BUY' : '🏁  SEL'} ${last(close).toFixed(8)}     ${new Date(last(time)).toLocaleString()}`)
