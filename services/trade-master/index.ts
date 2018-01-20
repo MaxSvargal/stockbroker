@@ -28,6 +28,6 @@ const exitProcess = (err: Event) => {
   process.exit(1)
 }
 
-const loopStream = delay(5000, periodic(120000))
+const loopStream = delay(5000, periodic(600000))
 
 main(exitProcess, loopStream, fetch, requesterPersistStore, requesterRespondStore, requesterProcess)

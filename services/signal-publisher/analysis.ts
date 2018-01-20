@@ -32,7 +32,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m ]) => {
   // })
 
   if(any(equals(true))([ buySignal, sellSignal ])) {
-    debug('dev')(`SIG ${buySignal ? '🚀  BUY' : '🏁  SEL'} ${last(close).toFixed(8)}     ${new Date(last(time)).toLocaleString()}`)
+    debug('dev')(`${symbol} SIG ${buySignal ? '🚀  BUY' : '🏁  SEL'} ${last(close).toFixed(8)}     ${new Date(last(time)).toLocaleString()}`)
     return { symbol, type: buySignal ? 'BUY' : 'SELL', price: last(close), time: new Date().getTime() }
   }
   return null

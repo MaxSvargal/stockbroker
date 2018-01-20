@@ -8,7 +8,7 @@ const { SYMBOL = 'BNBUSDT' } = process.env
 const name = `Signal Publisher ${SYMBOL}`
 const key = 'store-respond'
 const requests = [ 'cacheHashGet', 'cacheHashGetValues' ]
-const broadcasts = [ 'propagateSignal' ]
+const broadcasts = [ 'newSignal' ]
 
 // Constructors
 const exitProcess = (err: Error) => {

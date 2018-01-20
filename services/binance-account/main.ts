@@ -4,7 +4,7 @@ import {
   reject, complement, converge, match, gte, nth, last, sortBy, curry, divide,
   length, subtract, not, contains, propSatisfies, reduce, concat, filter,
   compose, prop, map, applyTo, flip, invoker, propEq, find, splitEvery, T, gt,
-  isNil, pair, when, both, append, defaultTo
+  isNil, pair, when, both, append, defaultTo, head, uniq
 } from 'ramda'
 import { fromEvent, observe, throttle } from 'most'
 import { Requester, Subscriber } from 'cote'
@@ -17,7 +17,7 @@ type Binance = {
 }
 type ExitProcess = (a: Error) => void
 type Account = string
-type Main = (a: ExitProcess, b: Binance, c: Subscriber, d: Requester, e: Account) => void
+type Main = (a: ExitProcess, b: Binance, c: Subscriber, d: Requester, e: Requester, f: Account) => void
 
 const invokeSend = flip(invoker(1, 'send'))
 const invokeAccountInfo = flip(invoker(1, 'accountInfo'))
@@ -27,11 +27,11 @@ const invokeMyTrades = flip(invoker(1, 'myTrades'))
 
 const requestPositions = (account: string) => ({
   type: 'cacheHashGetValues',
-  key: `${account}:positions`
+  key: `accounts:${account}:positions`
 })
 const requestSetPosition = (account: string) => (position: {}) => ({
   type: 'cacheHashSet',
-  key: `${account}:positions`,
+  key: `accounts:${account}:positions`,
   field: prop('id', position),
   value: JSON.stringify(position)
 })
@@ -75,8 +75,12 @@ const calcProfit = unapply(whenFirstArgIsset(getProfitFromPositionAndTrade))
 const takePairFromSymbol = compose(converge(pair, [ nth(1), nth(2) ]), match(/(.+)(...)/))
 const skipBuySignalByEqualActiveSymbol = both(propEq('type', 'BUY'), converge(isNotEquals, [ prop('activeSymbol'), prop('symbol') ]))
 const symbolNotLastIsset = converge(isNotEquals, [ prop('activeSymbol'), compose(last, defaultTo([]), prop('accountActiveSymbols')) ])
-const removeFromList = unapply(converge(reject, [ o(equals, nth(0)), nth(1) ]))
 const lastPositionIsClosed = both(o(propEq('side', 'SELL'), prop('position')), o(propEq('length', 1), prop('openedPositions')))
+
+const stringify = flip(invoker(1, 'stringify'))(JSON)
+const parse = flip(invoker(1, 'parse'))(JSON)
+const addSymbolToList = o(stringify, converge(append, [ head, o(compose(uniq, parse, defaultTo('[]')), last) ]))
+const removeSymbolFromList = o(stringify, converge(reject, [ o(equals, head), compose(parse, defaultTo('[]'), last) ]))
 
 const buyErrorsCondition = cond([
   [ o(equals(0), prop('avaliableChunks')), always(Error('Too much opened positions')) ],
@@ -89,14 +93,15 @@ const sellErrorsCondition = cond([
   [ T, always(null) ]
 ])
 
-const main: Main = (exitProcess, binance, subscriber, requester, account) => {
+const main: Main = (exitProcess, binance, subscriber, requesterRespondStore, requesterPersistStore, account) => {
 
   const propagateSignalStream = fromEvent('newSignal', subscriber)
   const binanceInvokers = [ invokeAccountInfo, invokeOrder, invokeMyTrades ]
   const [ accountInfo, sendOrder, myTrades ] = map(applyTo(binance), binanceInvokers)
 
-  const send = invokeSend(requester)
-  const sendSetPosition = compose(send, requestSetPosition(account))
+  const storeRequest = invokeSend(requesterRespondStore)
+  const storePersist = invokeSend(requesterPersistStore)
+  const setPosition = requestSetPosition(account)
   const getAccountActiveSymbols = requestAccountActiveSymbols(account)
   const setAccountActiveSymbols = requestSetAccountActiveSymbols(account)
   const getPositions = requestPositions(account)
@@ -104,17 +109,25 @@ const main: Main = (exitProcess, binance, subscriber, requester, account) => {
   type SignalRequest = { symbol: string, type: 'BUY' | 'SELL', price: number }
   const checkSignal = async ({ symbol, type, price }: SignalRequest) => {
     try {
-      const activeSymbol: string = await send(requestActiveSymbol)
+      debug('dev')({ symbol, type, price })
+      const activeSymbol: string = await storeRequest(requestActiveSymbol)
 
       if (skipBuySignalByEqualActiveSymbol({ type, symbol, activeSymbol }))
         throw Error(`Symbol ${symbol} is not active, skip BUY signal.`)
 
-      const [ accountActiveSymbols, positions, { balances } ] = await Promise.all(
-        concat(map(send, [ getAccountActiveSymbols, getPositions ]), [ accountInfo(null) ])
+      let [ accountActiveSymbols, positions, { balances } ] = await Promise.all(
+        concat(map(storeRequest, [ getAccountActiveSymbols, getPositions ]), [ accountInfo(null) ])
       )
 
-      if (symbolNotLastIsset({ activeSymbol, accountActiveSymbols })) {
-        await send(setAccountActiveSymbols(JSON.stringify(append(activeSymbol, accountActiveSymbols))))
+      balances = [
+        { asset: 'BTC', free: '1.00000000' },
+        { asset: 'EOS', free: '2000.00000000' }
+      ]
+
+      console.log({ accountActiveSymbols, activeSymbol })
+
+      if (symbolNotLastIsset({ activeSymbol, accountActiveSymbols }) /* TODO remove this? */) {
+        await compose(storePersist, setAccountActiveSymbols, addSymbolToList)([ activeSymbol, accountActiveSymbols ])
       }
 
       const [ slaveCurrency, masterCurrency ] = takePairFromSymbol(symbol)
@@ -135,6 +148,7 @@ const main: Main = (exitProcess, binance, subscriber, requester, account) => {
       const execSell = () => {
         const findBySlaveCurrency = findByAssetProp(slaveCurrency)
         const avaliableToSell = o(parseFreeProp, findBySlaveCurrency)(balances)
+        console.log({ avaliableToSell })
         const positionToCover = findOrderToCover([ price, minProfit ])(openedPositions)
         const quantity = prop('executedQty', positionToCover)
         // TODO also check for minimal quantity for symbol
@@ -147,21 +161,21 @@ const main: Main = (exitProcess, binance, subscriber, requester, account) => {
       const { quantity, error, positionToCover } = getTradeSide(type)
       if (error) throw error
 
-      const order = await sendOrder({ symbol, quantity, side: type, type: 'MARKET' })
-      debug('dev')('Order requested:', order)
+      // const order = await sendOrder({ symbol, quantity, side: type, type: 'MARKET' })
+      // debug('dev')('Order requested:', order)
 
       // const trades = await myTrades({ symbol, limit: 10 })
       // const trade = findTradeByOrderId(prop('orderId', order), trades)
-      const trade = { executedQty: quantity, price, side: type, symbol, created: new Date().getTime() }
+      const trade = { executedQty: quantity, price, side: type, symbol, created: new Date().getTime(), id: new Date().getTime() }
       const profit = calcProfit(positionToCover, trade)
       const coveredIds = positionToCover && [ prop('id', positionToCover) ]
-      const position = mergeAll([ order, trade, { profit, coveredIds } ])
+      const position = mergeAll([ /*order,*/ trade, { profit, coveredIds } ])
 
       debug('dev')(position)
-      const positionStoreStatus = await sendSetPosition(position)
+      const positionStoreStatus = await storePersist(setPosition(position))
 
       if (lastPositionIsClosed({ position, openedPositions })) {
-        await send(setAccountActiveSymbols(JSON.stringify(removeFromList(activeSymbol, accountActiveSymbols))))
+        await compose(storePersist, setAccountActiveSymbols, removeSymbolFromList)([ activeSymbol, accountActiveSymbols ])
       }
 
     } catch (error) {
@@ -174,7 +188,6 @@ const main: Main = (exitProcess, binance, subscriber, requester, account) => {
         price
       }
       debug('dev')(errorEvent)
-      send(errorEvent)
     }
   }
   // TODO: trottle
