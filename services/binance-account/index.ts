@@ -8,7 +8,8 @@ const {
 } = process.env
 const name = `Binance Exchange Account ${ACCOUNT}`
 const subscribesTo = [ 'newSignal' ]
-const requests = [ 'cacheHashGetValues' ]
+const requests = [ 'cacheHashGet', 'cacheHashGetValues' ]
+const key = 'store-respond'
 
 const exitProcess = (err: Error) => {
   console.error(err)
@@ -16,7 +17,7 @@ const exitProcess = (err: Error) => {
 }
 const binance = binanceCons({ apiKey: KEY, apiSecret: SECRET })
 const subscriber = subscriberCons({ name, subscribesTo })
-const requester = requesterCons({ name, requests })
+const requester = requesterCons({ name, key, requests })
 const account = ACCOUNT
 
 main(exitProcess, binance, subscriber, requester, account)
