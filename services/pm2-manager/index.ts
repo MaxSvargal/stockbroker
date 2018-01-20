@@ -5,13 +5,14 @@ import main from './main'
 
 // Options
 const name = 'PM2 Manager'
-const respondsTo = [ 'processStart', 'processStop', 'processDelete' ]
+const key = 'processes'
+const respondsTo = [ 'processStart', 'processStop', 'processDelete', 'processesList' ]
 
 // Constructors
 const exitProcess = (err: Event) => {
   console.error(err)
   process.exit(1)
 }
-const responder = responderCons({ name, respondsTo })
+const responder = responderCons({ name, key, respondsTo })
 
 main(exitProcess, pm2, responder)

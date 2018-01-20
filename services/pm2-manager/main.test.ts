@@ -16,6 +16,7 @@ const makePM2 = () => ({
   disconnect: jest.fn(),
   start: jest.fn(),
   delete: jest.fn(),
+  list: jest.fn(),
 })
 
 describe('PM2 Manager', () => {
@@ -36,7 +37,7 @@ describe('PM2 Manager', () => {
     await tick()
 
     const listenersCalls = responder.addListener.mock.calls
-    expect(listenersCalls).toHaveLength(3)
+    expect(listenersCalls).toHaveLength(4)
     const processStart = listenersCalls[0][1]
     processStart([
       {
@@ -83,7 +84,7 @@ describe('PM2 Manager', () => {
     await tick()
 
     const listenersCalls = responder.addListener.mock.calls
-    expect(listenersCalls).toHaveLength(3)
+    expect(listenersCalls).toHaveLength(4)
     const processDelete = listenersCalls[2][1]
     processDelete([
       {
@@ -103,5 +104,44 @@ describe('PM2 Manager', () => {
 
     await tick()
     expect(responseCb).toBeCalledWith(null, 'Signal Publisher BTGETH')
+  })
+  test('processesList should work correctly', async () => {
+    const exitProcess = jest.fn()
+    const responder = makeResponder()
+    const pm2 = makePM2()
+    const responseCb = jest.fn(function(err, value) { return value })
+
+    main(exitProcess, pm2, responder)
+
+    await tick()
+
+    const connectCalls = pm2.connect.mock.calls
+    expect(connectCalls).toHaveLength(1)
+    connectCalls[0][0]() // exec callback
+
+    await tick()
+
+    const listenersCalls = responder.addListener.mock.calls
+    expect(listenersCalls).toHaveLength(4)
+    const processesList = listenersCalls[3][1]
+    processesList([
+      {
+        type: 'processesList',
+        name: `Signal Publisher BTGETH`
+      },
+      responseCb
+    ])
+
+    await tick()
+
+    const pm2ListCalls = pm2.list.mock.calls
+    expect(pm2ListCalls).toHaveLength(1)
+    console.log(pm2ListCalls[0][0])
+    // expect(pm2ListCalls[0][0]).toEqual(`Signal Publisher BTGETH`)
+    // expect(pm2ListCalls[0][1]).toBeInstanceOf(Function)
+    // pm2ListCalls[0][1](null) // exec callback
+
+    // await tick()
+    // expect(responseCb).toBeCalledWith(null, 'Signal Publisher BTGETH')
   })
 })

@@ -8,13 +8,15 @@ interface PM2 {
   disconnect: () => void,
   start: () => void,
   stop: () => void,
-  delete: () => void
+  delete: () => void,
+  list: () => void
 }
 
 const invokeConnect = invoker(1, 'connect')
 const invokeStart = invoker(2, 'start')
 const invokeStop = invoker(2, 'stop')
 const invokeDelete = invoker(2, 'delete')
+const invokeList = invoker(1, 'list')
 const invokeDisconnect = invoker(0, 'disconnect')
 
 const connect = (pm2: PM2) => new Promise((resolve, reject) =>
@@ -32,13 +34,18 @@ type DeleteProcess = (a: PM2) => (xs: [ { name: string }, (b: Error, c: any) => 
 const deleteProcess: DeleteProcess = pm2 => ([ { name }, reply ]) =>
   invokeDelete(name, (err: Error) => reply(err, name))(pm2)
 
+type ListProcess = (a: PM2) => (xs: [ Error, (b: Error, c: any) => {} ]) => void
+const listProcesses: ListProcess = pm2 => ([ err, reply ]) =>
+  invokeList((err: Error, list: any) => reply(err, list))(pm2)
+
 type Main = (a: (a: Event) => void, b: PM2, c: Responder) => void
 const main: Main = async (exitProcess, pm2, responder) => {
   try {
     await connect(pm2)
     observe(<any>startProcess(pm2), fromEvent('processStart', responder))
-    observe(<any>startProcess(pm2), fromEvent('processStop', responder))
+    observe(<any>stopProcess(pm2), fromEvent('processStop', responder))
     observe(<any>deleteProcess(pm2), fromEvent('processDelete', responder))
+    observe(<any>listProcesses(pm2), fromEvent('processesList', responder))
   } catch (err) {
     invokeDisconnect(pm2)
     exitProcess(err)
