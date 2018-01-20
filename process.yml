@@ -5,7 +5,7 @@ apps:
       DEBUG   : 'dev'
 
   - name    : 'Redis Responder'
-    script  : 'services/redis-persist/index.ts'
+    script  : 'services/redis-responder/index.ts'
     env     :
       DEBUG   : 'dev'
 
