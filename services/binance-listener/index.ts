@@ -4,6 +4,7 @@ import main from './main'
 
 const { SYMBOL = 'BNBUSDT' } = process.env
 const name = `Binance Exchange Listener ${SYMBOL}`
+const key = 'store-persist'
 const requests = [ 'cacheHashMultiSet' ]
 
 const exitProcess = (err: Error) => {
@@ -11,7 +12,7 @@ const exitProcess = (err: Error) => {
   process.exit(1)
 }
 const binance = binanceCons({})
-const requester = requesterCons({ name, requests })
+const requester = requesterCons({ name, key, requests })
 const stream = periodic(20000)
 
 main(exitProcess, stream, binance, requester, SYMBOL)
