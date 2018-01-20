@@ -1,4 +1,6 @@
-const BFX = require('bitfinex-api-node')
+import BFX from 'bitfinex-api-node'
+
+const Bfx = require('bitfinex-api-node')
 const { ACCOUNT = 'maxsvargal' } = process.env
 const accountsKeys = <{ [name: string]: { key: string, secret: string } }>{
   maxsvargal: {
@@ -13,7 +15,7 @@ const accountsKeys = <{ [name: string]: { key: string, secret: string } }>{
 const { key, secret } = accountsKeys[ACCOUNT]
 
 export default () => {
-  const { ws } = new BFX(key, secret, { version: 2 })
+  const { ws } = new Bfx(key, secret, { version: 2 })
   return new Promise((resolve, reject) => {
     ws.on('error', (err: string) => reject(err))
     ws.on('open', () => {
