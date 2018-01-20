@@ -6,11 +6,12 @@ import main from './main'
 
 // Options
 const name = 'Redis Responder'
-const respondsTo = [ 'cacheHashGetValues' ]
+const key = 'store-respond'
+const respondsTo = [ 'cacheHashGet', 'cacheHashGetValues' ]
 
 // Constructors
 const exitProcess = () => process.exit(1)
 const redis = createClient()
-const responder = responderCons({ name, respondsTo })
+const responder = responderCons({ name, key, respondsTo })
 
 main(exitProcess, redis, responder)

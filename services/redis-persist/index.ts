@@ -6,6 +6,7 @@ import main from './main'
 
 // Options
 const name = 'Redis Persist'
+const key = 'store-persist'
 const respondsTo = [ 'cacheHashSet', 'cacheHashMultiSet' ]
 
 // Constructors
@@ -14,6 +15,6 @@ const exitProcess = (err: Error) => {
   process.exit(1)
 }
 const redis = createClient()
-const responder = responderCons({ name, respondsTo })
+const responder = responderCons({ name, key, respondsTo })
 
 main(exitProcess, redis, responder)
