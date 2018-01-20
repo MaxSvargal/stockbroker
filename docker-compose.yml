@@ -1,0 +1,22 @@
+version: '2'
+services:
+  base:
+    build: .
+    image: stockbroker
+    restart: on-failure
+
+  redis:
+    image: redis:latest
+
+  redis-persist:
+    extends: base
+    command: ts-node services/redis-persist
+    depends_on:
+      - redis
+
+  exchange-listener:
+    extends: base
+    image: "exchange-listener-${PAIR}"
+    command: ts-node services/exchange-listener
+    environment:
+      - PAIR=BTCUSD

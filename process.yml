@@ -1,0 +1,33 @@
+apps:
+  - name    : 'Redis Persist'
+    script  : 'services/redis-persist/index.ts'
+    env     :
+      DEBUG   : 'dev'
+
+  - name    : 'Redis Responder'
+    script  : 'services/redis-persist/index.ts'
+    env     :
+      DEBUG   : 'dev'
+
+  - name    : 'PM2 Manager'
+    script  : 'services/pm2-manager/index.ts'
+    env     :
+      DEBUG   : 'dev'
+
+  - name    : 'Signals Killer'
+    script  : 'services/signals-killer/index.ts'
+    env     :
+      DEBUG   : 'dev'
+
+  - name    : 'Trade Master'
+    script  : 'services/trade-master/index.ts'
+    env     :
+      DEBUG   : 'dev'
+
+  - name    : 'Binance Account maxsvargal'
+    script  : 'services/binance-account/index.ts'
+    env     :
+      DEBUG   : 'dev'
+      ACCOUNT : 'maxsvargal'
+      KEY     : 'ZtgjgCPqiKw80Y7M2BwzNjl2XspqiUCxWx5v1fRgDAnkWPhSpT5yNzbuaOT2SiqI'
+      SECRET  : '8VP3B4wtMJcuGjWyDDwVDkZoeI16Z8pALYo2LDqXZm1loMKkVzmCkdbXrakdmXBC'

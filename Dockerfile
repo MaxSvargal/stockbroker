@@ -1,18 +1,11 @@
-# Use an official Python runtime as a parent image
-FROM node:8.4
+FROM node:8
 
-# Set the working directory to /app
-WORKDIR /src
-
-# Install app dependencies
-COPY package.json .
-
-RUN npm install -g yarnpkg
+WORKDIR /services
+ADD package.json .
+RUN npm install -g yarnpkg pm2 ts-node
+RUN pm2 install typescript
 RUN yarn install
 
-COPY . .
+ADD . .
 
-# Make port 80 available to the world outside this container
-EXPOSE 3010
-
-CMD [ "yarn", "run", "worker:dev" ]
+CMD ["pm2-docker", "process.yml"]
