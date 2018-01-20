@@ -1,12 +1,12 @@
 import { constructN } from 'ramda'
-import { Requester, Responder, Publisher, Subscriber } from 'cote'
+import { Requester, Responder, Publisher, Subscriber, DiscoveryOptions } from 'cote'
 import * as BFX from 'bitfinex-api-node'
 import Binance from 'binance-api-node'
 
-type RequesterCons = (options: { name: string, requests: string[] }) => Requester
+type RequesterCons = (options: { name: string, key: string, requests: string[] }) => Requester
 export const requesterCons: RequesterCons = constructN(1, Requester)
 
-type ResponderCons = (options: { name: string, respondsTo: string[] }) => Responder
+type ResponderCons = (options: { name: string, key: string, respondsTo: string[] }) => Responder
 export const responderCons: ResponderCons = constructN(1, Responder)
 
 type PublisherCons = (options: { name: string, broadcasts: string[] }) => Publisher
