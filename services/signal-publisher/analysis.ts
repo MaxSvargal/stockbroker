@@ -15,7 +15,7 @@ type MakeAnalysis = (a: number[][][]) => { type: string, price: number, time: nu
 const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m ]) => {
   const [ time, open, high, low, close, volume ] = getCandlesParts(candles1m)
 
-  const wr = williamsr({ period: 7, close, low, high })
+  const wr = williamsr({ period: 9, close, low, high })
   const wrIsDrop = wrDrop(wr)
   const wrIsUp = wrUp(wr)
 
