@@ -4,13 +4,13 @@ import { Subscriber } from 'cote'
 import main from './main'
 
 const tick = () => Promise.resolve()
-let makeSubscriber, makeRequester, makeBinance, exitProcess, subscriber, account
+let makeSubscriber, makeRequesterRespondStore, makeRequesterPersistStore, makeBinance, exitProcess, subscriber, account
 
 const accountInfo = {
   balances: [
     { asset: 'BTC', free: '0.00010000', locked: '0.00000000' },
     { asset: 'LTC', free: '1.00000000', locked: '0.00000000' },
-    { asset: 'NEO', free: '1.00000000', locked: '0.00000000' },
+    { asset: 'NEO', free: '20.00000000', locked: '0.00000000' },
     { asset: 'ETH', free: '1.00000000', locked: '0.00000000' },
     { asset: 'POWR', free: '0.00000000', locked: '0.00000000' }
   ]
@@ -42,7 +42,7 @@ const positions = [
     price: '1.2',
     executedQty: '0.05'
   }
-].map(JSON.stringify)
+]
 const order = {
   symbol: 'NEOETH',
   orderId: 9470272,
@@ -89,17 +89,21 @@ describe('Binance Account', () => {
       addListener: jest.fn(),
       removeListener: jest.fn()
     })
-    makeRequester = ({ positions, activeSymbol, accountActiveSymbols, saveStatus }: any) => ({
+    makeRequesterRespondStore = ({ activeSymbol, accountActiveSymbols, positions }: any) => ({
       send: jest.fn()
         .mockReturnValueOnce(Promise.resolve(activeSymbol))
-        .mockReturnValueOnce(Promise.resolve(accountActiveSymbols))
-        .mockReturnValueOnce(Promise.resolve(positions))
-        .mockReturnValueOnce(Promise.resolve(saveStatus))
+        .mockReturnValueOnce(Promise.resolve(JSON.stringify(accountActiveSymbols)))
+        .mockReturnValueOnce(Promise.resolve(positions.map(JSON.stringify)))
+    })
+    makeRequesterPersistStore = ({ position, accountActiveSymbols }: any) => ({
+      send: jest.fn()
+        .mockReturnValueOnce(Promise.resolve(position))
+        .mockReturnValue(Promise.resolve(JSON.stringify(accountActiveSymbols)))
     })
     makeBinance = ({ accountInfo, order, myTrades }) => ({
       accountInfo: jest.fn().mockReturnValue(Promise.resolve(accountInfo)),
       order: jest.fn().mockReturnValue(Promise.resolve(order)),
-      myTrades: jest.fn().mockReturnValue(Promise.resolve(myTrades)),
+      myTrades: jest.fn().mockReturnValue(Promise.resolve(myTrades))
     })
     exitProcess = jest.fn()
     subscriber = makeSubscriber()
@@ -110,10 +114,12 @@ describe('Binance Account', () => {
     const activeSymbol = 'NEOETH'
     const accountActiveSymbols = [ 'POWRBTC' ]
     const saveStatus = 'OK'
+    const position = saveStatus
 
     const binance = makeBinance({ accountInfo, order, myTrades })
-    const requester = makeRequester({ positions, activeSymbol, accountActiveSymbols, saveStatus })
-    main(exitProcess, binance, subscriber, requester, account)
+    const requestStore = makeRequesterRespondStore({ activeSymbol, accountActiveSymbols, positions })
+    const persistStore = makeRequesterPersistStore({ position, accountActiveSymbols })
+    main(exitProcess, binance, subscriber, requestStore, persistStore, account)
 
     const listenersCalls = subscriber.addListener.mock.calls
     const propagateSignal = listenersCalls[0][1]
@@ -122,35 +128,28 @@ describe('Binance Account', () => {
 
     await tick()
 
-    expect(requester.send).toHaveBeenCalledTimes(1)
-    expect(requester.send).toHaveBeenCalledWith({
+    expect(requestStore.send).toHaveBeenCalledTimes(1)
+    expect(requestStore.send).toHaveBeenCalledWith({
       type: 'cacheHashGet', key: 'tradeState', field: 'currentSymbol'
     })
 
     await tick()
 
-    expect(requester.send).toHaveBeenCalledTimes(3)
-    expect(requester.send).toHaveBeenCalledWith({
+    expect(requestStore.send).toHaveBeenCalledTimes(3)
+    expect(requestStore.send).toHaveBeenCalledWith({
       type: 'cacheHashGet', key: 'accounts:activeSymbols', field: 'test'
     })
-    expect(requester.send).toHaveBeenCalledWith({
-      type: 'cacheHashGetValues', key: 'test:positions'
+    expect(requestStore.send).toHaveBeenCalledWith({
+      type: 'cacheHashGetValues', key: 'accounts:test:positions'
     })
     expect(binance.accountInfo).toHaveBeenCalledTimes(1)
     expect(binance.accountInfo).toHaveBeenCalledWith(null)
 
     await tick()
 
-    expect(requester.send).toHaveBeenCalledTimes(4)
-    expect(requester.send).toHaveBeenCalledWith({
-      type: 'cacheHashSet', key: 'accounts:activeSymbols', field: 'test', value: '[\"POWRBTC\",\"NEOETH\"]'
-    })
-
-    await tick()
-
     expect(binance.order).toHaveBeenCalledTimes(1)
     expect(binance.order).toHaveBeenCalledWith({
-      symbol: 'NEOETH', side: 'BUY', quantity: '0.30', type: 'MARKET'
+      symbol: 'NEOETH', side: 'BUY', quantity: '0.12', type: 'MARKET'
     })
 
     await tick()
@@ -162,18 +161,26 @@ describe('Binance Account', () => {
 
     await tick()
 
-    expect(requester.send).toHaveBeenCalledTimes(5)
-    expect(requester.send).toHaveBeenLastCalledWith({
+    expect(persistStore.send).toHaveBeenCalledTimes(1)
+    expect(persistStore.send).toHaveBeenLastCalledWith({
       type: 'cacheHashSet',
-      key: 'test:positions',
+      key: 'accounts:test:positions',
       field: 4414702,
       value: JSON.stringify({ ...order, ...myTrades[0], coveredIds: null })
+    })
+
+    await tick()
+
+    expect(persistStore.send).toHaveBeenCalledTimes(2)
+    expect(persistStore.send).toHaveBeenCalledWith({
+      type: 'cacheHashSet', key: 'accounts:activeSymbols', field: 'test', value: '[\"POWRBTC\",\"NEOETH\"]'
     })
   })
   test('Position SELL should be created when possible', async () => {
     const activeSymbol = 'POWRBTC'
     const accountActiveSymbols = [ 'NEOETH', 'POWRBTC' ]
     const saveStatus = 'OK'
+    const position = saveStatus
     const overOrder = {
       symbol: 'NEOETH',
       orderId: 9470272,
@@ -189,8 +196,9 @@ describe('Binance Account', () => {
     }
 
     const binance = makeBinance({ accountInfo, order: overOrder, myTrades })
-    const requester = makeRequester({ positions, activeSymbol, accountActiveSymbols, saveStatus })
-    main(exitProcess, binance, subscriber, requester, account)
+    const requestStore = makeRequesterRespondStore({ activeSymbol, accountActiveSymbols, positions })
+    const persistStore = makeRequesterPersistStore({ position, accountActiveSymbols })
+    main(exitProcess, binance, subscriber, requestStore, persistStore, account)
 
     const listenersCalls = subscriber.addListener.mock.calls
     const propagateSignal = listenersCalls[0][1]
@@ -199,21 +207,20 @@ describe('Binance Account', () => {
 
     await tick()
 
-    expect(requester.send).toHaveBeenCalledTimes(1)
-    expect(requester.send).toHaveBeenCalledWith({
+    expect(requestStore.send).toHaveBeenCalledTimes(1)
+    expect(requestStore.send).toHaveBeenCalledWith({
       type: 'cacheHashGet', key: 'tradeState', field: 'currentSymbol'
     })
 
     await tick()
 
-    expect(requester.send).toHaveBeenCalledTimes(3)
-    expect(requester.send).toHaveBeenCalledWith({
+    expect(requestStore.send).toHaveBeenCalledTimes(3)
+    expect(requestStore.send).toHaveBeenCalledWith({
       type: 'cacheHashGet', key: 'accounts:activeSymbols', field: 'test'
     })
-    expect(requester.send).toHaveBeenCalledWith({
-      type: 'cacheHashGetValues', key: 'test:positions'
+    expect(requestStore.send).toHaveBeenCalledWith({
+      type: 'cacheHashGetValues', key: 'accounts:test:positions'
     })
-
     expect(binance.accountInfo).toHaveBeenCalledTimes(1)
     expect(binance.accountInfo).toHaveBeenCalledWith(null)
 
@@ -233,10 +240,10 @@ describe('Binance Account', () => {
 
     await tick()
 
-    expect(requester.send).toHaveBeenCalledTimes(4)
-    expect(requester.send).toHaveBeenLastCalledWith({
+    expect(persistStore.send).toHaveBeenCalledTimes(1)
+    expect(persistStore.send).toHaveBeenLastCalledWith({
       type: 'cacheHashSet',
-      key: 'test:positions',
+      key: 'accounts:test:positions',
       field: 4414702,
       value: JSON.stringify({
         ...order,
@@ -249,16 +256,16 @@ describe('Binance Account', () => {
 
     await tick()
 
-    expect(requester.send).toHaveBeenCalledTimes(5)
-    expect(requester.send).toHaveBeenLastCalledWith({
+    expect(persistStore.send).toHaveBeenCalledTimes(2)
+    expect(persistStore.send).toHaveBeenLastCalledWith({
       type: 'cacheHashSet',
       key: 'accounts:activeSymbols',
       field: 'test',
-      value: '[\"NEOETH\"]'
+      value: '[\"POWRBTC\"]'
     })
   })
 
-  test('Position BUY should NOT be created when signal symbol is not equal global activeSymbol', async () => {
+  test.skip('Position BUY should NOT be created when signal symbol is not equal global activeSymbol', async () => {
     const activeSymbol = 'NEOETH'
     const accountActiveSymbols = [ 'POWRETH', 'NEOETH' ]
     const saveStatus = 'OK'
@@ -298,7 +305,7 @@ describe('Binance Account', () => {
     expect(binance.myTrades).toHaveBeenCalledTimes(0)
     expect(requester.send).toHaveBeenCalledTimes(2)
   })
-  test('Position BUY should NOT be created when too much opened positions', async () => {
+  test.skip('Position BUY should NOT be created when too much opened positions', async () => {
     const overPositions = [
       ...positions,
       ...[

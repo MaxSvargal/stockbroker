@@ -4,7 +4,7 @@ import {
   reject, complement, converge, match, gte, nth, last, sortBy, curry, divide,
   length, subtract, not, contains, propSatisfies, reduce, concat, filter,
   compose, prop, map, applyTo, flip, invoker, propEq, find, splitEvery, T, gt,
-  isNil, pair, when, both, append, defaultTo, head, uniq
+  isNil, pair, when, both, append, defaultTo, head, uniq, chain
 } from 'ramda'
 import { fromEvent, observe, throttle } from 'most'
 import { Requester, Subscriber } from 'cote'
@@ -21,8 +21,7 @@ type Main = (a: ExitProcess, b: Binance, c: Subscriber, d: Requester, e: Request
 
 const invokeSend = flip(invoker(1, 'send'))
 const invokeAccountInfo = flip(invoker(1, 'accountInfo'))
-// TODO: enable production
-const invokeOrder = flip(invoker(1, 'orderTest'))
+const invokeOrder = flip(invoker(1, 'order'))
 const invokeMyTrades = flip(invoker(1, 'myTrades'))
 
 const requestPositions = (account: string) => ({
@@ -52,8 +51,9 @@ const requestSetAccountActiveSymbols = (account: string) => (symbols: string[]) 
   value: symbols
 })
 
-const numOfChunks = 4
+const numOfChunks = 8
 const minProfit = 0.005
+const roundDown = (num: number) => Math.floor(num * 100) / 100
 const isNotEquals = complement(equals)
 const propPrice = prop('price')
 const findByAssetProp = o(find, propEq('asset'))
@@ -62,7 +62,10 @@ const filterBySymbol = o(filter, propEq('symbol'))
 const filterBuys = filter(propEq('side', 'BUY'))
 const filterSells = filter(propEq('side', 'SELL'))
 const getAllCoveredIds = compose(reduce(concat, []), map(prop('coveredIds')))
-const getNotCovered = (ids: number[]) => filter(propSatisfies(o(not, contains(__, ids)), 'id'))
+// TODO: bug with converge, refactor this fn later
+const getNotCovered = (ids: number[], buys: {}[]) => filter(propSatisfies(o(not, contains(__, ids)), 'id'))(buys)
+const getOpenedPositions = converge(getNotCovered, [ o(getAllCoveredIds, filterSells), filterBuys ])
+
 const minCoverPrice = converge(subtract, [ nth(0), apply(multiply) ])
 const getMostExpensiveByPrice = o(last, sortBy(prop('price')))
 const findOrderByMinPrice = (minPrice: number) => compose(last, sortBy(prop('price')), filter(o(gte(minPrice), prop('price'))))
@@ -74,13 +77,13 @@ const getProfitFromPositionAndTrade = converge(getProfitValue, [ o(propPrice, nt
 const calcProfit = unapply(whenFirstArgIsset(getProfitFromPositionAndTrade))
 const takePairFromSymbol = compose(converge(pair, [ nth(1), nth(2) ]), match(/(.+)(...)/))
 const skipBuySignalByEqualActiveSymbol = both(propEq('type', 'BUY'), converge(isNotEquals, [ prop('activeSymbol'), prop('symbol') ]))
-const symbolNotLastIsset = converge(isNotEquals, [ prop('activeSymbol'), compose(last, defaultTo([]), prop('accountActiveSymbols')) ])
-const lastPositionIsClosed = both(o(propEq('side', 'SELL'), prop('position')), o(propEq('length', 1), prop('openedPositions')))
 
 const stringify = flip(invoker(1, 'stringify'))(JSON)
 const parse = flip(invoker(1, 'parse'))(JSON)
 const addSymbolToList = o(stringify, converge(append, [ head, o(compose(uniq, parse, defaultTo('[]')), last) ]))
 const removeSymbolFromList = o(stringify, converge(reject, [ o(equals, head), compose(parse, defaultTo('[]'), last) ]))
+const symbolNotLastIsset = converge(isNotEquals, [ prop('activeSymbol'), compose(last, parse, defaultTo([]), prop('accountActiveSymbols')) ])
+const lastPositionIsClosed = both(o(propEq('side', 'SELL'), prop('position')), o(propEq('length', 1), prop('openedPositions')))
 
 const buyErrorsCondition = cond([
   [ o(equals(0), prop('avaliableChunks')), always(Error('Too much opened positions')) ],
@@ -115,41 +118,30 @@ const main: Main = (exitProcess, binance, subscriber, requesterRespondStore, req
       if (skipBuySignalByEqualActiveSymbol({ type, symbol, activeSymbol }))
         throw Error(`Symbol ${symbol} is not active, skip BUY signal.`)
 
-      let [ accountActiveSymbols, positions, { balances } ] = await Promise.all(
+      const [ accountActiveSymbols, rawPositions, { balances } ] = await Promise.all(
         concat(map(storeRequest, [ getAccountActiveSymbols, getPositions ]), [ accountInfo(null) ])
       )
 
-      balances = [
-        { asset: 'BTC', free: '1.00000000' },
-        { asset: 'EOS', free: '2000.00000000' }
-      ]
-
-      console.log({ accountActiveSymbols, activeSymbol })
-
-      if (symbolNotLastIsset({ activeSymbol, accountActiveSymbols }) /* TODO remove this? */) {
-        await compose(storePersist, setAccountActiveSymbols, addSymbolToList)([ activeSymbol, accountActiveSymbols ])
-      }
-
       const [ slaveCurrency, masterCurrency ] = takePairFromSymbol(symbol)
-      const positionsOfSymbol = filterBySymbol(symbol)(map(JSON.parse, positions))
-      const closedPositionsIds = o(getAllCoveredIds, filterSells)(positionsOfSymbol)
-      const openedPositions = o(getNotCovered(closedPositionsIds), filterBuys)(positionsOfSymbol)
+      const positions = map(parse, rawPositions)
+      const openedPositions = getOpenedPositions(positions)
+      const openedPositionsOfSymbol = o(getOpenedPositions, filterBySymbol(symbol))(positions)
 
       const execBuy = () => {
         const findByMasterCurrency = findByAssetProp(masterCurrency)
         const avaliableToBuy = o(parseFreeProp, findByMasterCurrency)(balances)
         const avaliableChunks = o(subtract(numOfChunks), length)(openedPositions)
         const quantity = divide(divide(avaliableToBuy, avaliableChunks), price)
+        console.log({ avaliableToBuy, avaliableChunks, price, quantity })
         const error = buyErrorsCondition({ avaliableChunks, quantity, avaliableToBuy })
 
-        return { quantity: quantity.toFixed(2), error, positionToCover: null }
+        return { quantity: roundDown(quantity).toString(), error, positionToCover: null }
       }
 
       const execSell = () => {
         const findBySlaveCurrency = findByAssetProp(slaveCurrency)
         const avaliableToSell = o(parseFreeProp, findBySlaveCurrency)(balances)
-        console.log({ avaliableToSell })
-        const positionToCover = findOrderToCover([ price, minProfit ])(openedPositions)
+        const positionToCover = findOrderToCover([ price, minProfit ])(openedPositionsOfSymbol)
         const quantity = prop('executedQty', positionToCover)
         // TODO also check for minimal quantity for symbol
         const error = sellErrorsCondition({ positionToCover, quantity, avaliableToSell })
@@ -161,21 +153,22 @@ const main: Main = (exitProcess, binance, subscriber, requesterRespondStore, req
       const { quantity, error, positionToCover } = getTradeSide(type)
       if (error) throw error
 
-      // const order = await sendOrder({ symbol, quantity, side: type, type: 'MARKET' })
-      // debug('dev')('Order requested:', order)
-
-      // const trades = await myTrades({ symbol, limit: 10 })
-      // const trade = findTradeByOrderId(prop('orderId', order), trades)
-      const trade = { executedQty: quantity, price, side: type, symbol, created: new Date().getTime(), id: new Date().getTime() }
+      const order = await sendOrder({ symbol, quantity, side: type, type: 'MARKET' })
+      const trades = await myTrades({ symbol, limit: 10 })
+      const trade = findTradeByOrderId(prop('orderId', order), trades)
       const profit = calcProfit(positionToCover, trade)
       const coveredIds = positionToCover && [ prop('id', positionToCover) ]
-      const position = mergeAll([ /*order,*/ trade, { profit, coveredIds } ])
+      const position = mergeAll([ order, trade, { profit, coveredIds } ])
 
       debug('dev')(position)
       const positionStoreStatus = await storePersist(setPosition(position))
 
+      if (symbolNotLastIsset({ activeSymbol, accountActiveSymbols })) {
+        await compose(storePersist, setAccountActiveSymbols, addSymbolToList)([ activeSymbol, accountActiveSymbols ])
+      }
+
       if (lastPositionIsClosed({ position, openedPositions })) {
-        await compose(storePersist, setAccountActiveSymbols, removeSymbolFromList)([ activeSymbol, accountActiveSymbols ])
+        await compose(storePersist, setAccountActiveSymbols, removeSymbolFromList)([ symbol, accountActiveSymbols ])
       }
 
     } catch (error) {
