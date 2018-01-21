@@ -132,7 +132,6 @@ const main: Main = (exitProcess, binance, subscriber, requesterRespondStore, req
         const avaliableToBuy = o(parseFreeProp, findByMasterCurrency)(balances)
         const avaliableChunks = o(subtract(numOfChunks), length)(openedPositions)
         const quantity = divide(divide(avaliableToBuy, avaliableChunks), price)
-        console.log({ avaliableToBuy, avaliableChunks, price, quantity })
         const error = buyErrorsCondition({ avaliableChunks, quantity, avaliableToBuy })
 
         return { quantity: roundDown(quantity).toString(), error, positionToCover: null }
@@ -163,9 +162,7 @@ const main: Main = (exitProcess, binance, subscriber, requesterRespondStore, req
       debug('dev')(position)
       const positionStoreStatus = await storePersist(setPosition(position))
 
-      if (symbolNotLastIsset({ activeSymbol, accountActiveSymbols })) {
-        await compose(storePersist, setAccountActiveSymbols, addSymbolToList)([ activeSymbol, accountActiveSymbols ])
-      }
+      await compose(storePersist, setAccountActiveSymbols, addSymbolToList)([ activeSymbol, accountActiveSymbols ])
 
       if (lastPositionIsClosed({ position, openedPositions })) {
         await compose(storePersist, setAccountActiveSymbols, removeSymbolFromList)([ symbol, accountActiveSymbols ])
