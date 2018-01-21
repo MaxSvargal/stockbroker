@@ -16,7 +16,7 @@ const processStartSignalerRequest = (symbol: string) => ({
   type: 'processStart',
   options: {
     name: `Signal Publisher ${symbol}`,
-    script: `/home/stockbroker/stockbroker/services/signal-publisher/index.ts`,
+    script: `${__dirname}/services/signal-publisher/index.ts`,
     env: { SYMBOL: symbol }
   }
 })
@@ -24,7 +24,7 @@ const processStartListenerRequest = (symbol: string) => ({
   type: 'processStart',
   options: {
     name: `Binance Exchange Listener ${symbol}`,
-    script: `/home/stockbroker/stockbroker/services/binance-listener/index.ts`,
+    script: `${__dirname}/services/binance-listener/index.ts`,
     env: { SYMBOL: symbol }
   }
 })
