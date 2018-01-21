@@ -37,5 +37,5 @@ apps:
     env     :
       DEBUG   : 'dev'
       ACCOUNT : 'lesorub'
-      KEY     : '2Vv4yLgyLCxfITKKecbTcxfeQMOgrIuMc85vukdzmhxjwgg2h14i8egszw30dmp6'
-      SECRET  : 'BJqLSzK1Ma2NAJt6xKdyaRkmXfqABEaMjh2ox6inqawx15b5piie1zm9smrpdwab'
+      KEY     : 'eao80LqrskiOzaANnizUAJjU4f85p6Ucy02Ag11YX8V4s7RMh1xbffSDc710w3ci'
+      SECRET  : 'nAVQtqgWU3jd1IqeJlcceyhS2GJWV2P9N6Hpz65ygGl1J55n70ERJqm8qouK04VH'
