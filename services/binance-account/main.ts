@@ -184,7 +184,7 @@ const main: Main = (exitProcess, binance, subscriber, requesterRespondStore, req
     }
   }
   // TODO: trottle
-  observe(checkSignal, throttle(60000, propagateSignalStream))
+  observe(checkSignal, throttle(30000, propagateSignalStream))
 }
 
 export default main
