@@ -53,6 +53,7 @@ const requestSetAccountActiveSymbols = (account: string) => (symbols: string[]) 
 
 const numOfChunks = 8
 const minProfit = 0.005
+const comission = 0.001
 const roundDown = (num: number) => Math.floor(num * 100) / 100
 const isNotEquals = complement(equals)
 const propPrice = prop('price')
@@ -65,6 +66,7 @@ const getAllCoveredIds = compose(reduce(concat, []), map(prop('coveredIds')))
 // TODO: bug with converge, refactor this fn later
 const getNotCovered = (ids: number[], buys: {}[]) => filter(propSatisfies(o(not, contains(__, ids)), 'id'))(buys)
 const getOpenedPositions = converge(getNotCovered, [ o(getAllCoveredIds, filterSells), filterBuys ])
+const subtractComission = unapply(converge(subtract, [ last, converge(multiply, [ head, last ]) ]))
 
 const minCoverPrice = converge(subtract, [ nth(0), apply(multiply) ])
 const getMostExpensiveByPrice = o(last, sortBy(prop('price')))
@@ -131,7 +133,7 @@ const main: Main = (exitProcess, binance, subscriber, requesterRespondStore, req
         const findByMasterCurrency = findByAssetProp(masterCurrency)
         const avaliableToBuy = o(parseFreeProp, findByMasterCurrency)(balances)
         const avaliableChunks = o(subtract(numOfChunks), length)(openedPositions)
-        const quantity = divide(divide(avaliableToBuy, avaliableChunks), price)
+        const quantity = subtractComission(comission, divide(divide(avaliableToBuy, avaliableChunks), price))
         const error = buyErrorsCondition({ avaliableChunks, quantity, avaliableToBuy })
 
         return { quantity: roundDown(quantity).toString(), error, positionToCover: null }
@@ -154,6 +156,7 @@ const main: Main = (exitProcess, binance, subscriber, requesterRespondStore, req
 
       const order = await sendOrder({ symbol, quantity, side: type, type: 'MARKET' })
       const trades = await myTrades({ symbol, limit: 10 })
+
       const trade = findTradeByOrderId(prop('orderId', order), trades)
       const profit = calcProfit(positionToCover, trade)
       const coveredIds = positionToCover && [ prop('id', positionToCover) ]
@@ -181,7 +184,7 @@ const main: Main = (exitProcess, binance, subscriber, requesterRespondStore, req
     }
   }
   // TODO: trottle
-  observe(checkSignal, throttle(30000, propagateSignalStream))
+  observe(checkSignal, throttle(60000, propagateSignalStream))
 }
 
 export default main
