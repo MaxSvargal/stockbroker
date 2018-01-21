@@ -77,10 +77,6 @@ const main: Main = (exitProcess, mainLoopStream, fetch, requesterPersistStore, r
     .then(o(storePersist, setExchangeInfoRequest))
     .catch(exitProcess)
 
-  // "symbol": "NEOETH",
-  // "baseAsset": "NEO",
-  // "quoteAsset": "ETH",
-
   const tick = async () => {
     try {
       debug('dev')('Tick started')
@@ -103,9 +99,7 @@ const main: Main = (exitProcess, mainLoopStream, fetch, requesterPersistStore, r
       // if current trade pair has minus, when send signal to sell all opened positions
       if (topWeightLessZero(pairsWeights)) debug('dev')('All symbols are down. Try on next tick...')
 
-      console.log('requests surr symbol')
       const currentSymbol = await storeRequest(getCurrentSymbolRequest())
-      console.log({ currentSymbol })
 
       if (equals(symbolToTrade, currentSymbol)) {
         debug('dev')(`Symbol ${symbolToTrade} is active already`)
@@ -122,30 +116,9 @@ const main: Main = (exitProcess, mainLoopStream, fetch, requesterPersistStore, r
     } catch (err) {
       exitProcess(err)
     }
-
-    // TODO: on change master currency, move all funds to new with trade signal
-
-    // OLD
-    // TODO: every minute check 15m WR for up trend, on reverse trend to fall over -50, close positions and out there
-    // then trend change to down, send signal to trade-master and exit process
-    // event { type: signalPublishersWorkComplete, symbol }
   }
 
-  // const tick = () => {
-  //   console.log('tick')
-  //   const pairToTrade = 'BTCUSD'
-  //   send(getTradeStateRequest()).then((state) => {
-  //     console.log({ state })
-  //     send(setActiveSymbolRequest(pairToTrade)).then(res => {
-  //       console.log({ res })
-  //     }).catch(err => console.log({ err }))
-  //   }).catch(err => console.log({ err }))
-  // }
-
   observe(tick, mainLoopStream)
-
-  // spawn pm2 process for pair and store pid
-  // wait for signalPublishersWorkComplete and pm2.stop them
 }
 
 export default main
