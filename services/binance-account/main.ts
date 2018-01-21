@@ -174,7 +174,7 @@ const main: Main = (exitProcess, binance, subscriber, requesterRespondStore, req
     } catch (error) {
       const errorEvent = {
         type: 'orderExecutionError',
-        error: error.stack || error,
+        error: error.message || error,
         method: type,
         account,
         symbol,
