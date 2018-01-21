@@ -16,7 +16,7 @@ const processStartSignalerRequest = (symbol: string) => ({
   type: 'processStart',
   options: {
     name: `Signal Publisher ${symbol}`,
-    script: './services/signal-publisher/index.ts',
+    script: `${process.cwd()}/services/signal-publisher/index.ts`,
     env: { SYMBOL: symbol }
   }
 })
@@ -24,7 +24,7 @@ const processStartListenerRequest = (symbol: string) => ({
   type: 'processStart',
   options: {
     name: `Binance Exchange Listener ${symbol}`,
-    script: './services/binance-listener/index.ts',
+    script: `${process.cwd()}/services/binance-listener/index.ts`,
     env: { SYMBOL: symbol }
   }
 })
@@ -103,7 +103,9 @@ const main: Main = (exitProcess, mainLoopStream, fetch, requesterPersistStore, r
       // if current trade pair has minus, when send signal to sell all opened positions
       if (topWeightLessZero(pairsWeights)) debug('dev')('All symbols are down. Try on next tick...')
 
+      console.log('requests surr symbol')
       const currentSymbol = await storeRequest(getCurrentSymbolRequest())
+      console.log({ currentSymbol })
 
       if (equals(symbolToTrade, currentSymbol)) {
         debug('dev')(`Symbol ${symbolToTrade} is active already`)
