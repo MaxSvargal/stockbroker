@@ -1,6 +1,7 @@
 import { delay, periodic } from 'most'
-import { requesterCons, publisherCons } from '../utils/cote'
 import fetch from 'node-fetch'
+import { error } from '../utils/log'
+import { requesterCons, publisherCons } from '../utils/cote'
 
 import main from './main'
 
@@ -9,12 +10,6 @@ const requesterPersistStore = requesterCons({
   name: 'Trade Master Persist Store Requester',
   key: 'store-persist',
   requests: [ 'cacheHashSet', 'cacheHashMultiSet' ]
-})
-
-const requesterRespondStore = requesterCons({
-  name: 'Trade Master Respond Store Requester',
-  key: 'store-respond',
-  requests: [ 'cacheHashGet', 'cacheHashGetValues' ]
 })
 
 const requesterProcess = requesterCons({
@@ -30,10 +25,10 @@ const publisher = publisherCons({
 
 
 const exitProcess = (err: Event) => {
-  console.error(err)
+  error(err)
   process.exit(1)
 }
 
-const loopStream = delay(5000, periodic(300000))
+const loopStream = delay(5000, periodic(150000))
 
-main(exitProcess, loopStream, fetch, requesterPersistStore, requesterRespondStore, requesterProcess, publisher)
+main(exitProcess, loopStream, fetch, requesterPersistStore, requesterProcess, publisher)

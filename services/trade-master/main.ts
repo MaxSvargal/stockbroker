@@ -1,19 +1,21 @@
 import { __, equals, append, unnest, unary, flip, invoker, divide, init, apply,
   zip, assoc, pair, last, takeLast, nth, useWith, take, splitAt, compose, head,
-  always, contains, filter, map, gt, sortBy, prop, o, reverse, converge, mean,
-  unapply, subtract, match, uniq, reject, isNil, length
+  always, contains, filter, map, gt, lt, sortBy, prop, o, reverse, converge, of,
+  unapply, subtract, match, uniq, reject, isNil, length, mergeAll, objOf, sort,
+  find, curry, mergeWith, reduce, concat, both, keys, mean, applyTo, union,
+  negate, toPairs, allPass, juxt, flatten
 } from 'ramda'
 
 import {
-  processStartSignalerRequest, processStartListenerRequest, getCurrentSymbolRequest,
-  setCurrentSymbolRequest, setSymbolWeights, setExchangeInfoRequest
+  processStartSignalerRequest, processStartListenerRequest,
+  setEnabledSymbolsRequest, setExchangeInfoRequest
 } from './requests'
 
 import * as pm2 from 'pm2'
 import { Stream, observe } from 'most'
 import { Requester, Publisher } from 'cote'
-import { macd } from 'technicalindicators'
-import { ema } from './ema'
+import { macd, williamsr, ema } from 'technicalindicators'
+// import { ema } from './ema'
 import { log, error } from '../utils/log'
 
 const mainSymbols = [ 'BTCUSDT' /*, 'ETHUSDT', 'BNBUSDT' */ ]
@@ -21,16 +23,20 @@ const mainSymbols = [ 'BTCUSDT' /*, 'ETHUSDT', 'BNBUSDT' */ ]
 const invokeSend = flip(invoker(1, 'send'))
 const invokePublish = invoker(2, 'publish')
 const makePublichExitFromSymbols = flip(invokePublish('exitFromSymbols'))
+const collectRequests = o(flatten, juxt([ map(processStartSignalerRequest), map(processStartListenerRequest) ]))
 const stringify = flip(invoker(1, 'stringify'))(JSON)
+// const parse = flip(invoker(1, 'parse'))(JSON)
 
-const convSub = converge(subtract, [ nth(1), nth(0) ])
-const convPairEmaLast = converge(pair, [ o(ema, init), last ])
-const macdHistogram = o(map(prop('histogram')), macd)
-const mapClosePrices = map(o(parseFloat, nth(4)))
-const assocMacdValues = assoc('values', __, { fastPeriod: 12, slowPeriod: 26, signalPeriod: 9 })
-const getMacdWeights = map(compose(convSub, convPairEmaLast, takeLast(5), macdHistogram, assocMacdValues, mapClosePrices))
+const assocPeriod = assoc('period')
+const prepareCandlesToWR = converge(unapply(mergeAll), [ o(objOf('low'), map(nth(3))), o(objOf('close'), map(nth(4))), o(objOf('high'), map(nth(2))) ])
+const calcWR = compose(williamsr, assocPeriod(14), prepareCandlesToWR)
+const calcEMA = compose(last, ema, assocPeriod(7), objOf('values'))
+const getWRPair = map(compose(converge(pair, [ o(Math.round, calcEMA), o(Math.round, last) ]), calcWR))
+const isGrow = allPass([ converge(lt, [ head, last ]), o(lt(-80), last), o(gt(-20), last) ])
+const isDrop = allPass([ converge(gt, [ head, last ]), o(lt(-20), head), o(gt(-20), last) ])
+const getEnabledToBuy = o(map(head), filter(o(isGrow, last)))
+const getExitFrom = o(map(head), filter(o(isDrop, last)))
 const zipAndSort = unapply(o(sortBy(nth(1)), apply(zip)))
-const topWeightLessZero = compose(gt(0), last, last)
 
 const lowHighMean = converge(unapply(mean), [ o(parseFloat, prop('lowPrice')), o(parseFloat, prop('highPrice')) ])
 const meanLastDiff = converge(subtract, [ lowHighMean, o(parseFloat, prop('lastPrice')) ])
@@ -43,14 +49,12 @@ const formatSymbolsToStore = compose(unnest, map(converge(pair, [ prop('symbol')
 
 const getTheBestMasterTicker = compose(head, sortByPriceLevel, sortByChangePerc, filter(symbolIssetIn(mainSymbols)))
 const takeCurrencyFromTicker = compose(converge(pair, [ nth(1), nth(2) ]), match(/(...)(.+)/), prop('symbol'))
-const getNegativeWeightSymbols = o(map(head), filter(o(gt(0), last)))
 
-const symbolToCandlesPath = (symbol: string) => `/klines?symbol=${symbol}&interval=15m&limit=40`
+const symbolToCandlesPath = (symbol: string) => `/klines?symbol=${symbol}&interval=30m&limit=24`
 
-type Main = (a: (a: Event) => void, b: Stream<{}>, c: any, d: Requester, e: Requester, f: Requester, g: Publisher) => void
-const main: Main = (exitProcess, mainLoopStream, fetch, requesterPersistStore, requesterRespondStore, requesterProcess, publisher) => {
+type Main = (a: (a: Event) => void, b: Stream<{}>, c: any, d: Requester, e: Requester, f: Publisher) => void
+const main: Main = (exitProcess, mainLoopStream, fetch, requesterPersistStore, requesterProcess, publisher) => {
   const storePersist: (req: {}) => any = invokeSend(requesterPersistStore)
-  const storeRequest: (req: {}) => any = invokeSend(requesterRespondStore)
   const publishExitFromSymbols = makePublichExitFromSymbols(publisher)
   const processes = invokeSend(requesterProcess)
   const fetchJson = (path: string): Promise<any> =>
@@ -63,41 +67,28 @@ const main: Main = (exitProcess, mainLoopStream, fetch, requesterPersistStore, r
   const tick = async () => {
     try {
       log('Tick started')
-      const [ tickers, currentSymbol ] = await Promise.all([
-        fetchJson('/ticker/24hr'),
-        storeRequest(getCurrentSymbolRequest())
-      ])
+      const tickers = await fetchJson('/ticker/24hr')
       log('Tickers fetched')
       const bestMasterTicker = getTheBestMasterTicker(tickers)
       const [ masterCurrency ] = takeCurrencyFromTicker(bestMasterTicker)
-      const slavesTickers: {}[] = compose(sortByPriceLevel, take(5), sortByChangePerc, filter(byMasterCurrency(masterCurrency)))(tickers)
-      const selectedPairs: string[] = compose(<any>uniq, reject(isNil), <any>append(currentSymbol), map(<any>prop('symbol')))(slavesTickers)
+      const slavesTickers: {}[] = compose(take(10), sortByChangePerc, filter(byMasterCurrency(masterCurrency)))(tickers)
+      const selectedPairs: string[] = compose(<any>uniq, reject(isNil), map(<any>prop('symbol')))(slavesTickers)
       const pairsCandles = await Promise.all(map(o(fetchJson, symbolToCandlesPath))(selectedPairs))
       log('Candles fetched')
 
-      const weights = getMacdWeights(pairsCandles)
-      const pairsWeights = zipAndSort(selectedPairs, weights)
-      const negativeWeightSymbols = getNegativeWeightSymbols(pairsWeights)
-      const symbolToTrade = o(head, last)(pairsWeights)
-      log(pairsWeights)
+      const wrPairs = getWRPair(pairsCandles)
+      const pairsStats = zipAndSort(selectedPairs, wrPairs)
+      const enabledSymbols = getEnabledToBuy(pairsStats)
+      const toExitSymbols = getExitFrom(pairsStats)
 
-      if (length(negativeWeightSymbols)) publishExitFromSymbols(negativeWeightSymbols)
+      log(new Date().toLocaleTimeString())
+      log(pairsStats)
+      log('Enabled: ', enabledSymbols)
+      log('To exit: ', toExitSymbols)
 
-      await storePersist(setSymbolWeights(<any>stringify(weights)))
-      // if current trade pair has minus, when send signal to sell all opened positions
-      if (topWeightLessZero(pairsWeights)) return error('All symbols are down. Try on next tick...')
-
-      log(`Symbol selected: ${symbolToTrade}`)
-      if (equals(symbolToTrade, currentSymbol)) {
-        log(`Symbol ${symbolToTrade} is active already`)
-      } else {
-        log(`Switch to symbol ${symbolToTrade}`)
-        await Promise.all([
-          storePersist(setCurrentSymbolRequest(symbolToTrade)), // TODO: check it?
-          processes(processStartSignalerRequest(symbolToTrade)),
-          processes(processStartListenerRequest(symbolToTrade))
-        ])
-      }
+      if (length(toExitSymbols)) publishExitFromSymbols(toExitSymbols)
+      await storePersist(setEnabledSymbolsRequest(stringify(enabledSymbols)))
+      await Promise.all(map(processes, collectRequests(enabledSymbols)))
 
       log('Tick complete')
     } catch (err) {
