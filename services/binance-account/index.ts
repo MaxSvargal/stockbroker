@@ -3,8 +3,6 @@ import main from './main'
 
 const { ACCOUNT, KEY, SECRET } = process.env
 
-console.log({ ACCOUNT, KEY, SECRET })
-
 const subscriber = subscriberCons({
   name: `Binance Exchange Account ${ACCOUNT}`,
   subscribesTo: [ 'newSignal' ]
