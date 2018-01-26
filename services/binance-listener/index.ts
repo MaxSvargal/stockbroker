@@ -13,6 +13,6 @@ const exitProcess = (err: Error) => {
 }
 const binance = binanceCons({})
 const requester = requesterCons({ name, key, requests })
-const stream = periodic(20000)
+const stream = periodic(19000)
 
 main(exitProcess, stream, binance, requester, SYMBOL)
