@@ -1,4 +1,4 @@
-import { fromEvent, observe, throttle } from 'most'
+import { fromEvent, observe } from 'most'
 import { Requester, Subscriber } from 'cote'
 import { o, flip, invoker, map, applyTo } from 'ramda'
 
@@ -45,7 +45,7 @@ const main: Main = (exitProcess, binance, subscriber, requesterRespondStore, req
     myTrades
   }
 
-  observe(checkOrderSignal(account, requests), throttle(20000, propagateSignalStream))
+  observe(checkOrderSignal(account, requests), propagateSignalStream)
   observe(checkExitFromSymbols(requests), exitFromSymbolsStream)
 }
 
