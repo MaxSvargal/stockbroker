@@ -7,7 +7,7 @@
     },
     "module": "commonjs",
     "target": "esnext",
-    "baseUrl": "./src",
+    "baseUrl": "./services",
     "moduleResolution": "node",
     "outDir": "build",
     "allowSyntheticDefaultImports": true,

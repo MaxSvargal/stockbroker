@@ -1,41 +1,41 @@
 apps:
-  - name    : 'Redis Persist'
+  - name    : 'Persist Redis'
     script  : 'services/redis-persist/index.ts'
     env     :
-      DEBUG   : 'dev'
+      DEBUG   : 'app:log,app:error'
 
-  - name    : 'Redis Responder'
+  - name    : 'Responder Redis'
     script  : 'services/redis-responder/index.ts'
     env     :
-      DEBUG   : 'dev'
+      DEBUG   : 'app:log,app:error'
 
   - name    : 'PM2 Manager'
     script  : 'services/pm2-manager/index.ts'
     env     :
-      DEBUG   : 'dev'
+      DEBUG   : 'app:log,app:error'
 
-  - name    : 'Signals Killer'
+  - name    : 'Killer Signals'
     script  : 'services/signals-killer/index.ts'
     env     :
-      DEBUG   : 'dev'
+      DEBUG   : 'app:log,app:error'
 
-  - name    : 'Trade Master'
+  - name    : 'Master Trade'
     script  : 'services/trade-master/index.ts'
     env     :
-      DEBUG   : 'dev'
+      DEBUG   : 'app:log,app:error'
 
-  - name    : 'Binance Account maxsvargal'
+  - name    : 'maxsvargal Account Binance'
     script  : 'services/binance-account/index.ts'
     env     :
-      DEBUG   : 'dev'
+      DEBUG   : 'app:log,app:error'
       ACCOUNT : 'maxsvargal'
       KEY     : 'ZtgjgCPqiKw80Y7M2BwzNjl2XspqiUCxWx5v1fRgDAnkWPhSpT5yNzbuaOT2SiqI'
       SECRET  : '8VP3B4wtMJcuGjWyDDwVDkZoeI16Z8pALYo2LDqXZm1loMKkVzmCkdbXrakdmXBC'
 
-  - name    : 'Binance Account lesorub'
+  - name    : 'lesorub Account Binance'
     script  : 'services/binance-account/index.ts'
     env     :
-      DEBUG   : 'dev'
+      DEBUG   : 'app:log,app:error'
       ACCOUNT : 'lesorub'
       KEY     : 'eao80LqrskiOzaANnizUAJjU4f85p6Ucy02Ag11YX8V4s7RMh1xbffSDc710w3ci'
       SECRET  : 'nAVQtqgWU3jd1IqeJlcceyhS2GJWV2P9N6Hpz65ygGl1J55n70ERJqm8qouK04VH'
