@@ -18,9 +18,9 @@ const mapToFrames = mapIndexed((_, idx, list) => slice(idx, add(num, idx), list)
 const flipedMap = flip(map)
 
 describe('Signals Stats', () => {
-  test('demo', async () => {
-    const symbol = 'ADAETH'
-    const [ candles1m, candles5m ] = await Promise.all([ fetchCandles(symbol, '1m'), fetchCandles(symbol, '5m') ])
+  test.skip('demo', async () => {
+    const symbol = 'WTCBTC'
+    const [ candles1m ] = await Promise.all([ fetchCandles(symbol, '1m') ])
 
     // const candles1m = convert(`${__dirname}/candles1m_test.json`)
     // const candles5m = convert(`${__dirname}/candles5m_test.json`)
@@ -31,11 +31,13 @@ describe('Signals Stats', () => {
     }
 
     const candlesFrames1m = compose(dropLast(num), mapToFrames)(candles1m)
-    const candlesFrames5m = map(compose(findTimeInFrames(candles5m), nth(6), last), candlesFrames1m)
+    // const candlesFrames5m = map(compose(findTimeInFrames(candles5m), nth(6), last), candlesFrames1m)
     const mapToCandles = flipedMap([ candlesFrames1m, candlesFrames5m ])
 
-    mapIndexed((_, idx) =>
-      apply(unapply(makeAnalysis), o(mapToCandles, nth)(idx))
-    )(candlesFrames1m)
+    // mapIndexed((_, idx) =>
+    //   apply(unapply(makeAnalysis), o(mapToCandles, nth)(idx))
+    // )(candlesFrames1m)
+
+    makeAnalysis([ candlesFrames1m ])
   })
 })

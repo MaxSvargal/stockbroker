@@ -2,8 +2,10 @@ import { just } from 'most'
 import { run } from 'most-test'
 import main from './main'
 
-const makeRequester = ({ candles }: any) => ({
-  send: jest.fn().mockReturnValue(candles)
+const makeRequester = ({ candles1m, candles5m }: any) => ({
+  send: jest.fn()
+    .mockReturnValueOnce(candles1m)
+    .mockReturnValueOnce(candles5m)
 })
 
 const makePublisher = () => ({
@@ -14,8 +16,12 @@ const makePublisher = () => ({
 
 describe('Signal Publisher', () => {
   test('should be send buy signal', async () => {
-    const candles = [
+    const candles1m = [
       //  time, open, high, low, close, volume
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 9, 8, 7, 0]',
       '[1514990110000, 0, 9, 8, 7, 0]',
       '[1514990110000, 0, 8, 7, 6, 0]',
       '[1514990110000, 0, 7, 6, 5, 0]',
@@ -25,9 +31,24 @@ describe('Signal Publisher', () => {
       '[1514990110000, 0, 3, 2, 1, 0]',
       '[1514990110000, 0, 19, 18, 17, 0]',
     ]
+    const candles5m = [
+      //  time, open, high, low, close, volume
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 8, 7, 6, 0]',
+      '[1514990110000, 0, 7, 6, 5, 0]',
+      '[1514990110000, 0, 6, 5, 4, 0]',
+      '[1514990110000, 0, 5, 4, 3, 0]',
+      '[1514990110000, 0, 4, 3, 2, 0]',
+      '[1514990110000, 0, 2, 2, 1, 0]',
+      '[1514990110000, 0, 4, 2, 4, 0]',
+    ]
     const symbol = 'BTCUSD'
     const exitProcess = (err: Error) => { throw err }
-    const requester = makeRequester({ candles })
+    const requester = makeRequester({ candles1m, candles5m })
     const publisher = makePublisher()
     const loopStream = just(null)
 
@@ -45,8 +66,12 @@ describe('Signal Publisher', () => {
   })
 
   test('should NOT be send any messages', async () => {
-    const candles = [
+    const candles1m = [
       //  time, open, high, low, close, volume
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 9, 8, 7, 0]',
       '[1514990110000, 0, 9, 8, 7, 0]',
       '[1514990110000, 0, 8, 7, 6, 0]',
       '[1514990110000, 0, 7, 6, 5, 0]',
@@ -54,11 +79,26 @@ describe('Signal Publisher', () => {
       '[1514990110000, 0, 5, 4, 3, 0]',
       '[1514990110000, 0, 4, 3, 2, 0]',
       '[1514990110000, 0, 3, 2, 1, 0]',
-      '[1514990110000, 0, 2, 1, 0, 0]',
+      '[1514990110000, 0, 19, 18, 17, 0]',
+    ]
+    const candles5m = [
+      //  time, open, high, low, close, volume
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 9, 8, 7, 0]',
+      '[1514990110000, 0, 8, 7, 6, 0]',
+      '[1514990110000, 0, 7, 6, 5, 0]',
+      '[1514990110000, 0, 6, 5, 4, 0]',
+      '[1514990110000, 0, 5, 4, 3, 0]',
+      '[1514990110000, 0, 6, 4, 6, 0]',
+      '[1514990110000, 0, 7, 5, 8, 0]',
+      '[1514990110000, 0, 8, 6, 7, 0]',
     ]
     const symbol = 'BTCUSD'
     const exitProcess = (err: Error) => { throw err }
-    const requester = makeRequester({ candles })
+    const requester = makeRequester({ candles1m, candles5m })
     const publisher = makePublisher()
     const loopStream = just(null)
 

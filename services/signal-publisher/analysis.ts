@@ -1,6 +1,8 @@
-import debug from 'debug'
+import log from '../utils/log'
 import { williamsr } from 'technicalindicators'
-import { any, equals, range, head, lt, gt, o, juxt, map, nth, takeLast, both, last } from 'ramda'
+import { any, equals, range, head, lt, gt, o, juxt, map, nth, takeLast, both, last, not, and, converge } from 'ramda'
+
+let timeOfLastSignal = 0
 
 const getCandlesParts: (a: any[][]) => number[][] = juxt(<any>map(o(map, nth), range(0, 6)))
 const getPrev = o(head, takeLast(2))
@@ -13,26 +15,29 @@ const wrUp = both(wrCurrIsUp, wrPrevIsLow)
 
 type MakeAnalysis = (a: number[][][]) => { type: string, price: number, time: number }
 const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m ]) => {
-  const [ time, open, high, low, close, volume ] = getCandlesParts(candles1m)
+  const [ time, open, high, low, close ] = getCandlesParts(candles1m)
 
-  const wr = williamsr({ period: 14, close, low, high })
+  const wr = williamsr({ period: 10, close, low, high })
   const wrIsDrop = wrDrop(wr)
   const wrIsUp = wrUp(wr)
 
   const buySignal = wrIsUp
   const sellSignal = wrIsDrop
 
-  // debug('dev')({
+  // log({
   //   now: new Date().toLocaleString(),
   //   t: new Date(last(time)).toLocaleString(),
   //   close: last(close),
-  //   buySignal,
-  //   sellSignal,
-  //   wrList: takeLast(4, wr)
+  //   wrList: takeLast(3, wr),
+  //   wrLongList: takeLast(3, wrLong)
   // })
 
   if(any(equals(true))([ buySignal, sellSignal ])) {
-    debug('dev')(`${symbol} SIG ${buySignal ? '🚀  BUY' : '🏁  SEL'} ${last(close).toFixed(8)}     ${new Date(last(time)).toLocaleString()}`)
+    // trottling
+    if (equals(last(time), timeOfLastSignal)) return null
+    else timeOfLastSignal = <number>last(time)
+
+    log(`${symbol} SIG ${buySignal ? '🚀  BUY' : '🏁  SEL'} ${last(close).toFixed(8)}     ${new Date(last(time)).toLocaleString()}`)
     return { symbol, type: buySignal ? 'BUY' : 'SELL', price: last(close), time: new Date().getTime() }
   }
   return null
