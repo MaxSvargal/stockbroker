@@ -108,7 +108,9 @@ const checkSignal = (account: string, requests: any) =>
     const execSell = () => {
       const findBySlaveCurrency = findByAssetProp(slaveCurrency)
       const avaliableToSell = o(parseFreeProp, findBySlaveCurrency)(balances)
+      log({ openedPositionsOfSymbol })
       const positionToCover = findOrderToCover([ price, minProfit ])(openedPositionsOfSymbol)
+      log({ positionToCover })
       const chunkAmount = prop('comissionIncQty', positionToCover)
       const quantity = roundToMinQty(minQty, chunkAmountToSellCond([ avaliableToSell, chunkAmount ]))
       const error = sellErrorsCondition({ positionToCover, quantity, avaliableToSell })
