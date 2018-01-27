@@ -5,7 +5,7 @@ const { ACCOUNT, KEY, SECRET } = process.env
 
 const subscriber = subscriberCons({
   name: `Binance Exchange Account ${ACCOUNT}`,
-  subscribesTo: [ 'newSignal' ]
+  subscribesTo: [ 'newSignal', 'exitFromSymbols' ]
 })
 
 const requesterRespondStore = requesterCons({
