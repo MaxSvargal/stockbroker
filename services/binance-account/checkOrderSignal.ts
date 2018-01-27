@@ -133,7 +133,7 @@ const checkSignal = (account: string, requests: any) =>
 
     const positionStoreStatus = await setPosition(position)
     const rawActiveSymbols = await getAccountActiveSymbols(null)
-
+    console.log({ rawActiveSymbols }, addSymbolToList([ symbol, rawActiveSymbols ]))
     if (lastPositionIsClosed({ position, openedPositions }))
       await setAccountActiveSymbols(removeSymbolFromList([ symbol, rawActiveSymbols ]))
     else
@@ -144,7 +144,7 @@ const checkSignal = (account: string, requests: any) =>
   } catch (err) {
     const errorEvent = {
       type: 'orderExecutionError',
-      error: err, //err.message || err,
+      error: err.message || err,
       method: type,
       account,
       symbol,
