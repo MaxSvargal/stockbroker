@@ -79,7 +79,6 @@ const checkSignal = (account: string, requests: any) =>
     } = requests
 
     const enabledSymbols: string = await getEnabledToBuySymbols(null)
-    console.log({ enabledSymbols })
 
     if (buySignalSymbolIsNotEnabled({ type, symbol, enabledSymbols }))
       throw Error(`Symbol ${symbol} is not active, skip BUY signal.`)
@@ -94,16 +93,11 @@ const checkSignal = (account: string, requests: any) =>
     const openedPositions = getOpenedPositions(positions)
     const openedPositionsOfSymbol = o(getOpenedPositions, filterBySymbol(symbol))(positions)
 
-    console.log({ minQty, openedPositionsOfSymbol })
-
     const execBuy = () => {
       const findByMasterCurrency = findByAssetProp(masterCurrency)
       const avaliableToBuy: number = o(parseFreeProp, findByMasterCurrency)(balances)
-      console.log({ avaliableToBuy })
       const avaliableChunks = o(subtract(numOfChunks), length)(openedPositions)
-      console.log({ avaliableChunks })
       const chunkAmount = divide(avaliableToBuy, avaliableChunks)
-      console.log({ chunkAmount })
       const quantity = roundToMinQty(minQty, divide(chunkAmount, price))
       log({ minQty, quantity, chunkAmount })
       const error = buyErrorsCondition({ avaliableChunks, quantity, avaliableToBuy })
@@ -114,12 +108,9 @@ const checkSignal = (account: string, requests: any) =>
     const execSell = () => {
       const findBySlaveCurrency = findByAssetProp(slaveCurrency)
       const avaliableToSell = o(parseFreeProp, findBySlaveCurrency)(balances)
-      console.log({ avaliableToSell })
       const positionToCover = findOrderToCover([ price, minProfit ])(openedPositionsOfSymbol)
       const chunkAmount = prop('comissionIncQty', positionToCover)
-      console.log({ chunkAmount })
       const quantity = roundToMinQty(minQty, chunkAmountToSellCond([ avaliableToSell, chunkAmount ]))
-      console.log({ quantity })
       const error = sellErrorsCondition({ positionToCover, quantity, avaliableToSell })
 
       return { quantity, error, positionToCover }
@@ -133,16 +124,23 @@ const checkSignal = (account: string, requests: any) =>
     log({ symbol, quantity, side: type })
     const order = await sendOrder({ symbol, quantity, side: type, type: 'MARKET' })
     const trades = await myTrades({ symbol, limit: 10 })
+    console.log({ order, trades })
 
     const trade = findTradeByOrderId(prop('orderId', order), trades)
+    console.log({ trade })
     const comissionIncQty = getComissionQty(type)(trade)
     const profit = defaultTo(null, calcProfit(positionToCover, trade))
     const coveredIds = getIdListOfPosition(positionToCover)
     const position = mergeAll([ order, trade, { comissionIncQty, profit, coveredIds } ])
+    console.log({ position, openedPositions })
 
     const positionStoreStatus = await setPosition(position)
+    console.log({ positionStoreStatus })
     const rawActiveSymbols = await getAccountActiveSymbols(null)
-
+    console.log({ rawActiveSymbols })
+    console.log({ lastPositionIsClosed: lastPositionIsClosed({ position, openedPositions }) })
+    console.log({ removeSymbolFromList: removeSymbolFromList([ symbol, rawActiveSymbols ]) })
+    console.log({ addSymbolToList: addSymbolToList([ symbol, rawActiveSymbols ]) })
     if (lastPositionIsClosed({ position, openedPositions }))
       await setAccountActiveSymbols(removeSymbolFromList([ symbol, rawActiveSymbols ]))
     else
