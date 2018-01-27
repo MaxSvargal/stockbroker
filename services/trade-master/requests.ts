@@ -1,7 +1,7 @@
 export const processStartSignalerRequest = (symbol: string) => ({
   type: 'processStart',
   options: {
-    name: `Signal Publisher ${symbol}`,
+    name: `Symbol ${symbol} Signaller`,
     script: `./services/signal-publisher/index.ts`,
     env: { SYMBOL: symbol, DEBUG: 'app:log,app:error' }
   }
@@ -10,7 +10,7 @@ export const processStartSignalerRequest = (symbol: string) => ({
 export const processStartListenerRequest = (symbol: string) => ({
   type: 'processStart',
   options: {
-    name: `Exchange Listener ${symbol}`,
+    name: `Symbol ${symbol} Listener`,
     script: `./services/exchange-listener/index.ts`,
     env: { SYMBOL: symbol, DEBUG: 'app:log,app:error' }
   }
