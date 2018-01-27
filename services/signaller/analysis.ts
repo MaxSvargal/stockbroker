@@ -24,12 +24,12 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m ]) => {
   const buySignal = wrIsUp
   const sellSignal = wrIsDrop
 
-  log({
-    now: new Date().toLocaleString(),
-    t: new Date(last(time)).toLocaleString(),
-    close: last(close),
-    wrList: takeLast(3, wr)
-  })
+  // log({
+  //   now: new Date().toLocaleString(),
+  //   t: new Date(last(time)).toLocaleString(),
+  //   close: last(close),
+  //   wrList: takeLast(3, wr)
+  // })
 
   if(any(equals(true))([ buySignal, sellSignal ])) {
     // trottling
