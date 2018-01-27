@@ -79,6 +79,7 @@ const checkSignal = (account: string, requests: any) =>
     } = requests
 
     const enabledSymbols: string = await getEnabledToBuySymbols(null)
+    console.log({ enabledSymbols })
 
     if (buySignalSymbolIsNotEnabled({ type, symbol, enabledSymbols }))
       throw Error(`Symbol ${symbol} is not active, skip BUY signal.`)
@@ -92,6 +93,8 @@ const checkSignal = (account: string, requests: any) =>
     const positions = map(parse, rawPositions)
     const openedPositions = getOpenedPositions(positions)
     const openedPositionsOfSymbol = o(getOpenedPositions, filterBySymbol(symbol))(positions)
+
+    console.log({ minQty, positions, openedPositionsOfSymbol, balances })
 
     const execBuy = () => {
       const findByMasterCurrency = findByAssetProp(masterCurrency)
