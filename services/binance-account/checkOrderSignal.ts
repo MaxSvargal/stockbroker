@@ -110,7 +110,7 @@ const checkSignal = (account: string, requests: any) =>
       const avaliableToSell = o(parseFreeProp, findBySlaveCurrency)(balances)
       log({ openedPositionsOfSymbol })
       const positionToCover = findOrderToCover([ price, minProfit ])(openedPositionsOfSymbol)
-      log({ positionToCover })
+      log({ positionToCover, priceOfBuy: price })
       const chunkAmount = prop('comissionIncQty', positionToCover)
       const quantity = roundToMinQty(minQty, chunkAmountToSellCond([ avaliableToSell, chunkAmount ]))
       const error = sellErrorsCondition({ positionToCover, quantity, avaliableToSell })
