@@ -15,7 +15,7 @@ import {
 
 // TODO move to account preferences
 const numOfChunks = 8
-const minProfit = 0.006
+const minProfit = 0.015
 const comissionPerc = 0.1
 
 const isNotEquals = complement(equals)
