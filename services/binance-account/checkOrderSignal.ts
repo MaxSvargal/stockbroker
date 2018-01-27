@@ -144,7 +144,7 @@ const checkSignal = (account: string, requests: any) =>
   } catch (err) {
     const errorEvent = {
       type: 'orderExecutionError',
-      error: err.message || err,
+      error: err, //err.message || err,
       method: type,
       account,
       symbol,
