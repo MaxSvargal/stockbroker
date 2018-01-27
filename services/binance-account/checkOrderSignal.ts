@@ -99,6 +99,7 @@ const checkSignal = (account: string, requests: any) =>
       const avaliableChunks = o(subtract(numOfChunks), length)(openedPositions)
       const chunkAmount = divide(avaliableToBuy, avaliableChunks)
       const quantity = roundToMinQty(minQty, chunkAmount)
+      log({ minQty, quantity, chunkAmount })
       const error = buyErrorsCondition({ avaliableChunks, quantity, avaliableToBuy })
 
       return { quantity, error, positionToCover: null }
@@ -120,6 +121,7 @@ const checkSignal = (account: string, requests: any) =>
     const { quantity, error, positionToCover } = getTradeSide(type)
     if (error) throw error
 
+    log({ symbol, quantity, side: type })
     const order = await sendOrder({ symbol, quantity, side: type, type: 'MARKET' })
     const trades = await myTrades({ symbol, limit: 10 })
 
