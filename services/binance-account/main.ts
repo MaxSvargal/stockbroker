@@ -38,7 +38,7 @@ const main: Main = (exitProcess, binance, subscriber, requesterRespondStore, req
     getEnabledToBuySymbols:   o(storeRequest, requestEnabledToBuySymbols),
     getExchangeInfoOfSymbol:   o(storeRequest, requestExchangeInfoSymbols),
     getPositions:             o(storeRequest, requestPositions(account)),
-    setAccountActiveSymbols:  o(storeRequest, requestSetAccountActiveSymbols(account)),
+    setAccountActiveSymbols:  o(storePersist, requestSetAccountActiveSymbols(account)),
     setPosition:              o(storePersist, requestSetPosition(account)),
     accountInfo,
     sendOrder,
