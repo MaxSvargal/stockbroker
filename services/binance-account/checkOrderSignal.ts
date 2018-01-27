@@ -53,7 +53,7 @@ const chunkAmountToSellCond = ifElse(fundsNotAccomodatesTwoChunks, head, last)
 
 const buyErrorsCondition = cond([
   [ o(equals(0), prop('avaliableChunks')), always(Error('Too much opened positions')) ],
-  [ o(gt(0.001), prop('quantity')), always(Error('No funds avaliable to buy')) ],
+  // [ o(gt(0.001), prop('quantity')), always(Error('No funds avaliable to buy')) ],
   [ T, always(null) ]
 ])
 const sellErrorsCondition = cond([
