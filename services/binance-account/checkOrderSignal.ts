@@ -124,27 +124,21 @@ const checkSignal = (account: string, requests: any) =>
     log({ symbol, quantity, side: type })
     const order = await sendOrder({ symbol, quantity, side: type, type: 'MARKET' })
     const trades = await myTrades({ symbol, limit: 10 })
-    console.log({ order, trades })
 
     const trade = findTradeByOrderId(prop('orderId', order), trades)
-    console.log({ trade })
     const comissionIncQty = getComissionQty(type)(trade)
     const profit = defaultTo(null, calcProfit(positionToCover, trade))
     const coveredIds = getIdListOfPosition(positionToCover)
     const position = mergeAll([ order, trade, { comissionIncQty, profit, coveredIds } ])
-    console.log({ position, openedPositions })
 
     const positionStoreStatus = await setPosition(position)
-    console.log({ positionStoreStatus })
     const rawActiveSymbols = await getAccountActiveSymbols(null)
     console.log({ rawActiveSymbols })
-    console.log({ lastPositionIsClosed: lastPositionIsClosed({ position, openedPositions }) })
-    console.log({ removeSymbolFromList: removeSymbolFromList([ symbol, rawActiveSymbols ]) })
     console.log({ addSymbolToList: addSymbolToList([ symbol, rawActiveSymbols ]) })
     if (lastPositionIsClosed({ position, openedPositions }))
       await setAccountActiveSymbols(removeSymbolFromList([ symbol, rawActiveSymbols ]))
     else
-      await setAccountActiveSymbols(addSymbolToList([ symbol, rawActiveSymbols ]))
+      await setAccountActiveSymbols(addSymbolToList([ symbol, defaultTo([], rawActiveSymbols) ]))
 
     log(position)
 
