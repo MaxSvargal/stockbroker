@@ -8,6 +8,11 @@ import {
   append, defaultTo, head, uniq, curryN, of, add, split, join, prepend, repeat
 } from 'ramda'
 
+import {
+  parse, stringify, roundToMinQty, getMinQtyFromSymbolInfo, takePairFromSymbol,
+  findTradeByOrderId
+} from './shared'
+
 // TODO move to account preferences
 const numOfChunks = 8
 const minProfit = 0.006
@@ -32,36 +37,19 @@ const subtractBuyComission = converge(subtract, [ floatProp('qty'), floatProp('c
 const minCoverPrice = converge(subtract, [ nth(0), apply(multiply) ])
 const findOrderByMinPrice = (minPrice: number) => compose(last, sortBy(propPrice), filter(o(gte(minPrice), propPrice)))
 const findOrderToCover = compose(findOrderByMinPrice, minCoverPrice)
-const findTradeByOrderId = unapply(converge(find, [ o(propEq('orderId'), nth(0)), nth(1) ]))
 
 const getProfitValue = curry((buy, sell) => (sell * 100 / buy) - 100)
 const getProfitFromPosAndTrade = converge(getProfitValue, [ o(propPrice, nth(0)), o(floatProp('price'), nth(1)) ])
 const calcProfit = compose(flip(subtract)(comissionPerc), unapply(getProfitFromPosAndTrade))
 
-const takePairFromSymbol = compose(converge(pair, [ nth(1), nth(2) ]), match(/(.+)(...)/))
-
 const notContains = complement(contains)
 const buySignalSymbolIsNotEnabled = both(propEq('type', 'BUY'), converge(notContains, [ prop('symbol'), prop('enabledSymbols') ]))
-
 const getIdListOfPosition = ifElse(isNil, always(null), o(of, prop('id')))
-
-const getMinQtyFromSymbolInfo = compose(prop('minQty'), find(propEq('filterType', 'LOT_SIZE')), prop('filters'))
-
-const stringify = flip(invoker(1, 'stringify'))(JSON)
-const parse = flip(invoker(1, 'parse'))(JSON)
 const addSymbolToList = compose(stringify, uniq, converge(append, [ head, compose(parse, defaultTo([]), last) ]))
 const removeSymbolFromList = o(stringify, converge(reject, [ o(equals, head), compose(defaultTo([]), parse, defaultTo('[]'), last) ]))
-const symbolNotLastIsset = converge(isNotEquals, [ prop('activeSymbol'), compose(last, parse, defaultTo([]), prop('accountActiveSymbols')) ])
 const lastPositionIsClosed = both(o(propEq('side', 'SELL'), prop('position')), o(propEq('length', 1), prop('openedPositions')))
 const fundsNotAccomodatesTwoChunks = unapply(converge(lt, [ head, o(multiply(2), last) ]))
 const chunkAmountToSellCond = ifElse(fundsNotAccomodatesTwoChunks, head, last)
-
-const numToDemention = compose(parseInt, join(''), prepend('1'), repeat('0'))
-const roundFloor = converge(divide, [ converge(Math.floor, [ apply(multiply), last ]), head ])
-const roundDown = unapply(compose(roundFloor, converge(pair, [ o(numToDemention, head), last ])))
-const getDigtOfFloat = compose(add(1), length, head, split('1'), last)
-const getDigit = compose(ifElse(o(equals('1'), head), always(0), getDigtOfFloat), split('.'))
-const roundToMinQty = unapply(converge(roundDown, [ o(getDigit, head), last ]))
 
 const buyErrorsCondition = cond([
   [ o(equals(0), prop('avaliableChunks')), always(Error('Too much opened positions')) ],
@@ -95,10 +83,9 @@ const checkSignal = (account: string, requests: any) =>
     if (buySignalSymbolIsNotEnabled({ type, symbol, enabledSymbols }))
       throw Error(`Symbol ${symbol} is not active, skip BUY signal.`)
 
-    let [ rawInfoSymbol, rawPositions, { balances } ] = await Promise.all([
+    const [ rawInfoSymbol, rawPositions, { balances } ] = await Promise.all([
       getExchangeInfoOfSymbol(symbol), getPositions(null), accountInfo(null),
     ])
-    balances = [ { asset: 'EOS', free: '10.00000000', locked: '0.00000000' } ]
 
     const [ slaveCurrency, masterCurrency ] = takePairFromSymbol(symbol)
     const minQty = o(getMinQtyFromSymbolInfo, parse)(rawInfoSymbol)

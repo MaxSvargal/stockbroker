@@ -5,14 +5,16 @@ import {
   converge, propEq, last, head, reject, propSatisfies, contains, pair, identity,
 } from 'ramda'
 
+import {
+  getMinQtyFromSymbolInfo, roundToMinQty, takePairFromSymbol, parse, findTradeByOrderId
+} from './shared'
+
 const propId = prop('id')
 const propOrderId = prop('orderId')
 const propPrice = o(parseFloat, prop('price'))
-const propQty = o(parseFloat, prop('qty'))
 const propExecutedQty = o(parseFloat, prop('executedQty'))
 
 const lengthIsZero = o(equals(0), length)
-const roundDown = (num: number) => Math.floor(num * 100) / 100
 const curryUnary = o(<any>curryN(2), <any>unapply)
 const curryUnary3 = o(<any>curryN(3), <any>unapply)
 const filterBySymbol = curryUnary(converge(filter, [ o(<any>propEq('symbol'), last), head ]))
@@ -23,15 +25,27 @@ const idContainsInList = converge(propSatisfies, [ o(flip(contains), head), alwa
 const getNotCovered = unapply(converge(reject, [ idContainsInList, last ]))
 const getByList = unapply(converge(filter, [ idContainsInList, last ]))
 const getOpenedPositions = converge(getNotCovered, [ o(getAllCoveredIds, filterSells), filterBuys ])
-const getTotalQuantity = compose(toString, sum, map(propExecutedQty))
-const findTradeByOrderId = unapply(converge(find, [ o(propEq('orderId'), head), last ]))
+
 const getProfitValue = curryUnary(converge(subtract, [ converge(divide, [ converge(multiply, [ head, always(100) ]), last ]) , always(100) ]))
 const getProfitOfQuantity = curryUnary3(converge(multiply, [ converge(getProfitValue, [ nth(1), nth(2) ]), nth(0) ]))
 
-type Requests = { getPositions: Function, sendOrder: Function, myTrades: Function, setPosition: Function }
+const parseFreeProp = o(parseFloat, prop('free'))
+const findByAssetProp = o(find, propEq('asset'))
+
+type Requests = {
+  getExchangeInfoOfSymbol: Function,
+  accountInfo: Function,
+  getPositions: Function,
+  sendOrder: Function,
+  myTrades: Function,
+  setPosition: Function
+}
 type CheckOrderSignal = (requests: Requests) => (symbols: string[]) => void
-const checkOrderSignal: CheckOrderSignal = ({ getPositions, setPosition, sendOrder, myTrades }) => async (symbols) => {
-  const positions = await getPositions(null)
+const checkOrderSignal: CheckOrderSignal = requests => async symbols => {
+  const { getExchangeInfoOfSymbol, accountInfo, getPositions, setPosition, sendOrder, myTrades } = requests
+
+  const [ rawPositions, { balances } ] = await Promise.all([ getPositions(null), accountInfo(null) ])
+  const positions = map(parse, rawPositions)
   const filterSymbol = filterBySymbol(positions)
   const getOpenedPositionsBySymbol = o(getOpenedPositions, filterSymbol)
 
@@ -40,8 +54,13 @@ const checkOrderSignal: CheckOrderSignal = ({ getPositions, setPosition, sendOrd
       const openedPositions = getOpenedPositionsBySymbol(symbol)
       if (lengthIsZero(openedPositions)) return null
 
-      // TODO: quantity of all avaliable funds
-      const quantity = getTotalQuantity(openedPositions)
+      const rawInfoSymbol = await getExchangeInfoOfSymbol(symbol)
+      const minQty = o(getMinQtyFromSymbolInfo, parse)(rawInfoSymbol)
+
+      const [ slaveCurrency ] = takePairFromSymbol(symbol)
+      const findBySlaveCurrency = findByAssetProp(slaveCurrency)
+      const avaliableToSell = o(parseFreeProp, findBySlaveCurrency)(balances)
+      const quantity = roundToMinQty(minQty, avaliableToSell)
 
       const order = await sendOrder({ symbol, quantity, side: 'SELL', type: 'MARKET' })
       const trades = await myTrades({ symbol, limit: 10 })

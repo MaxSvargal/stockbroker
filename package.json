@@ -38,7 +38,6 @@
   "scripts": {
     "test": "jest",
     "dev-exchange-listener": "nodemon ./services/exchange-listener --watch services/exchange-listener",
-    "dev-binance-listener": "nodemon ./services/binance-listener --watch services/binance-listener",
     "dev-redis-persist": "nodemon ./services/redis-persist --watch services/redis-persist",
     "dev-redis-responder": "nodemon ./services/redis-responder --watch services/redis-responder",
     "dev-signal-publisher": "nodemon ./services/signal-publisher --watch services/signal-publisher",
