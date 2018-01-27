@@ -24,7 +24,7 @@ apps:
     env     :
       DEBUG   : 'app:log,app:error'
 
-  - name    : 'maxsvargal Account Binance'
+  - name    : 'Account maxsvargal'
     script  : 'services/binance-account/index.ts'
     env     :
       DEBUG   : 'app:log,app:error'
@@ -32,7 +32,7 @@ apps:
       KEY     : 'ZtgjgCPqiKw80Y7M2BwzNjl2XspqiUCxWx5v1fRgDAnkWPhSpT5yNzbuaOT2SiqI'
       SECRET  : '8VP3B4wtMJcuGjWyDDwVDkZoeI16Z8pALYo2LDqXZm1loMKkVzmCkdbXrakdmXBC'
 
-  - name    : 'lesorub Account Binance'
+  - name    : 'Account lesorub'
     script  : 'services/binance-account/index.ts'
     env     :
       DEBUG   : 'app:log,app:error'
