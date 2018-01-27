@@ -98,7 +98,7 @@ const checkSignal = (account: string, requests: any) =>
       const avaliableToBuy: number = o(parseFreeProp, findByMasterCurrency)(balances)
       const avaliableChunks = o(subtract(numOfChunks), length)(openedPositions)
       const chunkAmount = divide(avaliableToBuy, avaliableChunks)
-      const quantity = roundToMinQty(minQty, chunkAmount)
+      const quantity = roundToMinQty(minQty, divide(chunkAmount, price))
       log({ minQty, quantity, chunkAmount })
       const error = buyErrorsCondition({ avaliableChunks, quantity, avaliableToBuy })
 
