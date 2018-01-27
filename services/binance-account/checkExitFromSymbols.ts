@@ -51,7 +51,9 @@ const checkOrderSignal: CheckOrderSignal = requests => async symbols => {
 
   const execForSymbol = async (symbol: string) => {
     try {
+      console.log('START EXIT FROM SYMBOL', symbol)
       const openedPositions = getOpenedPositionsBySymbol(symbol)
+      console.log({ openedPositions })
       if (lengthIsZero(openedPositions)) return null
 
       const rawInfoSymbol = await getExchangeInfoOfSymbol(symbol)
