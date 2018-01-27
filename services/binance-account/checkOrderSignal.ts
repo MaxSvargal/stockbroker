@@ -94,13 +94,16 @@ const checkSignal = (account: string, requests: any) =>
     const openedPositions = getOpenedPositions(positions)
     const openedPositionsOfSymbol = o(getOpenedPositions, filterBySymbol(symbol))(positions)
 
-    console.log({ minQty, positions, openedPositionsOfSymbol, balances })
+    console.log({ minQty, openedPositionsOfSymbol })
 
     const execBuy = () => {
       const findByMasterCurrency = findByAssetProp(masterCurrency)
       const avaliableToBuy: number = o(parseFreeProp, findByMasterCurrency)(balances)
+      console.log({ avaliableToBuy })
       const avaliableChunks = o(subtract(numOfChunks), length)(openedPositions)
+      console.log({ avaliableChunks })
       const chunkAmount = divide(avaliableToBuy, avaliableChunks)
+      console.log({ chunkAmount })
       const quantity = roundToMinQty(minQty, divide(chunkAmount, price))
       log({ minQty, quantity, chunkAmount })
       const error = buyErrorsCondition({ avaliableChunks, quantity, avaliableToBuy })
@@ -111,9 +114,12 @@ const checkSignal = (account: string, requests: any) =>
     const execSell = () => {
       const findBySlaveCurrency = findByAssetProp(slaveCurrency)
       const avaliableToSell = o(parseFreeProp, findBySlaveCurrency)(balances)
+      console.log({ avaliableToSell })
       const positionToCover = findOrderToCover([ price, minProfit ])(openedPositionsOfSymbol)
       const chunkAmount = prop('comissionIncQty', positionToCover)
+      console.log({ chunkAmount })
       const quantity = roundToMinQty(minQty, chunkAmountToSellCond([ avaliableToSell, chunkAmount ]))
+      console.log({ quantity })
       const error = sellErrorsCondition({ positionToCover, quantity, avaliableToSell })
 
       return { quantity, error, positionToCover }
