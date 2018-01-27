@@ -11,7 +11,7 @@ const requestGetActiveSymbols = { type: 'cacheHashGetValues', key: 'accounts:act
 const requestGetEnabledSymbols = { type: 'cacheHashGet', key: 'tradeState', field: 'enabledToBuySymbols' }
 const requestProcessesList = { type: 'processesList' }
 const requestStopSigProcess = (symbol: string) => ({ type: 'processStop', name: `Signal Publisher ${symbol}` })
-const requestStopLisProcess = (symbol: string) => ({ type: 'processStop', name: `Binance Exchange Listener ${symbol}` })
+const requestStopLisProcess = (symbol: string) => ({ type: 'processStop', name: `Exchange Listener ${symbol}` })
 
 const parse = flip(invoker(1, 'parse'))(JSON)
 const mapNamePidPair = map(converge(pair, [ prop('name'), prop('pid') ]))
