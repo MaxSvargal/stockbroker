@@ -11,7 +11,7 @@ export const processStartListenerRequest = (symbol: string) => ({
   type: 'processStart',
   options: {
     name: `Exchange Listener ${symbol}`,
-    script: `./services/binance-listener/index.ts`,
+    script: `./services/exchange-listener/index.ts`,
     env: { SYMBOL: symbol, DEBUG: 'app:log,app:error' }
   }
 })
