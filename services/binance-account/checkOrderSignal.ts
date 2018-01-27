@@ -45,7 +45,7 @@ const calcProfit = compose(flip(subtract)(comissionPerc), unapply(getProfitFromP
 const notContains = complement(contains)
 const buySignalSymbolIsNotEnabled = both(propEq('type', 'BUY'), converge(notContains, [ prop('symbol'), prop('enabledSymbols') ]))
 const getIdListOfPosition = ifElse(isNil, always(null), o(of, prop('id')))
-const addSymbolToList = compose(stringify, uniq, converge(append, [ head, compose(parse, defaultTo([]), last) ]))
+const addSymbolToList = compose(stringify, uniq, converge(append, [ head, compose(parse, defaultTo('[]'), last) ]))
 const removeSymbolFromList = o(stringify, converge(reject, [ o(equals, head), compose(defaultTo([]), parse, defaultTo('[]'), last) ]))
 const lastPositionIsClosed = both(o(propEq('side', 'SELL'), prop('position')), o(propEq('length', 1), prop('openedPositions')))
 const fundsNotAccomodatesTwoChunks = unapply(converge(lt, [ head, o(multiply(2), last) ]))
@@ -137,7 +137,7 @@ const checkSignal = (account: string, requests: any) =>
     if (lastPositionIsClosed({ position, openedPositions }))
       await setAccountActiveSymbols(removeSymbolFromList([ symbol, rawActiveSymbols ]))
     else
-      await setAccountActiveSymbols(addSymbolToList([ symbol, defaultTo([], rawActiveSymbols) ]))
+      await setAccountActiveSymbols(addSymbolToList([ symbol, rawActiveSymbols ]))
 
     log(position)
 
