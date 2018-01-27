@@ -133,8 +133,7 @@ const checkSignal = (account: string, requests: any) =>
 
     const positionStoreStatus = await setPosition(position)
     const rawActiveSymbols = await getAccountActiveSymbols(null)
-    console.log({ rawActiveSymbols })
-    console.log({ addSymbolToList: addSymbolToList([ symbol, rawActiveSymbols ]) })
+
     if (lastPositionIsClosed({ position, openedPositions }))
       await setAccountActiveSymbols(removeSymbolFromList([ symbol, rawActiveSymbols ]))
     else
