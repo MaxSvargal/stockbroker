@@ -1,17 +1,8 @@
-export const processStartSignalerRequest = (symbol: string) => ({
+export const processStartSignallerRequest = (symbol: string) => ({
   type: 'processStart',
   options: {
-    name: `Symbol ${symbol} Signaller`,
-    script: `./services/signal-publisher/index.ts`,
-    env: { SYMBOL: symbol, DEBUG: 'app:log,app:error' }
-  }
-})
-
-export const processStartListenerRequest = (symbol: string) => ({
-  type: 'processStart',
-  options: {
-    name: `Symbol ${symbol} Listener`,
-    script: `./services/exchange-listener/index.ts`,
+    name: `Signaller ${symbol}`,
+    script: `./services/signaller/index.ts`,
     env: { SYMBOL: symbol, DEBUG: 'app:log,app:error' }
   }
 })

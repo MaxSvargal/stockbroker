@@ -7,8 +7,7 @@ import { __, equals, append, unnest, unary, flip, invoker, divide, init, apply,
 } from 'ramda'
 
 import {
-  processStartSignalerRequest, processStartListenerRequest,
-  setEnabledSymbolsRequest, setExchangeInfoRequest
+  processStartSignallerRequest, setEnabledSymbolsRequest, setExchangeInfoRequest
 } from './requests'
 
 import * as pm2 from 'pm2'
@@ -23,7 +22,7 @@ const mainSymbols = [ 'BTCUSDT' /*, 'ETHUSDT', 'BNBUSDT' */ ]
 const invokeSend = flip(invoker(1, 'send'))
 const invokePublish = invoker(2, 'publish')
 const makePublichExitFromSymbols = flip(invokePublish('exitFromSymbols'))
-const collectRequests = o(flatten, juxt([ map(processStartSignalerRequest), map(processStartListenerRequest) ]))
+const collectRequests = map(processStartSignallerRequest)
 const stringify = flip(invoker(1, 'stringify'))(JSON)
 // const parse = flip(invoker(1, 'parse'))(JSON)
 

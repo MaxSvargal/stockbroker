@@ -5,7 +5,7 @@ import { Requester, Publisher } from 'cote'
 
 const limit = 50
 const candles = 'candles'
-const candlesFrames = [ '1m', '5m', '15m' ]
+const candlesFrames = [ '1m' ]
 
 const invokeSend = flip(invoker(1, 'send'))
 const requestCandles = flip(invoker(1, candles))
