@@ -27,7 +27,7 @@ const filterBuys = filter(propEq('side', 'BUY'))
 const filterSells = filter(propEq('side', 'SELL'))
 const getAllCoveredIds = compose(reduce(concat, []), map(prop('coveredIds')))
 // TODO: refactor this fn later
-const getNotCovered = (ids: number[], buys: {}[]) => filter(propSatisfies(o(not, contains(__, ids)), 'id'))(buys)
+const getNotCovered = (ids: number[], buys: {}[]) => filter(propSatisfies(o(not, contains(__, ids)), 'time'))(buys)
 const getOpenedPositions = converge(getNotCovered, [ o(getAllCoveredIds, filterSells), filterBuys ])
 
 const floatProp = curryN(2, compose(parseFloat, prop))
@@ -44,7 +44,7 @@ const calcProfit = compose(flip(subtract)(comissionPerc), unapply(getProfitFromP
 
 const notContains = complement(contains)
 const buySignalSymbolIsNotEnabled = both(propEq('type', 'BUY'), converge(notContains, [ prop('symbol'), prop('enabledSymbols') ]))
-const getIdListOfPosition = ifElse(isNil, always(null), o(of, prop('id')))
+const getIdListOfPosition = ifElse(isNil, always(null), o(of, prop('time')))
 const addSymbolToList = compose(stringify, uniq, converge(append, [ head, compose(parse, defaultTo('[]'), last) ]))
 const removeSymbolFromList = o(stringify, converge(reject, [ o(equals, head), compose(defaultTo([]), parse, defaultTo('[]'), last) ]))
 const lastPositionIsClosed = both(o(propEq('side', 'SELL'), prop('position')), o(propEq('length', 1), prop('openedPositions')))
