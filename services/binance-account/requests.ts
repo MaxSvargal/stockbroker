@@ -3,10 +3,10 @@ export const requestPositions = (account: string) => () => ({
   key: `accounts:${account}:positions`
 })
 
-export const requestSetPosition = (account: string) => (position: { id: number }) => ({
+export const requestSetPosition = (account: string) => (position: { time: number }) => ({
   type: 'cacheHashSet',
   key: `accounts:${account}:positions`,
-  field: position.id, // TODO change to time
+  field: position.time,
   value: JSON.stringify(position)
 })
 
