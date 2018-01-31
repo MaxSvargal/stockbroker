@@ -24,6 +24,9 @@ apps:
     env     :
       DEBUG   : 'app:log,app:error'
 
+  - name    : 'Logger Signals'
+    script  : 'services/logger-signals/index.ts'
+
   - name    : 'Account maxsvargal'
     script  : 'services/binance-account/index.ts'
     env     :
