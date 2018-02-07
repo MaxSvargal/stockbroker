@@ -45,6 +45,7 @@
     "dev-trade-master": "nodemon ./services/trade-master --watch services/trade-master",
     "dev-pm2-manager": "nodemon ./services/pm2-manager --watch services/pm2-manager",
     "dev-signals-killer": "nodemon ./services/signals-killer --watch services/signals-killer"
+    "dev-db": "nodemon ./services/db-rethink --watch services/db-rethink"
   },
   "repository": {
     "type": "git",
