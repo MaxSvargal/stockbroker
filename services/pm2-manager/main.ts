@@ -1,4 +1,4 @@
-import { invoker, curry } from 'ramda'
+import { invoker, curry, map, o, props, last, head, both, lt, equals, compose, any, converge, pair, prop } from 'ramda'
 import { fromEvent, observe } from 'most'
 import { Responder } from 'cote'
 import { StartOptions } from 'pm2'
@@ -19,12 +19,21 @@ const invokeDelete = invoker(2, 'delete')
 const invokeList = invoker(1, 'list')
 const invokeDisconnect = invoker(0, 'disconnect')
 
+const mapPidName = o(map(props([ 'pid', 'name' ])), last)
+const checkStates = ([ name, list ]: [ string, [ number, string ][] ]) => map(both(o(lt(0), head), o(equals(name), last)), list)
+const isAlreadyStarted = compose(any(equals(true)), checkStates, converge(pair, [ head, mapPidName ]))
+
 const connect = (pm2: PM2) => new Promise((resolve, reject) =>
   invokeConnect((err: Error) => err ? reject(err) : resolve())(pm2))
 
 type StartProcess = (a: PM2) => (xs: [ { options: StartOptions }, (b: Error, c: any) => {} ]) => void
-const startProcess: StartProcess = pm2 => ([ { options }, reply ]) =>
-  invokeStart(options, (err: Error, apps: {}) => reply(err, apps))(pm2)
+const startProcess: StartProcess = pm2 => ([ { options }, reply ]) => {
+  invokeList((err: Error, list: any) =>
+    isAlreadyStarted([ prop('name', options), list ]) ?
+      reply(Error('Instance already started'), null) :
+      invokeStart(options, (err: Error, apps: {}) => reply(err, apps))(pm2)
+  )(pm2)
+}
 
 type StopProcess = (a: PM2) => (xs: [ { name: string }, (b: Error, c: any) => {} ]) => void
 const stopProcess: StopProcess = pm2 => ([ { name }, reply ]) =>

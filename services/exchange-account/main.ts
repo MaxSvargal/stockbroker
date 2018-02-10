@@ -1,9 +1,9 @@
-import { fromEvent, observe } from 'most'
+import { fromEvent, observe, Stream } from 'most'
 import { Requester, Subscriber } from 'cote'
 import { o, flip, invoker, map, applyTo } from 'ramda'
 
 import checkOrderSignal from './checkOrderSignal'
-import checkExitFromSymbols from './checkExitFromSymbols'
+import checkStopLimit from './checkStopLimit'
 
 const requestAccount = (id: string) => () =>
   ({ type: 'dbGet', table: 'accounts', id })
@@ -24,6 +24,7 @@ const invokeSend = flip(invoker(1, 'send'))
 const invokeAccountInfo = flip(invoker(1, 'accountInfo'))
 const invokeOrder = flip(invoker(1, 'order'))
 const invokeMyTrades = flip(invoker(1, 'myTrades'))
+const invokePrices = flip(invoker(1, 'allBookTickers'))
 
 type Binance = {
   candles: (a: string) => Promise<any[]>,
@@ -33,13 +34,12 @@ type Binance = {
 }
 type ExitProcess = (a: Error) => void
 type Account = string
-type Main = (a: ExitProcess, b: Binance, c: Subscriber, d: Requester, f: Account) => void
-const main: Main = (exitProcess, binance, subscriber, requester, account) => {
+type Main = (a: ExitProcess, b: Account, c: Binance, d: Subscriber, e: Requester, f: Stream) => void
+const main: Main = (exitProcess, account, binance, subscriber, requester, loopStream) => {
   const propagateSignalStream = fromEvent('newSignal', subscriber)
   const exitFromSymbolsStream = fromEvent('exitFromSymbols', subscriber)
-  const binanceInvokers = [ invokeAccountInfo, invokeOrder, invokeMyTrades ]
-  const [ accountInfo, sendOrder, myTrades ] = map(applyTo(binance), binanceInvokers)
-
+  const binanceInvokers = [ invokeAccountInfo, invokeOrder, invokeMyTrades, invokePrices ]
+  const [ accountInfo, sendOrder, myTrades, getPrices ] = map(applyTo(binance), binanceInvokers)
   const request = invokeSend(requester)
 
   const requests = {
@@ -52,44 +52,12 @@ const main: Main = (exitProcess, binance, subscriber, requester, account) => {
     closePosition:      o(request, requestClosePosition),
     accountInfo,
     sendOrder,
-    myTrades
+    myTrades,
+    getPrices
   }
 
-  // TODO: check stop limit for every trade
-
-  // const test = async () => {
-  //   try {
-  //     console.log('request')
-  //     const openCount = await requests.getOpenPosCount(null)
-  //     console.log({ openCount })
-  //
-  //     const account = await requests.getAccount(null)
-  //     console.log({ account })
-  //     const positions = await requests.getPositions('NEOBTC')
-  //     console.log({ positions })
-  //     const symbolInfo = await requests.getSymbolInfo('WTCBTC')
-  //     console.log({ symbolInfo })
-  //     const symbolsEnabled = await requests.getSymbolsEnabled(null)
-  //     console.log({ symbolsEnabled })
-  //
-  //     // const openStatus = await requests.openPosition({
-  //     //   id: 1215, account: 'maxsvargal', symbol: 'NEOBTC', closed: false, open: { id: 356, orderId: 455234, qty: 1, origQty: 1, price: 0.000034 }
-  //     // })
-  //     // console.log({ openStatus })
-  //
-  //     // const closeStatus = await requests.closePosition({
-  //     //   id: 1215, closed: true, close: { id: 357, orderId: 455235, qty: 1, origQty: 1, price: 0.000064 }
-  //     // })
-  //     // console.log({ closeStatus })
-  //   } catch (err) {
-  //     console.error(err)
-  //   }
-  // }
-  //
-  // test()
-
   observe(checkOrderSignal(account, requests), propagateSignalStream)
-  observe(checkExitFromSymbols(requests), exitFromSymbolsStream)
+  observe(checkStopLimit(requests), loopStream)
 }
 
 export default main

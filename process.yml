@@ -1,11 +1,6 @@
 apps:
-  - name    : 'Persist Redis'
-    script  : 'services/redis-persist/index.ts'
-    env     :
-      DEBUG   : 'app:log,app:error'
-
-  - name    : 'Responder Redis'
-    script  : 'services/redis-responder/index.ts'
+  - name    : 'DB Rethink'
+    script  : 'services/db-rethink/index.ts'
     env     :
       DEBUG   : 'app:log,app:error'
 
@@ -24,19 +19,20 @@ apps:
     env     :
       DEBUG   : 'app:log,app:error'
 
-  - name    : 'Logger Signals'
-    script  : 'services/logger-signals/index.ts'
+  # - name    : 'Logger Signals'
+  #   script  : 'services/logger-signals/index.ts'
 
   - name    : 'Account maxsvargal'
-    script  : 'services/binance-account/index.ts'
+    script  : 'services/exchange-account/index.ts'
     env     :
       DEBUG   : 'app:log,app:error'
       ACCOUNT : 'maxsvargal'
       KEY     : 'ZtgjgCPqiKw80Y7M2BwzNjl2XspqiUCxWx5v1fRgDAnkWPhSpT5yNzbuaOT2SiqI'
       SECRET  : '8VP3B4wtMJcuGjWyDDwVDkZoeI16Z8pALYo2LDqXZm1loMKkVzmCkdbXrakdmXBC'
+      MODE    : 'development'
 
   - name    : 'Account lesorub'
-    script  : 'services/binance-account/index.ts'
+    script  : 'services/exchange-account/index.ts'
     env     :
       DEBUG   : 'app:log,app:error'
       ACCOUNT : 'lesorub'

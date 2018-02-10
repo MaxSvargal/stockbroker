@@ -1,7 +1,7 @@
 import {
   curryN, subtract, apply, divide, curry, chain, pair, props, prop, compose,
   constructN, pick, evolve, converge, objOf, always, o, merge, mergeAll, lt,
-  unapply, multiply, head, last, tail, filter, pathSatisfies, gte, ifElse
+  unapply, multiply, head, last, tail, filter, pathSatisfies, gte, ifElse, map
 } from 'ramda'
 
 type Price = number
@@ -44,7 +44,9 @@ const divside: Divside = converge(subtract, [ apply(multiply), o(multiply(fee), 
 
 type CalcProfit = (a: [ [ number, number ], [ number, number ] ]) => number
 const calcProfitAmount: CalcProfit = converge(subtract, [ o(divside, last), o(divside, head) ])
-const calcProfitPerc: CalcProfit = converge(divide, [ o(head, last), o(head, head) ])
+
+const margin = converge(divide, [ converge(subtract, [ last, head ]), ifElse(converge(lt, [ head, last ]), head, last) ])
+const calcProfitPerc: CalcProfit = o(converge(multiply, [ always(100), margin ]), map(head))
 
 type AmountPropsPair = (a: { price: number, origQty: number }) => [ number, number ]
 const amountPropsPair = <AmountPropsPair>props([ 'price', 'origQty' ])

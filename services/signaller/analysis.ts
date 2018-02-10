@@ -1,6 +1,6 @@
 import log from '../utils/log'
 import { williamsr } from 'technicalindicators'
-import { any, equals, range, head, lt, gt, o, juxt, map, nth, takeLast, both, last, not, and, converge } from 'ramda'
+import { any, equals, range, head, lt, gt, o, juxt, map, nth, takeLast, both, last } from 'ramda'
 
 let timeOfLastSignal = 0
 
@@ -14,8 +14,8 @@ const wrDrop = both(wrCurrIsDrop, wrPrevIsGreat)
 const wrUp = both(wrCurrIsUp, wrPrevIsLow)
 
 type MakeAnalysis = (a: number[][][]) => { type: string, price: number, time: number }
-const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m ]) => {
-  const [ time, open, high, low, close ] = getCandlesParts(candles1m)
+const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles ]) => {
+  const [ time, open, high, low, close ] = getCandlesParts(candles)
 
   const wr = williamsr({ period: 14, close, low, high })
   const wrIsDrop = wrDrop(wr)
@@ -37,7 +37,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m ]) => {
     else timeOfLastSignal = <number>last(time)
 
     log(`${symbol} SIG ${buySignal ? '🚀  BUY' : '🏁  SEL'} ${last(close)}     ${new Date(last(time)).toLocaleString()}`)
-    return { symbol, type: buySignal ? 'BUY' : 'SELL', price: last(close), time: new Date().getTime() }
+    return { symbol, side: buySignal ? 'BUY' : 'SELL', price: last(close), time: new Date().getTime() }
   }
   return null
 }

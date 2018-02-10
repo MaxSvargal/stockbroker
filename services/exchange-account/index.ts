@@ -1,4 +1,5 @@
 import { subscriberCons, requesterCons, binanceCons } from '../utils/cote'
+import { periodic } from 'most'
 import main from './main'
 
 const { ACCOUNT, KEY, SECRET } = process.env
@@ -19,6 +20,7 @@ const exitProcess = (err: Error) => {
   process.exit(1)
 }
 const binance = binanceCons({ apiKey: KEY, apiSecret: SECRET })
+const checkStopLimitLoopStream = periodic(120000)
 const account = ACCOUNT
 
-main(exitProcess, binance, subscriber, requester, account)
+main(exitProcess, account, binance, subscriber, requester, checkStopLimitLoopStream)

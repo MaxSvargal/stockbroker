@@ -1,7 +1,7 @@
 import {
   filter, curry, converge, lt, o, path, pair, prop, chain, append, subtract,
   last, head, multiply, curryN, unapply, map, compose, takeLast, apply, gte,
-  forEach, when, equals, zip, call, merge, always, objOf
+  forEach, when, equals, zip, call, merge, always, objOf, nth
 } from 'ramda'
 
 import trade from './modules/trade'
@@ -10,7 +10,7 @@ import trade from './modules/trade'
 const sellStateIsTrue = compose(equals(true), last, last)
 const getSymbolPricePair = converge(pair, [ prop('symbol'), path([ 'open', 'price' ]) ])
 const getStopLimitFromPreferences: (a: any) => number = path([ 'preferences', 'stopLimitPerc' ])
-const findPriceBySymbol = o(parseFloat, converge(prop, [ o(head, last), head ]))
+const findPriceBySymbol = compose(parseFloat, prop('bidPrice'), converge(prop, [ o(head, last), head ]))
 const addCurrentPrice = curryN(2, unapply(converge(append, [ findPriceBySymbol, last ])))
 const addSellStatus = chain(append, o(apply(gte), takeLast(2)))
 
@@ -20,7 +20,7 @@ const addStopLimitValue = (limit: number) =>
 const checkPositionsLimit = (prices: {}, stopLimitPerc: number) =>
   map(compose(addSellStatus, addCurrentPrice(prices), addStopLimitValue(stopLimitPerc), getSymbolPricePair))
 
-const checkStopLimit = async requests => {
+const checkStopLimit = requests => async () => {
   const { getAccount, getOpenedPositions, getPrices, closePosition, sendOrder, myTrades } = requests
   const [ account, openedPositions, prices ] = await Promise.all([ getAccount(null), getOpenedPositions(null), getPrices(null) ])
 

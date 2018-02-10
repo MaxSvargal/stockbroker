@@ -17,14 +17,11 @@ import { williamsr, ema, obv } from 'technicalindicators'
 // import { ema } from './ema'
 import { log, error } from '../utils/log'
 
-const mainSymbols = [ 'BTCUSDT' /*, 'ETHUSDT', 'BNBUSDT' */ ]
+const mainSymbols = [ /* 'BTCUSDT', */ 'ETHUSDT' /* , 'BNBUSDT' */ ]
 
 const invokeSend = flip(invoker(1, 'send'))
 const invokePublish = invoker(2, 'publish')
-const makePublichExitFromSymbols = flip(invokePublish('exitFromSymbols'))
 const collectRequests = map(processStartSignallerRequest)
-const stringify = flip(invoker(1, 'stringify'))(JSON)
-// const parse = flip(invoker(1, 'parse'))(JSON)
 
 const objHigh = o(objOf('high'), map(nth(2)))
 const objLow = o(objOf('low'), map(nth(3)))
@@ -52,23 +49,23 @@ const sortByPriceLevel = sortBy(o(parseFloat, converge(gt, [ meanLastDiff, prop(
 const sortByChangePerc = o(reverse, sortBy(o(parseFloat, prop('priceChangePercent'))))
 const symbolIssetIn = (list: string[]) => converge(contains, [ prop('symbol'), always(list) ])
 const byMasterCurrency = (master: string) => converge(contains, [ always(master), prop('symbol') ])
-const formatSymbolsToStore = compose(unnest, map(converge(pair, [ prop('symbol'), unary(stringify) ])), prop('symbols'))
 
 const getTheBestMasterTicker = compose(head, sortByPriceLevel, sortByChangePerc, filter(symbolIssetIn(mainSymbols)))
 const takeCurrencyFromTicker = compose(converge(pair, [ nth(1), nth(2) ]), match(/(...)(.+)/), prop('symbol'))
 
+const replaceInfoSymbols = (data: {}[]) => ({ type: 'dbReplaceAll', table: 'exchangeInfoSymbols', primaryKey: 'symbol', data })
+const updateSymbolsEnabled = (values: string[]) => ({ type: 'dbUpdate', table: 'tradeState', id: 'symbolsEnabled', data: { values } })
 const symbolToCandlesPath = (symbol: string) => `/klines?symbol=${symbol}&interval=30m&limit=28`
 
 type Main = (a: (a: Event) => void, b: Stream<{}>, c: any, d: Requester, e: Requester, f: Publisher) => void
-const main: Main = (exitProcess, mainLoopStream, fetch, requesterPersistStore, requesterProcess, publisher) => {
-  const storePersist: (req: {}) => any = invokeSend(requesterPersistStore)
-  const publishExitFromSymbols = makePublichExitFromSymbols(publisher)
+const main: Main = (exitProcess, mainLoopStream, fetch, requesterProcess, requesterDb, publisher) => {
   const processes = invokeSend(requesterProcess)
+  const db = invokeSend(requesterDb)
   const fetchJson = (path: string): Promise<any> =>
     fetch(`https://api.binance.com/api/v1${path}`).then((res: Response) => res.json())
 
   const exchangeInfo = fetchJson('/exchangeInfo')
-    .then(o(storePersist, o(setExchangeInfoRequest, formatSymbolsToStore)))
+    .then(compose(db, replaceInfoSymbols, prop('symbols')))
     .catch(exitProcess)
 
   const tick = async () => {
@@ -94,8 +91,7 @@ const main: Main = (exitProcess, mainLoopStream, fetch, requesterPersistStore, r
       log('Enabled: ', enabledSymbols)
       log('To exit: ', toExitSymbols)
 
-      if (length(toExitSymbols)) publishExitFromSymbols(toExitSymbols)
-      await storePersist(setEnabledSymbolsRequest(stringify(enabledSymbols)))
+      await db(updateSymbolsEnabled(enabledSymbols))
       await Promise.all(map(processes, collectRequests(enabledSymbols)))
 
       log('Tick complete')

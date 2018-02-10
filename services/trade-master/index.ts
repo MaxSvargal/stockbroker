@@ -5,17 +5,16 @@ import { requesterCons, publisherCons } from '../utils/cote'
 
 import main from './main'
 
-// Constructors
-const requesterPersistStore = requesterCons({
-  name: 'Trade Master Persist Store Requester',
-  key: 'store-persist',
-  requests: [ 'cacheHashSet', 'cacheHashMultiSet' ]
-})
-
 const requesterProcess = requesterCons({
   name: 'Trade Master Process Requester',
   key: 'processes',
   requests: [ 'processStart' ]
+})
+
+const requesterDb = requesterCons({
+  name: 'Trade Master Database Requester',
+  key: 'db',
+  requests: [ 'dbUpdate', 'dbReplaceAll' ]
 })
 
 const publisher = publisherCons({
@@ -26,9 +25,9 @@ const publisher = publisherCons({
 
 const exitProcess = (err: Event) => {
   error(err)
-  // process.exit(1)
+  process.exit(1)
 }
 
-const loopStream = delay(2000, periodic(200000))
+const loopStream = delay(5000, periodic(250000))
 
-main(exitProcess, loopStream, fetch, requesterPersistStore, requesterProcess, publisher)
+main(exitProcess, loopStream, fetch, requesterProcess, requesterDb, publisher)
