@@ -14,9 +14,9 @@ const wrDrop = both(wrCurrIsDrop, wrPrevIsGreat)
 const wrUp = both(wrCurrIsUp, wrPrevIsLow)
 
 type MakeAnalysis = (a: number[][][]) => { type: string, price: number, time: number }
-const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]) => {
+const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m ]) => {
   const [ time, _, highShort, lowShort, closeShort ] = getCandlesParts(candles1m)
-  const [ __, ___, highLong, lowLong, closeLong ] = getCandlesParts(candles5m)
+  // const [ __, ___, highLong, lowLong, closeLong ] = getCandlesParts(candles5m)
 
   const wrShort = williamsr({ period: 10, close: closeShort, low: lowShort, high: highShort })
   // const wrLong = williamsr({ period: 10, close: closeLong, low: lowLong, high: highLong })
