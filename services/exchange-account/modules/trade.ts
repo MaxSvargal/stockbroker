@@ -1,6 +1,8 @@
 import { or, prop, equals, unapply, converge, find, o, propEq, head, last, when, isNil, not, and, ifElse, always, path } from 'ramda'
 import { makeOpenedPosition, makeClosedPosition, Order, Trade, Position } from './positions'
 
+const { MODE } = process.env
+
 type FindTradeByOrderId = (a: number, b: Trade[]) => Trade
 const findTradeByOrderId: FindTradeByOrderId = unapply(converge(find, [ o(propEq('orderId'), head), last ]))
 
@@ -18,14 +20,29 @@ type Props = {
   positionToCover?: Position
 }
 
-export default async ({ openPosition, closePosition, sendOrder, myTrades, positionToCover, position }: Props): Promise<{} | void> => {
+export default async ({ openPosition, closePosition, sendOrder, myTrades, positionToCover, position, price }: Props): Promise<{} | void> => {
   const account: string = getAccount(position)
   const side: string = getSide(positionToCover)
   const symbol: string = getSymbol(or(position, positionToCover))
   const quantity: number = getQuantity([ side, or(position, positionToCover) ])
-  const order = await sendOrder({ side, symbol, quantity, type: 'MARKET' })
-  const trades = await myTrades({ symbol, limit: 10 })
-  const trade = findTradeByOrderId(prop('orderId', order), trades)
+
+  const order = {
+    orderId: 0,
+    origQty: quantity
+  }
+  const trade = {
+    id: 0,
+    symbol,
+    orderId: 0,
+    time: new Date().getTime(),
+    price: position ? position.price : price,
+    qty: quantity,
+    commission: position ? position.price * quantity : price * quantity,
+    commissionAsset: 'TEST'
+  }
+  // const order = await sendOrder({ side, symbol, quantity, type: 'MARKET' })
+  // const trades = await myTrades({ symbol, limit: 10 })
+  // const trade = findTradeByOrderId(prop('orderId', order), trades)
 
   return equals('BUY', side) ?
     openPosition && await openPosition(makeOpenedPosition([ order, trade, { account } ])) :
