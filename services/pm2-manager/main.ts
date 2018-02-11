@@ -30,7 +30,7 @@ type StartProcess = (a: PM2) => (xs: [ { options: StartOptions }, (b: Error, c: 
 const startProcess: StartProcess = pm2 => ([ { options }, reply ]) => {
   invokeList((err: Error, list: any) =>
     isAlreadyStarted([ prop('name', options), list ]) ?
-      reply(Error('Instance already started'), null) :
+      reply(null, null) :
       invokeStart(options, (err: Error, apps: {}) => reply(err, apps))(pm2)
   )(pm2)
 }

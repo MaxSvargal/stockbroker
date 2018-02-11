@@ -14,21 +14,21 @@ const wrDrop = both(wrCurrIsDrop, wrPrevIsGreat)
 const wrUp = both(wrCurrIsUp, wrPrevIsLow)
 
 type MakeAnalysis = (a: number[][][]) => { type: string, price: number, time: number }
-const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles ]) => {
-  const [ time, open, high, low, close ] = getCandlesParts(candles)
+const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]) => {
+  const [ time, _, highShort, lowShort, closeShort ] = getCandlesParts(candles1m)
+  const [ __, ___, highLong, lowLong, closeLong ] = getCandlesParts(candles5m)
 
-  const wr = williamsr({ period: 14, close, low, high })
-  const wrIsDrop = wrDrop(wr)
-  const wrIsUp = wrUp(wr)
+  const wrShort = williamsr({ period: 10, close: closeShort, low: lowShort, high: highShort })
+  const wrLong = williamsr({ period: 10, close: closeLong, low: lowLong, high: highLong })
 
-  const buySignal = wrIsUp
-  const sellSignal = wrIsDrop
+  const buySignal = wrUp(wrShort)
+  const sellSignal = wrDrop(wrLong)
 
   // log({
   //   now: new Date().toLocaleString(),
-  //   t: new Date(last(time)).toLocaleString(),
-  //   close: last(close),
-  //   wrList: takeLast(3, wr)
+  //   t: new Date(last(closeShort)).toLocaleString(),
+  //   close: last(closeShort),
+  //   wrList: takeLast(3, wrShort)
   // })
 
   if(any(equals(true))([ buySignal, sellSignal ])) {
@@ -36,9 +36,10 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles ]) => {
     if (equals(last(time), timeOfLastSignal)) return null
     else timeOfLastSignal = <number>last(time)
 
-    log(`${symbol} SIG ${buySignal ? '🚀  BUY' : '🏁  SEL'} ${last(close)}     ${new Date(last(time)).toLocaleString()}`)
-    return { symbol, side: buySignal ? 'BUY' : 'SELL', price: last(close), time: new Date().getTime() }
+    log(`${symbol} SIG ${buySignal ? '🚀  BUY' : '🏁  SEL'} ${last(closeShort)}     ${new Date(last(time)).toLocaleString()}`)
+    return { symbol, side: buySignal ? 'BUY' : 'SELL', price: last(closeShort), time: new Date().getTime() }
   }
+
   return null
 }
 

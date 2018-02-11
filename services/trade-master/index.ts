@@ -22,12 +22,11 @@ const publisher = publisherCons({
   broadcasts: [ 'exitFromSymbols' ]
 })
 
-
 const exitProcess = (err: Event) => {
   error(err)
   process.exit(1)
 }
 
-const loopStream = delay(5000, periodic(250000))
+const loopStream = delay(5000, periodic(360000))
 
 main(exitProcess, loopStream, fetch, requesterProcess, requesterDb, publisher)
