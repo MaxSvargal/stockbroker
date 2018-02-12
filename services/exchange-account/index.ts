@@ -20,7 +20,7 @@ const exitProcess = (err: Error) => {
   process.exit(1)
 }
 const binance = binanceCons({ apiKey: KEY, apiSecret: SECRET })
-const checkStopLimitLoopStream = periodic(120000)
+const checkStopLimitLoopStream = periodic(60000)
 const account = ACCOUNT
 
 main(exitProcess, account, binance, subscriber, requester, checkStopLimitLoopStream)
