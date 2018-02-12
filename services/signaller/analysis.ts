@@ -18,10 +18,10 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
   const [ time, _, highShort, lowShort, closeShort ] = getCandlesParts(candles1m)
   const [ __, ___, highLong, lowLong, closeLong ] = getCandlesParts(candles5m)
 
-  const wrShort = williamsr({ period: 14, close: closeShort, low: lowShort, high: highShort })
-  const wrLong = williamsr({ period: 14, close: closeLong, low: lowLong, high: highLong })
+  // const wrShort = williamsr({ period: 10, close: closeShort, low: lowShort, high: highShort })
+  const wrLong = williamsr({ period: 10, close: closeLong, low: lowLong, high: highLong })
 
-  const buySignal = wrUp(wrShort)
+  const buySignal = wrUp(wrLong)
   const sellSignal = wrDrop(wrLong)
 
   // log({
