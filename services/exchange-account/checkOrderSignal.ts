@@ -1,6 +1,6 @@
 import { log, error as logError } from '../utils/log'
 import {
-  o, cond, always, unapply, ifElse, equals, reject, complement, converge, last, divide, uniq,
+  o, cond, always, unapply, ifElse, equals, reject, complement, converge, last, divide, uniq, map,
   length, subtract, contains, filter, prop, propEq, find, T, gt, isNil, both, append, head, path
 } from 'ramda'
 
@@ -14,7 +14,7 @@ const filterBySymbol = o(filter, propEq('symbol'))
 
 const buySignalSymbolIsNotEnabled = both(propEq('side', 'BUY'), converge(complement(contains), [ prop('symbol'), prop('enabledSymbols') ]))
 const lastPositionIsClosed = both(o(equals('SELL'), head), o(propEq('length', 1), last))
-const addSymbolToList = unapply(o(uniq, converge(append, [ head, last ])))
+const getSymbolsOfPositions = o(uniq, map(prop('symbol')))
 const removeSymbolFromList = unapply(converge(reject, [ o(equals, head), last ]))
 
 const buyErrorsCondition = cond([
@@ -101,7 +101,7 @@ const checkSignal = (account: string, requests: any) =>
     if (lastPositionIsClosed([ side, openedPositionsOfSymbol ]))
       await setAccountSymbols(removeSymbolFromList(symbol, activeSymbols))
     else
-      await setAccountSymbols(addSymbolToList(symbol, activeSymbols))
+      await setAccountSymbols(getSymbolsOfPositions(openedPositions))
 
   } catch (err) {
     const errorEvent = {
