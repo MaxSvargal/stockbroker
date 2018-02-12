@@ -16,13 +16,13 @@ const wrUp = both(wrCurrIsUp, wrPrevIsLow)
 type MakeAnalysis = (a: number[][][]) => { type: string, price: number, time: number }
 const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]) => {
   const [ time, _, highShort, lowShort, closeShort ] = getCandlesParts(candles1m)
-  const [ __, ___, highLong, lowLong, closeLong ] = getCandlesParts(candles5m)
+  // const [ __, ___, highLong, lowLong, closeLong ] = getCandlesParts(candles5m)
 
-  // const wrShort = williamsr({ period: 10, close: closeShort, low: lowShort, high: highShort })
-  const wrLong = williamsr({ period: 10, close: closeLong, low: lowLong, high: highLong })
+  const wrShort = williamsr({ period: 10, close: closeShort, low: lowShort, high: highShort })
+  // const wrLong = williamsr({ period: 10, close: closeLong, low: lowLong, high: highLong })
 
-  const buySignal = wrUp(wrLong)
-  const sellSignal = wrDrop(wrLong)
+  const buySignal = wrUp(wrShort)
+  const sellSignal = wrDrop(wrShort)
 
   // log({
   //   now: new Date().toLocaleString(),
