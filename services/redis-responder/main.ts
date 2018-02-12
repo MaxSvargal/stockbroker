@@ -11,18 +11,22 @@ const replyFn = nth(1)
 type Hvals = (a: string, b: Function, c: RedisClient) => void
 const hvals: Hvals = invoker(2, 'hvals')
 const hget: Hvals = invoker(3, 'hget')
+const hgetall: Hvals = invoker(2, 'hgetall')
 
 type OnRequest = <Stream>(req: [ storeGetAllRequest, (err: Error, res: any[]) => any ]) => void
 const applyHvals: OnRequest = converge(hvals, [ key, replyFn ])
 const applyHget: OnRequest = converge(hget, [ key, field, replyFn ])
+const applyHgetAll: OnRequest = converge(hgetall, [ key, replyFn ])
 
 type EventToRequest = (a: RedisClient) => (b: Event) => any
 const eventHValuesToRequest: EventToRequest = flip(uncurryN(2, applyHvals))
 const eventHGetToRequest: EventToRequest = flip(uncurryN(2, applyHget))
+const eventHGetAllToRequest: EventToRequest = flip(uncurryN(2, applyHgetAll))
 
 type Main = (a: (a: Event) => void, b: RedisClient, c: Responder) => void
 const main: Main = (exitProcess, redis, responder) => {
   observe(eventHValuesToRequest(redis), fromEvent('cacheHashGetValues', responder))
+  observe(eventHGetAllToRequest(redis), fromEvent('cacheHashGetAll', responder))
   observe(eventHGetToRequest(redis), fromEvent('cacheHashGet', responder))
 }
 
