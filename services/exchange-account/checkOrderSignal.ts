@@ -98,7 +98,7 @@ const checkSignal = (account: string, requests: any) =>
       await trade({ sendOrder, myTrades, openPosition, position: { account, symbol, quantity, price } }) :
       await trade({ sendOrder, myTrades, closePosition, positionToCover, price })
 
-    if (lastPositionIsClosed([ side, openedPositions ]))
+    if (lastPositionIsClosed([ side, openedPositionsOfSymbol ]))
       await setAccountSymbols(removeSymbolFromList(symbol, activeSymbols))
     else
       await setAccountSymbols(addSymbolToList(symbol, activeSymbols))
