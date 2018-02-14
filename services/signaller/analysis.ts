@@ -1,6 +1,9 @@
 import log from '../utils/log'
-import { williamsr } from 'technicalindicators'
-import { any, equals, range, head, lt, gt, o, juxt, map, nth, takeLast, both, last } from 'ramda'
+import { williamsr, bollingerbands } from 'technicalindicators'
+import {
+  any, equals, range, head, lt, gt, o, juxt, map, nth, takeLast, both,
+  last, not, and, converge, prop
+} from 'ramda'
 
 let timeOfLastSignal = 0
 
@@ -13,33 +16,39 @@ const wrPrevIsLow = o(gt(-80), getPrev)
 const wrDrop = both(wrCurrIsDrop, wrPrevIsGreat)
 const wrUp = both(wrCurrIsUp, wrPrevIsLow)
 
+const getBBLastLower = o(prop('lower'), last)
+const getBBLastUpper = o(prop('upper'), last)
+
 type MakeAnalysis = (a: number[][][]) => { type: string, price: number, time: number }
 const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]) => {
-  const [ time, _, highShort, lowShort, closeShort ] = getCandlesParts(candles1m)
-  // const [ __, ___, highLong, lowLong, closeLong ] = getCandlesParts(candles5m)
+  const [ timeShort, openShort, highShort, lowShort, closeShort ] = getCandlesParts(candles1m)
+  const [ timeLong, openLong, highLong, lowLong, closeLong ] = getCandlesParts(candles5m)
 
-  const wrShort = williamsr({ period: 10, close: closeShort, low: lowShort, high: highShort })
-  // const wrLong = williamsr({ period: 10, close: closeLong, low: lowLong, high: highLong })
+  const bbShort = bollingerbands({ period: 20, stdDev: 2, values: map(parseFloat, closeShort) })
+  const bbLong = bollingerbands({ period: 20, stdDev: 2, values: map(parseFloat, closeLong) })
+  const wrShort = williamsr({ period: 14, close: closeShort, low: lowShort, high: highShort })
+  const wrLong = williamsr({ period: 14, close: closeLong, low: lowLong, high: highLong })
+  const lastPrice = last(closeShort)
 
-  const buySignal = wrUp(wrShort)
-  const sellSignal = wrDrop(wrShort)
+  const buySignal = lastPrice < getBBLastLower(bbShort) && last(wrShort) < -80
+  const sellSignal = lastPrice > getBBLastUpper(bbLong) && last(wrLong) > -20
 
   // log({
   //   now: new Date().toLocaleString(),
-  //   t: new Date(last(closeShort)).toLocaleString(),
+  //   t: new Date(last(timeShort)).toLocaleString(),
   //   close: last(closeShort),
-  //   wrList: takeLast(3, wrShort)
+  //   wrList: takeLast(3, wrShort),
+  //   wrLongList: takeLast(3, wrLong)
   // })
 
   if(any(equals(true))([ buySignal, sellSignal ])) {
     // trottling
-    if (equals(last(time), timeOfLastSignal)) return null
-    else timeOfLastSignal = <number>last(time)
+    if (equals(last(timeLong), timeOfLastSignal)) return null
+    else timeOfLastSignal = <number>last(timeLong)
 
-    log(`${symbol} SIG ${buySignal ? '🚀  BUY' : '🏁  SEL'} ${last(closeShort)}     ${new Date(last(time)).toLocaleString()}`)
-    return { symbol, side: buySignal ? 'BUY' : 'SELL', price: last(closeShort), time: new Date().getTime() }
+    log(`${symbol} SIG ${buySignal ? '🚀  BUY' : '🏁  SEL'} ${last(closeShort)}     ${new Date(last(timeShort)).toLocaleString()}`)
+    return { symbol, type: buySignal ? 'BUY' : 'SELL', price: last(closeShort), time: new Date().getTime() }
   }
-
   return null
 }
 
