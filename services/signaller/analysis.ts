@@ -2,7 +2,7 @@ import log from '../utils/log'
 import { williamsr, bollingerbands } from 'technicalindicators'
 import {
   any, equals, range, head, lt, gt, o, juxt, map, nth, takeLast, both,
-  last, not, and, converge, prop
+  last, not, and, converge, prop, reduce, min
 } from 'ramda'
 
 let timeOfLastSignal = 0
@@ -18,6 +18,7 @@ const wrUp = both(wrCurrIsUp, wrPrevIsLow)
 
 const getBBLastLower = o(prop('lower'), last)
 const getBBLastUpper = o(prop('upper'), last)
+const getLowestLow = o(reduce(min, Infinity), map(parseFloat))
 
 type MakeAnalysis = (a: number[][][]) => { type: string, price: number, time: number }
 const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]) => {
@@ -32,6 +33,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
 
   const buySignal = lastPrice < getBBLastLower(bbShort) && last(wrShort) < -80
   const sellSignal = lastPrice > getBBLastUpper(bbLong) && last(wrLong) > -20
+  const riftPrice = getLowestLow(lowLong)
 
   // log({
   //   now: new Date().toLocaleString(),
@@ -47,7 +49,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
     else timeOfLastSignal = <number>last(timeLong)
 
     log(`${symbol} SIG ${buySignal ? '🚀  BUY' : '🏁  SEL'} ${last(closeShort)}     ${new Date(last(timeShort)).toLocaleString()}`)
-    return { symbol, side: buySignal ? 'BUY' : 'SELL', price: last(closeShort), time: new Date().getTime() }
+    return { symbol, riftPrice, side: buySignal ? 'BUY' : 'SELL', price: last(closeShort), time: new Date().getTime() }
   }
   return null
 }
