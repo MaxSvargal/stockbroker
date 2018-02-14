@@ -4,15 +4,11 @@ import checkStopLimit from './checkStopLimit'
 describe('Exchange Account Check Stop Limit', () => {
   test('should work correctly', async () => {
     const data = {
-      account: {
-        preferences: {
-          stopLimitPerc: 0.01
-        }
-      },
       positions: [
         {
           id: 0,
           symbol: 'NEOBTC',
+          riftPrice: 0.0534,
           closed: false,
           open: {
             price: 0.05392500,
@@ -22,6 +18,7 @@ describe('Exchange Account Check Stop Limit', () => {
         {
           id: 1,
           symbol: 'NEOBTC',
+          riftPrice: 0.0534,
           closed: false,
           open: {
             price: 0.05392500,
@@ -31,6 +28,7 @@ describe('Exchange Account Check Stop Limit', () => {
         {
           id: 2,
           symbol: 'MCOBTC',
+          riftPrice: 0.0173,
           closed: false,
           open: {
             price: 0.01746473,
@@ -67,7 +65,6 @@ describe('Exchange Account Check Stop Limit', () => {
     }
 
     const requests = {
-      getAccount: jest.fn().mockReturnValue(Promise.resolve(data.account)),
       getOpenedPositions: jest.fn().mockReturnValue(Promise.resolve(data.positions)),
       getPrices: jest.fn().mockReturnValue(Promise.resolve(data.prices)),
       closePosition: jest.fn().mockReturnValue(Promise.resolve({ updated: 1 })),
@@ -75,7 +72,7 @@ describe('Exchange Account Check Stop Limit', () => {
       myTrades: jest.fn().mockReturnValue(Promise.resolve(data.trades))
     }
 
-    await checkStopLimit(requests)
+    await checkStopLimit(requests)()
 
     expect(requests.getOpenedPositions).toHaveBeenCalledTimes(1)
     expect(requests.getOpenedPositions).toHaveBeenCalledWith(null)

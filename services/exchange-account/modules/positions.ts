@@ -23,12 +23,12 @@ const makeObjFromProps = (name: string) => converge(objOf, [ always(name), pickP
 /* makeOpenedPosition */
 
 const openPositionObjPredicates = [
-  pick([ 'account', 'symbol' ]),
+  pick([ 'account', 'symbol', 'riftPrice' ]),
   makeObjFromProps('open'),
   always({ closed: false })
 ]
 
-type MakeOpenedPosition = (xs: [ Order, Trade, { account: string } ]) => Position
+type MakeOpenedPosition = (xs: [ Order, Trade, { account: string, riftPrice: number } ]) => Position
 const makeOpenedPosition = <MakeOpenedPosition>o(convMergeAll(<any>openPositionObjPredicates), mergeAll)
 
 

@@ -24,7 +24,7 @@ const invokeSend = flip(invoker(1, 'send'))
 const invokeAccountInfo = flip(invoker(1, 'accountInfo'))
 const invokeOrder = flip(invoker(1, 'order'))
 const invokeMyTrades = flip(invoker(1, 'myTrades'))
-const invokePrices = flip(invoker(1, 'allBookTickers'))
+const invokePrices = flip(invoker(1, 'prices'))
 
 type Binance = {
   candles: (a: string) => Promise<any[]>,
