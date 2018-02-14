@@ -47,7 +47,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
     else timeOfLastSignal = <number>last(timeLong)
 
     log(`${symbol} SIG ${buySignal ? '🚀  BUY' : '🏁  SEL'} ${last(closeShort)}     ${new Date(last(timeShort)).toLocaleString()}`)
-    return { symbol, type: buySignal ? 'BUY' : 'SELL', price: last(closeShort), time: new Date().getTime() }
+    return { symbol, side: buySignal ? 'BUY' : 'SELL', price: last(closeShort), time: new Date().getTime() }
   }
   return null
 }
