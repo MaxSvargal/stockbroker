@@ -2,7 +2,8 @@ import log from '../utils/log'
 import { williamsr, bollingerbands } from 'technicalindicators'
 import {
   any, equals, range, head, lt, gt, o, juxt, map, nth, takeLast, both,
-  last, not, and, converge, prop, reduce, min
+  last, not, and, converge, prop, reduce, min,
+  divide, subtract, ifElse, pair
 } from 'ramda'
 
 let timeOfLastSignal = 0
@@ -15,6 +16,7 @@ const wrCurrIsUp = o(lt(-80), last)
 const wrPrevIsLow = o(gt(-80), getPrev)
 const wrDrop = both(wrCurrIsDrop, wrPrevIsGreat)
 const wrUp = both(wrCurrIsUp, wrPrevIsLow)
+const margin = converge(divide, [ converge(subtract, [ last, head ]), ifElse(converge(lt, [ head, last ]), head, last) ])
 
 const getBBLastLower = o(prop('lower'), last)
 const getBBLastUpper = o(prop('upper'), last)
@@ -33,7 +35,8 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
 
   const buySignal = lastPrice < getBBLastLower(bbShort) && last(wrShort) < -80
   const sellSignal = lastPrice > getBBLastUpper(bbLong) && last(wrLong) > -20
-  const riftPrice = getLowestLow(lowShort)
+  const riftPrice = getLowestLow(lowLong)
+  const volatilityPerc = margin(o(converge(pair, [ prop('lower'), prop('upper') ]), last)(bbLong))
 
   // log({
   //   now: new Date().toLocaleString(),
@@ -49,7 +52,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
     else timeOfLastSignal = <number>last(timeLong)
 
     log(`${symbol} SIG ${buySignal ? '🚀  BUY' : '🏁  SEL'} ${last(closeShort)}     ${new Date(last(timeShort)).toLocaleString()}`)
-    return { symbol, riftPrice, side: buySignal ? 'BUY' : 'SELL', price: last(closeShort), time: new Date().getTime() }
+    return { symbol, riftPrice, volatilityPerc, side: buySignal ? 'BUY' : 'SELL', price: last(closeShort), time: new Date().getTime() }
   }
   return null
 }

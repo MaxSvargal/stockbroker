@@ -5,8 +5,8 @@ import {
 } from 'ramda'
 
 import trade from './modules/trade'
-import { roundToMinQty, getMinQtyFromSymbolInfo, takePairFromSymbol, findTradeByOrderId } from './shared'
-import { findOrderToCover, chunkAmountToSellCond, makeOpenedPosition, makeClosedPosition, Order, Trade, Position } from './modules/positions'
+import { roundToMinQty, getMinQtyFromSymbolInfo, takePairFromSymbol } from './shared'
+import { findPositionToCover, chunkAmountToSellCond, makeOpenedPosition, makeClosedPosition, Order, Trade, Position } from './modules/positions'
 
 const findByAssetProp = o(find, propEq('asset'))
 const parseFreeProp = o(parseFloat, prop('free'))
@@ -28,9 +28,9 @@ const sellErrorsCondition = cond([
   [ T, always(null) ]
 ])
 
-type SignalRequest = { symbol: string, side: 'BUY' | 'SELL', price: number }
+type SignalRequest = { symbol: string, side: 'BUY' | 'SELL', price: number, riftPrice: number, volatilityPerc: number }
 const checkSignal = (account: string, requests: any) =>
-  async ({ symbol, side, price, riftPrice }: SignalRequest) => {
+  async ({ symbol, side, price, riftPrice, volatilityPerc }: SignalRequest) => {
   try {
     const {
       getAccount,
@@ -82,7 +82,7 @@ const checkSignal = (account: string, requests: any) =>
     const execSell = () => {
       const findBySlaveCurrency = findByAssetProp(slaveCurrency)
       const avaliableToSell = o(parseFreeProp, findBySlaveCurrency)(balances)
-      const positionToCover: Position = findOrderToCover([ price, profitMin ], openedPositionsOfSymbol)
+      const positionToCover = findPositionToCover(price, openedPositionsOfSymbol)
       const chunkAmount = path([ 'open', 'origQty' ], positionToCover)
       const quantity = roundToMinQty(minQty, chunkAmountToSellCond([ avaliableToSell, chunkAmount ]))
       const error = sellErrorsCondition({ positionToCover, quantity, avaliableToSell })
@@ -95,9 +95,11 @@ const checkSignal = (account: string, requests: any) =>
     if (error) throw error
 
     const positionState = equals('BUY', side) ?
-      await trade({ sendOrder, myTrades, openPosition, position: { account, symbol, quantity, riftPrice, price } }) :
+      await trade({ sendOrder, myTrades, openPosition, position: { account, symbol, quantity, price, riftPrice, volatilityPerc } }) :
       await trade({ sendOrder, myTrades, closePosition, positionToCover, price })
 
+    // TODO: check activeSymbols by checking the all opened positions
+    // TODO: simplify to one fn
     if (lastPositionIsClosed([ side, openedPositionsOfSymbol ]))
       await setAccountSymbols(removeSymbolFromList(symbol, activeSymbols))
     else

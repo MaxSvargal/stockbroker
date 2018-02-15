@@ -1,7 +1,7 @@
 import {
-  curryN, subtract, apply, divide, curry, chain, pair, props, prop, compose,
-  constructN, pick, evolve, converge, objOf, always, o, merge, mergeAll, lt,
-  unapply, multiply, head, last, tail, filter, pathSatisfies, gte, ifElse, map
+  curryN, subtract, apply, divide, curry, chain, pair, props, prop, compose, add,
+  constructN, pick, evolve, converge, objOf, always, o, merge, mergeAll, lt, path,
+  unapply, multiply, head, last, tail, filter, pathSatisfies, gte, ifElse, map, find
 } from 'ramda'
 
 type Price = number
@@ -23,12 +23,12 @@ const makeObjFromProps = (name: string) => converge(objOf, [ always(name), pickP
 /* makeOpenedPosition */
 
 const openPositionObjPredicates = [
-  pick([ 'account', 'symbol', 'riftPrice' ]),
+  pick([ 'account', 'symbol', 'riftPrice', 'volatilityPerc' ]),
   makeObjFromProps('open'),
   always({ closed: false })
 ]
 
-type MakeOpenedPosition = (xs: [ Order, Trade, { account: string, riftPrice: number } ]) => Position
+type MakeOpenedPosition = (xs: [ Order, Trade, { account: string, riftPrice: number, volatilityPerc: number } ]) => Position
 const makeOpenedPosition = <MakeOpenedPosition>o(convMergeAll(<any>openPositionObjPredicates), mergeAll)
 
 
@@ -68,12 +68,12 @@ const makeClosedPosition = <MakeClosedPosition>chain(makeCompleteObj, makeCloseO
 
 /* findOrderToCover */
 
-const minCoverPrice = converge(subtract, [ head, apply(multiply) ])
-const openPriceLowerThan = converge(pathSatisfies, [ o(<any>gte, head), always([ 'open', 'price' ]) ])
-const findOrderByMinPrice = unapply(converge(filter, [ openPriceLowerThan, last ]))
+const minCoverPrice = unapply(converge(add, [ head, apply(multiply) ]))
+const minCoverPriceOfPos = converge(minCoverPrice, [ path([ 'open', 'price' ]), prop('volatilityPerc') ])
+const compareWithMinCover = curryN(2, unapply(converge(gte, [ head, o(minCoverPriceOfPos, last) ])))
 
-type FindOrderToCover = (a: [ Price, Perc ], b: { open: { price: number } }[]) => Position
-const findOrderToCover: FindOrderToCover = unapply(o(head, converge(findOrderByMinPrice, [ o(minCoverPrice, head), last ])))
+type FindPositionToCover = (a: Price, b: { volatilityPerc: number, open: { price: number } }[]) => Position
+const findPositionToCover = unapply(converge(find, [ o(compareWithMinCover, head), last ]))
 
 
 /* chunkAmountToSellCond */
@@ -82,4 +82,4 @@ const fundsNotAccomodatesTwoChunks = unapply(converge(lt, [ head, o(multiply(2),
 const chunkAmountToSellCond = ifElse(fundsNotAccomodatesTwoChunks, head, last)
 
 
-export { makeOpenedPosition, makeClosedPosition, findOrderToCover, chunkAmountToSellCond }
+export { makeOpenedPosition, makeClosedPosition, findPositionToCover, chunkAmountToSellCond }

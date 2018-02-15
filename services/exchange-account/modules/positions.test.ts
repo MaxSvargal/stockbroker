@@ -1,4 +1,4 @@
-import { makeOpenedPosition, makeClosedPosition } from './positions'
+import { makeOpenedPosition, makeClosedPosition, findPositionToCover } from './positions'
 
 describe('Exchange Account Positions', () => {
   test('makeOpenedPosition should work correctly', () => {
@@ -59,5 +59,9 @@ describe('Exchange Account Positions', () => {
         time: new Date(1517659764365)
       }
     })
+  })
+
+  test('findPositionToCover should work correctly', () => {
+    
   })
 })

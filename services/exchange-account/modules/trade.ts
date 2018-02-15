@@ -47,6 +47,6 @@ export default async ({ openPosition, closePosition, sendOrder, myTrades, positi
   // const trade = findTradeByOrderId(prop('orderId', order), trades)
 
   return equals('BUY', side) ?
-    openPosition && await openPosition(makeOpenedPosition([ order, trade, { account, riftPrice } ])) :
+    openPosition && await openPosition(makeOpenedPosition([ order, trade, { account, riftPrice, volatilityPerc } ])) :
     closePosition && await closePosition(makeClosedPosition([ positionToCover, order, trade ]))
 }
