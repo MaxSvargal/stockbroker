@@ -9,6 +9,7 @@ const findTradeByOrderId: FindTradeByOrderId = unapply(converge(find, [ o(propEq
 const getSymbol = prop('symbol')
 const getAccount = prop('account')
 const propRiftPrice = prop('riftPrice')
+const propVolatilityPerc = prop('volatilityPerc')
 const getSide = ifElse(isNil, always('BUY'), always('SELL'))
 const getQuantity = <any>ifElse(o(equals('BUY'), head), o(<any>prop('quantity'), last), o(path([ 'open', 'origQty' ]), last))
 
@@ -24,6 +25,7 @@ type Props = {
 export default async ({ openPosition, closePosition, sendOrder, myTrades, positionToCover, position, price }: Props): Promise<{} | void> => {
   const account: string = getAccount(position)
   const riftPrice: string = propRiftPrice(position)
+  const volatilityPerc: string = propVolatilityPerc(position)
   const side: string = getSide(positionToCover)
   const symbol: string = getSymbol(or(position, positionToCover))
   const quantity: number = getQuantity([ side, or(position, positionToCover) ])
