@@ -33,7 +33,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
 
   const buySignal = lastPrice < getBBLastLower(bbShort) && last(wrShort) < -80
   const sellSignal = lastPrice > getBBLastUpper(bbLong) && last(wrLong) > -20
-  const riftPrice = getLowestLow(lowLong)
+  const riftPrice = getLowestLow(lowShort)
 
   // log({
   //   now: new Date().toLocaleString(),
