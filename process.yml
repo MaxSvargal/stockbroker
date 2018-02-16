@@ -22,6 +22,9 @@ apps:
   # - name    : 'Logger Signals'
   #   script  : 'services/logger-signals/index.ts'
 
+  - name    : 'Web UI'
+    script  : 'services/ui/index.js'
+
   - name    : 'Account maxsvargal'
     script  : 'services/exchange-account/index.ts'
     env     :
