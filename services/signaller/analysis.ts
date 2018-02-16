@@ -1,26 +1,35 @@
 import log from '../utils/log'
 import { williamsr, bollingerbands } from 'technicalindicators'
 import {
-  any, equals, range, head, lt, gt, o, juxt, map, nth, takeLast, both,
-  last, not, and, converge, prop, reduce, min,
-  divide, subtract, ifElse, pair
+  any, equals, range, head, lt, o, juxt, map, nth, takeLast, last, converge, gt,
+  prop, reduce, min, divide, subtract, ifElse, mean, unapply, allPass, always
 } from 'ramda'
 
 let timeOfLastSignal = 0
 
 const getCandlesParts: (a: any[][]) => number[][] = juxt(<any>map(o(map, nth), range(0, 6)))
-const getPrev = o(head, takeLast(2))
-const wrCurrIsDrop = o(gt(-20), last)
-const wrPrevIsGreat = o(lt(-20), getPrev)
-const wrCurrIsUp = o(lt(-80), last)
-const wrPrevIsLow = o(gt(-80), getPrev)
-const wrDrop = both(wrCurrIsDrop, wrPrevIsGreat)
-const wrUp = both(wrCurrIsUp, wrPrevIsLow)
-const margin = converge(divide, [ converge(subtract, [ last, head ]), ifElse(converge(lt, [ head, last ]), head, last) ])
 
+const prev = o(head, takeLast(2))
 const getBBLastLower = o(prop('lower'), last)
 const getBBLastUpper = o(prop('upper'), last)
 const getLowestLow = o(reduce(min, Infinity), map(parseFloat))
+
+const margin = converge(divide, [ converge(subtract, [ last, head ]), ifElse(converge(lt, [ head, last ]), head, last) ])
+const marginBBProps = converge(unapply(margin), [ prop('lower'), prop('upper') ])
+const meanMargin = o(mean, map(marginBBProps))
+
+const buyPass = allPass([
+  converge(lt, [ prop('price'), o(getBBLastLower, prop('bb')) ]),
+  converge(lt, [ o(prev, prop('wr')), o(last, prop('wr')) ]),
+  converge(lt, [ o(prev, prop('wr')), always(-80) ]),
+  converge(gt, [ o(last, prop('wr')), always(-80) ])
+])
+const sellPass = allPass([
+  converge(gt, [ prop('price'), o(getBBLastUpper, prop('bb')) ]),
+  converge(gt, [ o(prev, prop('wr')), o(last, prop('wr')) ]),
+  converge(gt, [ o(prev, prop('wr')), always(-20) ]),
+  converge(lt, [ o(last, prop('wr')), always(-20) ])
+])
 
 type MakeAnalysis = (a: number[][][]) => { type: string, price: number, time: number }
 const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]) => {
@@ -33,17 +42,19 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
   const wrLong = williamsr({ period: 14, close: closeLong, low: lowLong, high: highLong })
   const lastPrice = last(closeShort)
 
-  const buySignal = lastPrice < getBBLastLower(bbShort) && last(wrShort) < -80
-  const sellSignal = lastPrice > getBBLastUpper(bbLong) && last(wrLong) > -20
+  const buySignal = buyPass({ price: lastPrice, bb: bbShort, wr: wrShort })
+  const sellSignal = sellPass({ price: lastPrice, bb: bbLong, wr: wrLong })
   const riftPrice = getLowestLow(lowLong)
-  const volatilityPerc = margin(o(converge(pair, [ prop('lower'), prop('upper') ]), last)(bbLong))
+  const volatilityPerc = meanMargin(bbLong)
 
   // log({
   //   now: new Date().toLocaleString(),
   //   t: new Date(last(timeShort)).toLocaleString(),
   //   close: last(closeShort),
   //   wrList: takeLast(3, wrShort),
-  //   wrLongList: takeLast(3, wrLong)
+  //   wrLongList: takeLast(3, wrLong),
+  //   riftPrice,
+  //   volatilityPerc
   // })
 
   if(any(equals(true))([ buySignal, sellSignal ])) {
