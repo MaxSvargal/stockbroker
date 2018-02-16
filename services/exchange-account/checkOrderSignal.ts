@@ -53,7 +53,7 @@ const checkSignal = (account: string, requests: any) =>
     const [
       symbolInfo,
       openedPositions,
-      { activeSymbols, preferences: { chunksNumber = 8, profitMin = 0.01 } },
+      { activeSymbols, preferences: { chunksNumber = 8 } },
       { balances }
     ] = await Promise.all([
       getSymbolInfo(symbol),

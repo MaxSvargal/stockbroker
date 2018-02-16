@@ -15,4 +15,4 @@ type SubscriberCons = (options: { name: string, subscribesTo: string[] }) => Sub
 export const subscriberCons: SubscriberCons = constructN(1, Subscriber)
 
 type BinanceCons = (options?: { apiKey: string, apiSecret: string }) => typeof Binance
-export const binanceCons = constructN(1, Binance)
+export const binanceCons: BinanceCons = constructN(1, <any>Binance)

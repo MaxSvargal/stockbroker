@@ -2,6 +2,7 @@ node_modules
 build
 .tmp
 .DS_Store
+.vscode
 src/server/accounts/*
 accounts.config.js
 services/ui/.next
