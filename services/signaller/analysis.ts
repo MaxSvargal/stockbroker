@@ -2,7 +2,7 @@ import log from '../utils/log'
 import { williamsr, bollingerbands } from 'technicalindicators'
 import {
   any, equals, range, head, lt, o, juxt, map, nth, takeLast, last, converge, gt,
-  prop, reduce, min, divide, subtract, ifElse, mean, unapply, allPass, always
+  prop, reduce, min, divide, subtract, ifElse, mean, unapply, allPass, always, multiply
 } from 'ramda'
 
 let timeOfLastSignal = 0
@@ -15,8 +15,9 @@ const getBBLastUpper = o(prop('upper'), last)
 const getLowestLow = o(reduce(min, Infinity), map(parseFloat))
 
 const margin = converge(divide, [ converge(subtract, [ last, head ]), ifElse(converge(lt, [ head, last ]), head, last) ])
-const marginBBProps = converge(unapply(margin), [ prop('lower'), prop('upper') ])
+const marginBBProps = converge(unapply(margin), [ prop('middle'), prop('upper') ])
 const meanMargin = o(mean, map(marginBBProps))
+const decreaseMeanMarginOnPb = converge(multiply, [ meanMargin, o(prop('pb'), last) ])
 
 const buyPass = allPass([
   converge(lt, [ prop('low'), o(getBBLastLower, prop('bb')) ]),
@@ -45,7 +46,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
   const buySignal = buyPass({ low: last(lowLong), bb: bbShort, wr: wrShort })
   const sellSignal = sellPass({ high: last(highLong), bb: bbLong, wr: wrLong })
   const riftPrice = getLowestLow(lowLong)
-  const volatilityPerc = meanMargin(bbLong) * o(prop('pb'), last)(bbLong)
+  const volatilityPerc = decreaseMeanMarginOnPb(bbLong)
 
   // log({
   //   now: new Date().toLocaleString(),
