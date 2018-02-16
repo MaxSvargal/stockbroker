@@ -55,7 +55,7 @@ const takeCurrencyFromTicker = compose(converge(pair, [ nth(1), nth(2) ]), match
 
 const replaceInfoSymbols = (data: {}[]) => ({ type: 'dbReplaceAll', table: 'exchangeInfoSymbols', primaryKey: 'symbol', data })
 const updateSymbolsEnabled = (values: string[]) => ({ type: 'dbUpdate', table: 'tradeState', id: 'symbolsEnabled', data: { values } })
-const symbolToCandlesPath = (symbol: string) => `/klines?symbol=${symbol}&interval=15m&limit=28`
+const symbolToCandlesPath = (symbol: string) => `/klines?symbol=${symbol}&interval=30m&limit=28`
 
 type Main = (a: (a: Event) => void, b: Stream<{}>, c: any, d: Requester, e: Requester, f: Publisher) => void
 const main: Main = (exitProcess, mainLoopStream, fetch, requesterProcess, requesterDb, publisher) => {
