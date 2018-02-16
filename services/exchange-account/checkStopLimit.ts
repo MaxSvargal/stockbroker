@@ -19,11 +19,8 @@ const checkStopLimit = requests => async () => {
 
   const state = mapSellState(prices, openedPositions)
   const statePositions = zip(openedPositions, state)
+  const makeTradeProps = converge(merge, [ always({ closePosition, sendOrder, myTrades }), o(objOf('positionToCover'), head) ])
 
-  const makeTradeProps = converge(merge, [
-    ([ { symbol } ]) => ({ price: prop(symbol, prices) }), // only for tests
-    converge(merge, [ always({ closePosition, sendOrder, myTrades }), o(objOf('positionToCover'), head) ])
-  ])
   forEach(when(sellStateIsTrue, o(trade, makeTradeProps)), statePositions)
 }
 

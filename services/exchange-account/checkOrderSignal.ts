@@ -50,7 +50,7 @@ const checkSignal = (account: string, requests: any) =>
     if (buySignalSymbolIsNotEnabled({ side, symbol, enabledSymbols }))
       throw Error(`Symbol ${symbol} is not active, skip BUY signal.`)
 
-    let [
+    const [
       symbolInfo,
       openedPositions,
       { activeSymbols, preferences: { chunksNumber = 8, profitMin = 0.01 } },
@@ -61,8 +61,6 @@ const checkSignal = (account: string, requests: any) =>
       getAccount(null),
       accountInfo(null)
     ])
-
-    balances = [ { asset: 'ETH', free: '1.00000000', locked: '0.00000000' } ]
 
     const [ slaveCurrency, masterCurrency ] = takePairFromSymbol(symbol)
     const openedPositionsOfSymbol = filterBySymbol(symbol)(openedPositions)
@@ -95,8 +93,8 @@ const checkSignal = (account: string, requests: any) =>
     if (error) throw error
 
     const positionState = equals('BUY', side) ?
-      await trade({ sendOrder, myTrades, openPosition, position: { account, symbol, quantity, price, riftPrice, volatilityPerc } }) :
-      await trade({ sendOrder, myTrades, closePosition, positionToCover, price })
+      await trade({ sendOrder, myTrades, openPosition, position: { account, symbol, quantity, riftPrice, volatilityPerc } }) :
+      await trade({ sendOrder, myTrades, closePosition, positionToCover })
 
     // TODO: check activeSymbols by checking the all opened positions
     // TODO: simplify to one fn
