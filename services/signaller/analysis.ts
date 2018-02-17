@@ -10,7 +10,7 @@ let timeOfLastSignal = 0
 const getCandlesParts: (a: any[][]) => number[][] = juxt(<any>map(o(map, nth), range(0, 6)))
 
 const prev = o(head, takeLast(2))
-const getBBLastMiddle = o(prop('middle'), last)
+const getBBLastLower = o(prop('lower'), last)
 const getBBLastUpper = o(prop('upper'), last)
 const getLowestLow = o(reduce(min, Infinity), map(parseFloat))
 
@@ -20,7 +20,7 @@ const meanMargin = o(mean, map(marginBBProps))
 const decreaseMeanMarginOnPb = converge(multiply, [ meanMargin, o(prop('pb'), last) ])
 
 const buyPass = allPass([
-  converge(lt, [ prop('low'), o(getBBLastMiddle, prop('bb')) ]),
+  converge(lt, [ prop('low'), o(getBBLastLower, prop('bb')) ]),
   converge(lt, [ o(prev, prop('wr')), o(last, prop('wr')) ]),
   converge(lt, [ o(prev, prop('wr')), always(-80) ]),
   converge(gt, [ o(last, prop('wr')), always(-80) ])
