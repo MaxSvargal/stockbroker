@@ -9,7 +9,7 @@ const accumSeq = mapAccum((a, b) => [a + b, a + b], 0)
 const composeProfitRows = compose(
   converge(zip, [
     map(o(date, path([ 'close', 'time' ]))),
-    compose(last, accumSeq, map(prop('profitPerc')))
+    compose(last, accumSeq, map(prop('profitAmount')))
   ]),
   sortBy(path([ 'close', 'time' ])),
   filter(prop('close'))
