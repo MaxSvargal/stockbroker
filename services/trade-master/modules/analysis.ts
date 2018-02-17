@@ -5,7 +5,7 @@ import {
 import { williamsr, bollingerbands, ema } from 'technicalindicators'
 
 const mainCurrency = 'ETH'
-const symbolsNumForAnalysis = 8
+const symbolsNumForAnalysis = 10
 const limit = 28
 const interval = '15m'
 
