@@ -46,7 +46,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
   const buySignal = buyPass({ low: last(lowLong), bb: bbShort, wr: wrShort })
   const sellSignal = sellPass({ high: last(highLong), bb: bbLong, wr: wrLong })
   const riftPrice = getLowestLow(lowLong)
-  const volatilityPerc = decreaseMeanMarginOnPb(bbShort)
+  const volatilityPerc = decreaseMeanMarginOnPb(bbLong)
 
   // log({
   //   now: new Date().toLocaleString(),
