@@ -1,11 +1,12 @@
 import {
-  unapply, converge, filter, o, contains, head, always, prop, last, reverse, pair, lt, equals,
+  unapply, converge, filter, o, contains, head, always, prop, last, reverse, pair, lt, equals, unnest,
   sortBy, take, compose, map, merge, identity, objOf, nth, assoc, mergeAll, allPass, both, zip
 } from 'ramda'
 import { williamsr, bollingerbands, ema } from 'technicalindicators'
+import { log } from '../../utils/log'
 
 const mainCurrency = 'ETH'
-const symbolsNumForAnalysis = 10
+const symbolsNumForAnalysis = 20
 const limit = 28
 const interval = '15m'
 
@@ -55,7 +56,5 @@ export default async ({ fetchTicker, fetchCandles, setEnabledSymbols, startSigna
     ...map(startSignallerProcess, enabled)
   ])
   
-  console.log(states)
-  console.log(wrs)
-  console.log(bbs)
+  log(compose(map(unnest), zip(states), zip(bbs))(wrs))
 }
