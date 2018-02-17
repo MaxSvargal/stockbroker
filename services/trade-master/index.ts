@@ -17,11 +17,6 @@ const requesterDb = requesterCons({
   requests: [ 'dbUpdate', 'dbReplaceAll' ]
 })
 
-const publisher = publisherCons({
-  name: 'Trade Master Signal Publisher',
-  broadcasts: [ 'exitFromSymbols' ]
-})
-
 const exitProcess = (err: Event) => {
   error(err)
   process.exit(1)
@@ -29,4 +24,4 @@ const exitProcess = (err: Event) => {
 
 const loopStream = delay(5000, periodic(240000))
 
-main(exitProcess, loopStream, fetch, requesterProcess, requesterDb, publisher)
+main(exitProcess, loopStream, fetch, requesterProcess, requesterDb)

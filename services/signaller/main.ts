@@ -19,7 +19,7 @@ const filterCandleProps = <Candle>o(map, map, candlesProps)
 type Binance = { candles: (a: string) => Promise<{}[]> }
 type Symbol = string
 type ExitProcess = (a: Error) => void
-type Main = (a: ExitProcess, b: Stream<{}>, c: Binance, e: Symbol) => void
+type Main = (a: ExitProcess, b: Stream<{}>, c: Binance, d: Publisher, e: Symbol) => void
 
 const main: Main = (exitProcess, mainLoopStream, binance, publisher, symbol) => {
   // TODO use fetch instead?
