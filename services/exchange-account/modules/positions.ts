@@ -11,7 +11,7 @@ export type Trade = { id: number, orderId: number, time: number, price: string, 
 type PositionSide = { id: number, orderId: number, qty: number, origQty: number, time: Date, price: number, commission: number, commissionAsset: string }
 export type Position = { id: number, account: string, symbol: string, closed: boolean, profitAmount?: number, profitPerc?: number, open: PositionSide, close?: PositionSide }
 
-const fee = 0.001
+const fee = 0.0015
 const convMergeAll = converge(unapply(mergeAll))
 const date = constructN(1, Date)
 const pickFromOrderTrade = pick([ 'id', 'time', 'price', 'qty', 'commission', 'commissionAsset', 'orderId', 'origQty' ])

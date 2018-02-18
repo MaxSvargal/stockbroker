@@ -18,7 +18,6 @@ const processStartSignaller = (symbol: string) => ({
   options: {
     name: `Signaller ${symbol}`,
     script: `./services/signaller/index.ts`,
-    watch: true,
     env: { SYMBOL: symbol, DEBUG: 'app:log,app:error' }
   }
 })

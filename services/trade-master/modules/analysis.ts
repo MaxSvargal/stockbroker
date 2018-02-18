@@ -1,8 +1,8 @@
 import {
   unapply, converge, filter, o, contains, head, always, prop, last, reverse, pair, lt, equals, unnest,
-  sortBy, take, compose, map, merge, identity, objOf, nth, assoc, mergeAll, allPass, both, zip
+  sortBy, take, compose, map, merge, identity, objOf, nth, assoc, mergeAll, allPass, zip, of
 } from 'ramda'
-import { williamsr, bollingerbands, ema } from 'technicalindicators'
+import { williamsr, bollingerbands, obv, ema } from 'technicalindicators'
 import { log } from '../../utils/log'
 
 const mainCurrency = 'ETH'
@@ -27,17 +27,22 @@ const objHigh = o(objOf('high'), map(o(parseFloat, nth(2))))
 const objLow = o(objOf('low'), map(o(parseFloat, nth(3))))
 const objClose = o(objOf('close'), map(o(parseFloat, nth(4))))
 const objValues = o(objOf('values'), map(o(parseFloat, nth(4))))
+const objVolume = o(objOf('volume'), map(o(parseInt, nth(5))))
 const assocPeriod = assoc('period')
 const assocStdDev = assoc('stdDev')
 const prepareCandlesToWR = converge(unapply(mergeAll), [ objLow, objClose, objHigh ])
+const prepareCandlesToOBV = converge(unapply(mergeAll), [ objClose, objVolume ])
+const calcOBV = compose(obv, prepareCandlesToOBV)
 const calcWR = compose(williamsr, assocPeriod(14), prepareCandlesToWR)
 const calcBB = compose(bollingerbands, assocPeriod(20), assocStdDev(2), objValues)
 const calcEMA = compose(last, ema, assocPeriod(7), objOf('values'))
 const getEmaPair = converge(pair, [ calcEMA, last ])
 const isBBPositive = allPass([ converge(lt, [ head, last ]), o(lt(0.5), head) ])
 const isWRPositive = converge(lt, [ head, last ])
-const indicatorsArePositive = compose(map(both(o(isWRPositive, head), o(isBBPositive, last))), zip)
+const isOBVPositive = converge(lt, [ head, last ])
+const indicatorsArePositive = map(allPass([ o(isWRPositive, nth(1)), o(isBBPositive, nth(2)), o(isOBVPositive, nth(3)) ]))
 const getTruthSymbols = o(map(head), filter(o(equals(true), last)))
+const zip4 = o(map(unnest), converge(zip, [ converge(zip, [ nth(0), nth(1) ]), converge(zip, [ nth(2), nth(3) ]) ]))
 
 export default async ({ fetchTicker, fetchCandles, setEnabledSymbols, startSignallerProcess }: MainInput) => {
   const ticker = await fetchTicker()
@@ -46,11 +51,12 @@ export default async ({ fetchTicker, fetchCandles, setEnabledSymbols, startSigna
   
   const candles = await Promise.all(map(fetchCandles, candlesRequests))
 
+  const obvs = map(o(getEmaPair, calcOBV), candles)
   const wrs = map(o(getEmaPair, calcWR), candles)
   const bbs = map(compose(getEmaPair, map(prop('pb')), calcBB), candles)
-  const states = zip(symbols, indicatorsArePositive(wrs, bbs))
-  const enabled = getTruthSymbols(states)
-  
+  const states = o(indicatorsArePositive, zip4)([ symbols, wrs, bbs, obvs ])
+  const enabled = getTruthSymbols(zip(symbols, states))
+
   await Promise.all([
     setEnabledSymbols(enabled),
     ...map(startSignallerProcess, enabled)
