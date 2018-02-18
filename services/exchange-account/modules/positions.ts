@@ -1,5 +1,5 @@
 import {
-  curryN, subtract, apply, divide, curry, chain, pair, props, prop, compose, add,
+  curryN, subtract, apply, divide, curry, chain, pair, props, prop, compose, add, flip,
   constructN, pick, evolve, converge, objOf, always, o, merge, mergeAll, lt, path,
   unapply, multiply, head, last, tail, filter, pathSatisfies, gte, ifElse, map, find
 } from 'ramda'
