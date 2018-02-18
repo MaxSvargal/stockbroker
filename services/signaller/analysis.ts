@@ -27,9 +27,7 @@ const buyPass = allPass([
 ])
 const sellPass = allPass([
   converge(gt, [ prop('high'), o(getBBLastUpper, prop('bb')) ]),
-  converge(gt, [ o(prev, prop('wr')), o(last, prop('wr')) ]),
-  converge(gt, [ o(prev, prop('wr')), always(-20) ]),
-  converge(lt, [ o(last, prop('wr')), always(-20) ])
+  converge(gt, [ o(prev, prop('wr')), o(last, prop('wr')) ])
 ])
 
 type MakeAnalysis = (a: number[][][]) => { type: string, price: number, time: number }
