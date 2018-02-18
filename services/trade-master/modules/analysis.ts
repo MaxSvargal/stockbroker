@@ -1,6 +1,6 @@
 import {
   unapply, converge, filter, o, contains, head, always, prop, last, reverse, pair, lt, equals, unnest,
-  sortBy, take, compose, map, merge, identity, objOf, nth, assoc, mergeAll, allPass, zip, of
+  sortBy, take, compose, map, merge, identity, objOf, nth, assoc, mergeAll, allPass, zip, of, flatten
 } from 'ramda'
 import { williamsr, bollingerbands, obv, ema } from 'technicalindicators'
 import { log } from '../../utils/log'
@@ -54,13 +54,14 @@ export default async ({ fetchTicker, fetchCandles, setEnabledSymbols, startSigna
   const obvs = map(o(getEmaPair, calcOBV), candles)
   const wrs = map(o(getEmaPair, calcWR), candles)
   const bbs = map(compose(getEmaPair, map(prop('pb')), calcBB), candles)
-  const states = o(indicatorsArePositive, zip4)([ symbols, wrs, bbs, obvs ])
+  const compiling = zip4([ symbols, wrs, bbs, obvs ])
+  const states = indicatorsArePositive(compiling)
   const enabled = getTruthSymbols(zip(symbols, states))
+  
+  log(map(flatten)(zip(states, compiling)))
 
   await Promise.all([
     setEnabledSymbols(enabled),
     ...map(startSignallerProcess, enabled)
   ])
-  
-  log(compose(map(unnest), zip(states), zip(bbs))(wrs))
 }
