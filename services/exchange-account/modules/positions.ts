@@ -68,7 +68,7 @@ const makeClosedPosition = <MakeClosedPosition>chain(makeCompleteObj, makeCloseO
 
 /* findOrderToCover */
 
-const minCoverPrice = unapply(converge(add, [ head, apply(multiply) ]))
+const minCoverPrice = unapply(converge(add, [ head, o(flip(divide)(1.5), apply(multiply)) ]) )
 const minCoverPriceOfPos = converge(minCoverPrice, [ path([ 'open', 'price' ]), prop('volatilityPerc') ])
 const compareWithMinCover = curryN(2, unapply(converge(gte, [ head, o(minCoverPriceOfPos, last) ])))
 
