@@ -15,10 +15,9 @@ app.prepare()
   const server = new Koa()
   const router = new Router()
 
-  router.get('/a', async ctx => {
+  router.get('/dashboard', async ctx => {
     const positions = await getPositions(account)
-    console.log({ positions })
-    await app.render(ctx.req, ctx.res, '/index', { positions })
+    await app.render(ctx.req, ctx.res, '/dashboard', { positions })
     ctx.respond = false
   })
 
