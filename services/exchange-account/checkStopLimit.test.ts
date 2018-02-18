@@ -8,36 +8,36 @@ describe('Exchange Account Check Stop Limit', () => {
         {
           id: 0,
           symbol: 'NEOBTC',
-          riftPrice: 0.0534,
+          volatilityPerc: 0.005,
           closed: false,
           open: {
-            price: 0.05392500,
+            price: 0.06,
             origQty: 1
           }
         },
         {
           id: 1,
           symbol: 'NEOBTC',
-          riftPrice: 0.0534,
+          volatilityPerc: 0.006,
           closed: false,
           open: {
-            price: 0.05392500,
+            price: 0.06,
             origQty: 1
           }
         },
         {
           id: 2,
           symbol: 'MCOBTC',
-          riftPrice: 0.0173,
+          riftPrice: 0.007,
           closed: false,
           open: {
-            price: 0.01746473,
+            price: 0.07,
             origQty: 1
           }
         }
       ],
       prices: {
-        NEOBTC: '0.05338575',
+        NEOBTC: '0.04974',
         MCOBTC: '0.017464'
       },
       order: {
@@ -89,8 +89,8 @@ describe('Exchange Account Check Stop Limit', () => {
     expect(requests.closePosition).toHaveBeenCalledWith({
       id: 0,
       closed: true,
-      profitAmount: -0.00005394599999999222,
-      profitPerc: 0.9989986091794159,
+      profitAmount: -0.006122870999999995,
+      profitPerc: -11.37717881606058,
       close: {
         id: 4415570,
         orderId: 4414702,
@@ -101,5 +101,6 @@ describe('Exchange Account Check Stop Limit', () => {
         commissionAsset: 'BTC'
       }
     })
+
   })
 })

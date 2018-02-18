@@ -1,17 +1,17 @@
 import {
   o, converge, lt, prop, map, compose, flip, head, forEach, when, equals, zip,
-  merge, always, objOf, nth, last
+  merge, always, objOf, nth, last, add, pair, path, subtract, multiply
 } from 'ramda'
 
 import trade from './modules/trade'
 
-const mapSellState = (prices: {}, positions: {}[]) =>
-  map(converge(lt, [
-    compose(<any>parseFloat, flip(prop)(prices), <any>prop('symbol')),
-    prop('riftPrice')
-  ]), positions)
-
 const sellStateIsTrue = compose(equals(true), last)
+
+const getSymbolPrice = (prices) => compose(parseFloat, flip(prop)(prices), prop('symbol'))
+const pairOpenPriceVolatility = converge(pair, [ path(['open', 'price']), prop('volatilityPerc') ])
+const marginWithIncrease = (inc) => converge(subtract, [ head, converge(multiply, [ head, o(add(inc), last) ]) ])
+const mapSellState = (prices: string[], positions: {}[]) =>
+  map(converge(lt, [ getSymbolPrice(prices), o(marginWithIncrease(0.01), pairOpenPriceVolatility) ]), positions)
 
 const checkStopLimit = requests => async () => {
   const { getOpenedPositions, getPrices, closePosition, sendOrder, myTrades } = requests
