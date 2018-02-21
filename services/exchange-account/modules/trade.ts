@@ -22,7 +22,7 @@ type Props = {
   positionToCover?: Position
 }
 
-export default async ({ openPosition, closePosition, sendOrder, myTrades, positionToCover, position }: Props): Promise<{} | void> => {
+export default async ({ price, openPosition, closePosition, sendOrder, myTrades, positionToCover, position }: Props): Promise<{} | void> => {
   const account: string = getAccount(position)
   const riftPrice: string = propRiftPrice(position)
   const volatilityPerc: string = propVolatilityPerc(position)
@@ -30,9 +30,21 @@ export default async ({ openPosition, closePosition, sendOrder, myTrades, positi
   const symbol: string = getSymbol(or(position, positionToCover))
   const quantity: number = getQuantity([ side, or(position, positionToCover) ])
 
-  const order = await sendOrder({ side, symbol, quantity, type: 'MARKET' })
-  const trades = await myTrades({ symbol, limit: 10 })
-  const trade = findTradeByOrderId(prop('orderId', order), trades)
+  const order = {}
+  const trade = {
+    symbol: position ? position.symbol : positionToCover.symbol,
+    price,
+    id: null,
+    qty: 1,
+    origQty: 1,
+    commission: 0.0015,
+    commissionAsset: 'TEST',
+    orderId: 0,
+    time: new Date().getTime()
+  }
+  // const order = await sendOrder({ side, symbol, quantity, type: 'MARKET' })
+  // const trades = await myTrades({ symbol, limit: 10 })
+  // const trade = findTradeByOrderId(prop('orderId', order), trades)
 
   return equals('BUY', side) ?
     openPosition && await openPosition(makeOpenedPosition([ order, trade, { account, riftPrice, volatilityPerc } ])) :

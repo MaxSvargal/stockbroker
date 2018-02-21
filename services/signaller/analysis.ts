@@ -1,7 +1,7 @@
 import log from '../utils/log'
 import { williamsr, bollingerbands } from 'technicalindicators'
 import {
-  any, equals, range, head, lt, o, juxt, map, nth, takeLast, last, converge, gt,
+  any, equals, range, head, lt, o, juxt, map, nth, takeLast, last, converge, gt, when,
   prop, reduce, min, divide, subtract, ifElse, mean, unapply, allPass, always, multiply
 } from 'ramda'
 
@@ -10,17 +10,15 @@ let timeOfLastSignal = 0
 const getCandlesParts: (a: any[][]) => number[][] = juxt(<any>map(o(map, nth), range(0, 6)))
 
 const prev = o(head, takeLast(2))
-const getBBLastMiddle = o(prop('middle'), last)
+const getBBLastLow = o(prop('lower'), last)
 const getBBLastUpper = o(prop('upper'), last)
 const getLowestLow = o(reduce(min, Infinity), map(parseFloat))
 
+const defaultMargin = when(gt(0.007), always(0.007))
 const margin = converge(divide, [ converge(subtract, [ last, head ]), ifElse(converge(lt, [ head, last ]), head, last) ])
-const marginBBProps = converge(unapply(margin), [ prop('middle'), prop('upper') ])
-const meanMargin = o(mean, map(marginBBProps))
-const decreaseMeanMarginOnPb = converge(multiply, [ meanMargin, o(prop('pb'), last) ])
 
 const buyPass = allPass([
-  converge(lt, [ prop('low'), o(getBBLastMiddle, prop('bb')) ]),
+  converge(lt, [ prop('low'), o(getBBLastLow, prop('bb')) ]),
   converge(lt, [ o(prev, prop('wr')), o(last, prop('wr')) ]),
   converge(lt, [ o(prev, prop('wr')), always(-80) ]),
   converge(gt, [ o(last, prop('wr')), always(-80) ])
@@ -35,16 +33,16 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
   const [ timeShort, openShort, highShort, lowShort, closeShort ] = getCandlesParts(candles1m)
   const [ timeLong, openLong, highLong, lowLong, closeLong ] = getCandlesParts(candles5m)
 
-  const bbShort = bollingerbands({ period: 20, stdDev: 2, values: map(parseFloat, closeShort) })
-  const bbLong = bollingerbands({ period: 20, stdDev: 2, values: map(parseFloat, closeLong) })
+  const bbShort = bollingerbands({ period: 21, stdDev: 2, values: map(parseFloat, closeShort) })
+  const bbLong = bollingerbands({ period: 21, stdDev: 2, values: map(parseFloat, closeLong) })
   const wrShort = williamsr({ period: 14, close: closeShort, low: lowShort, high: highShort })
   const wrLong = williamsr({ period: 14, close: closeLong, low: lowLong, high: highLong })
-  const lastPrice = last(closeShort)
+  const lastPrice = o(parseFloat, last)(closeShort)
 
   const buySignal = buyPass({ low: last(lowShort), bb: bbShort, wr: wrShort })
   const sellSignal = sellPass({ high: last(highLong), bb: bbLong, wr: wrLong })
   const riftPrice = getLowestLow(lowLong)
-  const volatilityPerc = decreaseMeanMarginOnPb(bbLong)
+  const volatilityPerc = o(defaultMargin, margin)([ lastPrice, o(prop('upper'), last)(bbLong) ])
 
   // log({
   //   now: new Date().toLocaleString(),
@@ -52,6 +50,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
   //   close: last(closeShort),
   //   wrShortList: takeLast(3, wrShort),
   //   wrLongList: takeLast(3, wrLong),
+  //   bbLong: last(bbShort),
   //   riftPrice,
   //   volatilityPerc
   // })

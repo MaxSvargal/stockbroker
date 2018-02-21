@@ -24,7 +24,7 @@ const buyErrorsCondition = cond([
 ])
 const sellErrorsCondition = cond([
   [ o(isNil, prop('positionToCover')), always(Error('No position to cover')) ],
-  [ converge(gt, [ prop('quantity'), prop('avaliableToSell') ]), always(Error('No funds avaliable to cover position')) ],
+  // [ converge(gt, [ prop('quantity'), prop('avaliableToSell') ]), always(Error('No funds avaliable to cover position')) ],
   [ T, always(null) ]
 ])
 
@@ -93,8 +93,8 @@ const checkSignal = (account: string, requests: any) =>
     if (error) throw error
 
     const positionState = equals('BUY', side) ?
-      await trade({ sendOrder, myTrades, openPosition, position: { account, symbol, quantity, riftPrice, volatilityPerc } }) :
-      await trade({ sendOrder, myTrades, closePosition, positionToCover })
+      await trade({ price, sendOrder, myTrades, openPosition, position: { account, symbol, quantity, riftPrice, volatilityPerc } }) :
+      await trade({ price, sendOrder, myTrades, closePosition, positionToCover })
 
     // TODO: check activeSymbols by checking the all opened positions
     // TODO: simplify to one fn

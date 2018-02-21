@@ -1,14 +1,14 @@
 import {
   unapply, converge, filter, o, contains, head, always, prop, last, reverse, pair, lt, equals, unnest,
-  sortBy, take, compose, map, merge, identity, objOf, nth, assoc, mergeAll, allPass, zip, of, flatten
+  sortBy, take, compose, map, merge, identity, objOf, nth, assoc, mergeAll, allPass, zip, of, flatten, gt
 } from 'ramda'
 import { williamsr, bollingerbands, obv, ema } from 'technicalindicators'
 import { log } from '../../utils/log'
 
 const mainCurrency = 'ETH'
-const symbolsNumForAnalysis = 20
+const symbolsNumForAnalysis = 10
 const limit = 28
-const interval = '15m'
+const interval = '30m'
 
 type MainInput = {
   fetchTicker: () => Promise<{ symbol: string, priceChangePercent: string }[]>,
@@ -34,10 +34,10 @@ const prepareCandlesToWR = converge(unapply(mergeAll), [ objLow, objClose, objHi
 const prepareCandlesToOBV = converge(unapply(mergeAll), [ objClose, objVolume ])
 const calcOBV = compose(obv, prepareCandlesToOBV)
 const calcWR = compose(williamsr, assocPeriod(14), prepareCandlesToWR)
-const calcBB = compose(bollingerbands, assocPeriod(20), assocStdDev(2), objValues)
+const calcBB = compose(bollingerbands, assocPeriod(21), assocStdDev(2), objValues)
 const calcEMA = compose(last, ema, assocPeriod(7), objOf('values'))
 const getEmaPair = converge(pair, [ calcEMA, last ])
-const isBBPositive = allPass([ converge(lt, [ head, last ]), o(lt(0.5), head) ])
+const isBBPositive = allPass([ converge(lt, [ head, last ]), o(lt(0.5), head), o(gt(1), last) ])
 const isWRPositive = converge(lt, [ head, last ])
 const isOBVPositive = converge(lt, [ head, last ])
 const indicatorsArePositive = map(allPass([ o(isWRPositive, nth(1)), o(isBBPositive, nth(2)), o(isOBVPositive, nth(3)) ]))
