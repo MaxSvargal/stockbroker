@@ -30,8 +30,8 @@ apps:
     env     :
       DEBUG   : 'app:log,app:error'
       ACCOUNT : 'maxsvargal'
-      KEY     : 'ZtgjgCPqiKw80Y7M2BwzNjl2XspqiUCxWx5v1fRgDAnkWPhSpT5yNzbuaOT2SiqI'
-      SECRET  : '8VP3B4wtMJcuGjWyDDwVDkZoeI16Z8pALYo2LDqXZm1loMKkVzmCkdbXrakdmXBC'
+      KEY     : 'HBAgVcBmHOVu6y7iHJ09VAk47udV0x2n0jYRzKCvORJCo6TTQtOAqTkLU4c4QTjL'
+      SECRET  : 'm5zLxJT0syB41hCDdcqUQAKj00IbRpQYAP198k1IjAsiXVJVecX3PnZvuRCELaXt'
       MODE    : 'development'
 
   - name    : 'Account lesorub'
