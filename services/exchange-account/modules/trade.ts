@@ -8,7 +8,6 @@ const findTradeByOrderId: FindTradeByOrderId = unapply(converge(find, [ o(propEq
 
 const getSymbol = prop('symbol')
 const getAccount = prop('account')
-const propRiftPrice = prop('riftPrice')
 const propVolatilityPerc = prop('volatilityPerc')
 const getSide = ifElse(isNil, always('BUY'), always('SELL'))
 const getQuantity = <any>ifElse(o(equals('BUY'), head), o(<any>prop('quantity'), last), o(path([ 'open', 'origQty' ]), last))
@@ -18,13 +17,12 @@ type Props = {
   myTrades: (a: { symbol: string, limit: number }) => Trade[],
   openPosition?: (a: {}) => {},
   closePosition?: (a: {}) => {},
-  position?: { symbol: string, quantity: number, account: string, riftPrice: number, volatilityPerc: number }
+  position?: { symbol: string, quantity: number, account: string, volatilityPerc: number }
   positionToCover?: Position
 }
 
 export default async ({ price, openPosition, closePosition, sendOrder, myTrades, positionToCover, position }: Props): Promise<{} | void> => {
   const account: string = getAccount(position)
-  const riftPrice: string = propRiftPrice(position)
   const volatilityPerc: string = propVolatilityPerc(position)
   const side: string = getSide(positionToCover)
   const symbol: string = getSymbol(or(position, positionToCover))
@@ -47,6 +45,6 @@ export default async ({ price, openPosition, closePosition, sendOrder, myTrades,
   // const trade = findTradeByOrderId(prop('orderId', order), trades)
 
   return equals('BUY', side) ?
-    openPosition && await openPosition(makeOpenedPosition([ order, trade, { account, riftPrice, volatilityPerc } ])) :
+    openPosition && await openPosition(makeOpenedPosition([ order, trade, { account, volatilityPerc } ])) :
     closePosition && await closePosition(makeClosedPosition([ positionToCover, order, trade ]))
 }

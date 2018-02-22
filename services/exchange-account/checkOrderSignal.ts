@@ -28,9 +28,9 @@ const sellErrorsCondition = cond([
   [ T, always(null) ]
 ])
 
-type SignalRequest = { symbol: string, side: 'BUY' | 'SELL', price: number, riftPrice: number, volatilityPerc: number }
+type SignalRequest = { symbol: string, side: 'BUY' | 'SELL', price: number, volatilityPerc: number }
 const checkSignal = (account: string, requests: any) =>
-  async ({ symbol, side, price, riftPrice, volatilityPerc }: SignalRequest) => {
+  async ({ symbol, side, price, volatilityPerc }: SignalRequest) => {
   try {
     const {
       getAccount,
@@ -93,7 +93,7 @@ const checkSignal = (account: string, requests: any) =>
     if (error) throw error
 
     const positionState = equals('BUY', side) ?
-      await trade({ price, sendOrder, myTrades, openPosition, position: { account, symbol, quantity, riftPrice, volatilityPerc } }) :
+      await trade({ price, sendOrder, myTrades, openPosition, position: { account, symbol, quantity, volatilityPerc } }) :
       await trade({ price, sendOrder, myTrades, closePosition, positionToCover })
 
     // TODO: check activeSymbols by checking the all opened positions
