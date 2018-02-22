@@ -16,9 +16,16 @@ const lowerProp = <any>prop('lower')
 const upperProp = <any>prop('upper')
 const getLowestLow = o(<() => number>reduce(min, Infinity), map(parseFloat))
 
-const defaultMargin = when(gt(0.007), always(0.007))
-const margin = converge(divide, [ converge(subtract, [ last, head ]), ifElse(converge(lt, [ head, last ]), head, last) ])
-
+const getVolatilityPerc = o(
+  when(gt(0.007), always(0.007)),
+  converge(divide, [
+    converge(subtract, [ last, head ]),
+    converge(multiply, [
+      ifElse(converge(lt, [ head, last ]), head, last),
+      always(2)
+    ])
+  ])
+)
 const buyPass = allPass([
   converge(lt, [ prop('low'), compose(lowerProp, last, bbProp) ]),
   converge(lt, [ o(prev, wrProp), o(last, wrProp) ]),
@@ -43,7 +50,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
 
   const buySignal = buyPass({ low: last(lowShort), bb: bbShort, wr: wrShort })
   const sellSignal = sellPass({ high: last(highLong), bb: bbLong, wr: wrLong })
-  const volatilityPerc = o(defaultMargin, margin)([ lastPrice, o(upperProp, last, bbLong) ])
+  const volatilityPerc = getVolatilityPerc([ lastPrice, o(upperProp, last, bbLong) ])
 
   // log({
   //   now: new Date().toLocaleString(),
