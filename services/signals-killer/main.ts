@@ -4,7 +4,7 @@ import {
 } from 'ramda'
 import { Requester, Publisher } from 'cote'
 import { observe, Stream } from 'most'
-import debug from 'debug'
+import { log } from '../utils/log'
 
 const invokeSend = flip(invoker(1, 'send'))
 const requestGetActiveSymbols = { type: 'cacheHashGetValues', key: 'accounts:activeSymbols' }
@@ -37,11 +37,13 @@ const main: Main = (exitProcess, loopStream, requesterStore, requesterProcesses)
       const activeSymbols: string[] = compose(uniq, flatten)([ map(parse, usersSymbolsRaw), parse(enabledSymbolsRaw) ])
       const symbolsToStop = difference(activeProcesses, activeSymbols)
 
+      log({ activeSymbols, symbolsToStop })
+
       if(lengthIsMoreZero(symbolsToStop)) {
         await Promise.all(map(o(processes, requestStopSignallerProcess), symbolsToStop))
-        debug('dev')(`Processes for symbols ${symbolsToStop} successfully stoped.`)
+        log(`Processes for symbols ${symbolsToStop} successfully stoped.`)
       }
-      debug('dev')('No targets to kill')
+      log('No targets to kill')
     } catch (err) {
       exitProcess(err)
     }

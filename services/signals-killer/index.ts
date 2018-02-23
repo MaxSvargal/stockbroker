@@ -18,6 +18,6 @@ const requesterProcesses = requesterCons({
   key: 'processes',
   requests: [ 'processStop' ]
 })
-const loopStream = periodic(300000)
+const loopStream = periodic(120000)
 
 main(exitProcess, loopStream, requesterStore, requesterProcesses)
