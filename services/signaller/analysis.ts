@@ -29,7 +29,7 @@ const getVolatilityPerc = o(
 )
 const buyPass = allPass([
   converge(lt, [ prop('low'), compose(lowerProp, last, bbProp) ]),
-  converge(lt, [ compose(last, calcEMA, wrProp), o(last, wrProp) ]),
+  converge(lt, [ o(calcEMA, wrProp), o(last, wrProp) ]),
   converge(lt, [ o(prev, wrProp), always(-80) ]),
   converge(gt, [ o(last, wrProp), always(-80) ])
 ])
