@@ -1,21 +1,25 @@
 apps:
   - name    : 'DB Rethink'
     script  : 'services/db-rethink/index.ts'
+    max_memory_restart: '100M'
     env     :
       DEBUG   : 'app:log,app:error'
 
   - name    : 'PM2 Manager'
     script  : 'services/pm2-manager/index.ts'
+    max_memory_restart: '100M'
     env     :
       DEBUG   : 'app:log,app:error'
 
   - name    : 'Killer Signals'
     script  : 'services/signals-killer/index.ts'
+    max_memory_restart: '100M'
     env     :
       DEBUG   : 'app:log,app:error'
 
   - name    : 'Master Trade'
     script  : 'services/trade-master/index.ts'
+    max_memory_restart: '150M'
     env     :
       DEBUG   : 'app:log,app:error'
 
@@ -23,6 +27,7 @@ apps:
   #   script  : 'services/logger-signals/index.ts'
 
   - name    : 'Web UI'
+    max_memory_restart: '200M'
     script  : 'services/ui/index.js'
 
   - name    : 'Account maxsvargal'

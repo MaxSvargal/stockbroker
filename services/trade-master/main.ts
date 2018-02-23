@@ -18,6 +18,7 @@ const processStartSignaller = (symbol: string) => ({
   options: {
     name: `Signaller ${symbol}`,
     script: `./services/signaller/index.ts`,
+    max_memory_restart: '120M',
     env: { SYMBOL: symbol, DEBUG: 'app:log,app:error' }
   }
 })
