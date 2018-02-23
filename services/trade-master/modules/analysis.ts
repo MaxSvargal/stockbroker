@@ -40,25 +40,29 @@ const getEmaPair = converge(pair, [ calcEMA, last ])
 const isBBPositive = allPass([ converge(lt, [ head, last ]), o(lt(0.4), head), o(gt(1.1), last) ])
 const isWRPositive = converge(lt, [ head, last ])
 const isOBVPositive = converge(lt, [ head, last ])
-const indicatorsArePositive = map(allPass([ o(isWRPositive, nth(1)), o(isBBPositive, nth(2)), o(isOBVPositive, nth(3)) ]))
+const indicatorsArePositive = map(allPass([ o(isWRPositive, nth(1)), o(isBBPositive, nth(2)) ]))
 const getTruthSymbols = o(map(head), filter(o(equals(true), last)))
 const zip4 = o(map(unnest), converge(zip, [ converge(zip, [ nth(0), nth(1) ]), converge(zip, [ nth(2), nth(3) ]) ]))
+
+export const analyzer = (symbols: string[], candles: number[][]): string[] => {
+  const obvs = map(o(getEmaPair, calcOBV), candles) // remove this, don't need
+  const wrs = map(o(getEmaPair, calcWR), candles)
+  const bbs = map(compose(getEmaPair, map(<any>prop('pb')), calcBB), candles)
+  const compiling = zip4([ symbols, wrs, bbs, obvs ])
+  const states: boolean[] = indicatorsArePositive(compiling)
+  const enabled: string[] = getTruthSymbols(zip(symbols, states))
+
+  log(map(flatten)(zip(states, compiling)))
+
+  return enabled
+}
 
 export default async ({ fetchTicker, fetchCandles, setEnabledSymbols, startSignallerProcess }: MainInput) => {
   const ticker = await fetchTicker()
   const symbols = getFitTickers(mainCurrency, ticker)
   const candlesRequests = makeCandlesRequests(symbols)
-  
   const candles = await Promise.all(map(fetchCandles, candlesRequests))
-
-  const obvs = map(o(getEmaPair, calcOBV), candles)
-  const wrs = map(o(getEmaPair, calcWR), candles)
-  const bbs = map(compose(getEmaPair, map(prop('pb')), calcBB), candles)
-  const compiling = zip4([ symbols, wrs, bbs, obvs ])
-  const states = indicatorsArePositive(compiling)
-  const enabled = getTruthSymbols(zip(symbols, states))
-  
-  log(map(flatten)(zip(states, compiling)))
+  const enabled = analyzer(symbols, candles)
 
   await Promise.all([
     setEnabledSymbols(enabled),
