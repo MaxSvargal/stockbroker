@@ -47,9 +47,9 @@ describe('Trade Master Analysis', () => {
     await analysis({ fetchTicker, fetchCandles, setEnabledSymbols, startSignallerProcess })
 
     expect(fetchCandles).toHaveBeenCalledTimes(3)
-    expect(fetchCandles).toHaveBeenCalledWith({ interval: '15m', limit: 28, symbol: 'FUELETH' })
-    expect(fetchCandles).toHaveBeenCalledWith({ interval: '15m', limit: 28, symbol: 'NEOETH' })
-    expect(fetchCandles).toHaveBeenCalledWith({ interval: '15m', limit: 28, symbol: 'MCOETH' })
+    expect(fetchCandles).toHaveBeenCalledWith({ interval: '30m', limit: 28, symbol: 'FUELETH' })
+    expect(fetchCandles).toHaveBeenCalledWith({ interval: '30m', limit: 28, symbol: 'NEOETH' })
+    expect(fetchCandles).toHaveBeenCalledWith({ interval: '30m', limit: 28, symbol: 'MCOETH' })
   
     expect(startSignallerProcess).toHaveBeenCalledTimes(3)
     expect(startSignallerProcess).toHaveBeenCalledWith('FUELETH')
