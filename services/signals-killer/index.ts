@@ -10,8 +10,8 @@ const exitProcess = (err: Error) => {
 }
 const requesterStore = requesterCons({
   name: 'Signals Killer Store Requester',
-  key: 'store-respond',
-  requests: [ 'cacheHashGetValues' ]
+  key: 'db',
+  requests: [ 'dbGet', 'dbGetAllRowsConcat' ]
 })
 const requesterProcesses = requesterCons({
   name: 'Signals Killer Processes Requester',

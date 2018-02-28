@@ -7,12 +7,11 @@ import { observe, Stream } from 'most'
 import { log } from '../utils/log'
 
 const invokeSend = flip(invoker(1, 'send'))
-const requestGetActiveSymbols = { type: 'cacheHashGetValues', key: 'accounts:activeSymbols' }
-const requestGetEnabledSymbols = { type: 'cacheHashGet', key: 'tradeState', field: 'enabledToBuySymbols' }
+const requestGetActiveSymbols = { type: 'dbGetAllRowsConcat', table: 'accounts', row: 'activeSymbols' }
+const requestGetEnabledSymbols = { type: 'dbGet', table: 'tradeState', id: 'symbolsEnabled' }
 const requestProcessesList = { type: 'processesList' }
 const requestStopSignallerProcess = (symbol: string) => ({ type: 'processStop', name: `Signaller ${symbol}` })
 
-const parse = flip(invoker(1, 'parse'))(JSON)
 const mapNamePidPair = map(converge(pair, [ prop('name'), prop('pid') ]))
 const filterOnlyActive = filter(o(lt(0), last))
 const mapSymbolsOfProc = map(compose(last, match(/Signaller\s(.+)/), head))
@@ -27,14 +26,14 @@ const main: Main = (exitProcess, loopStream, requesterStore, requesterProcesses)
 
   const tick = async () => {
     try {
-      const [ procList, usersSymbolsRaw, enabledSymbolsRaw ] = await Promise.all([
+      const [ procList, usersSymbols, { values: enabledSymbols } ] = await Promise.all([
         processes(requestProcessesList),
         store(requestGetActiveSymbols),
         store(requestGetEnabledSymbols)
       ])
 
       const activeProcesses = getActiveProcSymbols(procList)
-      const activeSymbols: string[] = compose(uniq, flatten)([ map(parse, usersSymbolsRaw), parse(enabledSymbolsRaw) ])
+      const activeSymbols: string[] = compose(uniq, flatten)([ usersSymbols, enabledSymbols ])
       const symbolsToStop = difference(activeProcesses, activeSymbols)
 
       log({ activeSymbols, symbolsToStop })

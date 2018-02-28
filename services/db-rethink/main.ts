@@ -42,8 +42,8 @@ const replaceAll: RethinkDBConn = (db, conn) => ([ { table, primaryKey, data }, 
 const main = (db: Db, conn: Connection, responder: Responder) => {
   observe(<any>get(db, conn),               fromEvent('dbGet', responder))
   observe(<any>getAll(db, conn),            fromEvent('dbGetAll', responder))
-  observe(<any>getAllRows(db, conn),        fromEvent('getAllRows', responder))
-  observe(<any>getAllRowsConcat(db, conn),  fromEvent('getAllRowsConcat', responder))
+  observe(<any>getAllRows(db, conn),        fromEvent('dbGetAllRows', responder))
+  observe(<any>getAllRowsConcat(db, conn),  fromEvent('dbGetAllRowsConcat', responder))
   observe(<any>insert(db, conn),            fromEvent('dbInsert', responder))
   observe(<any>update(db, conn),            fromEvent('dbUpdate', responder))
   observe(<any>replaceAll(db, conn),        fromEvent('dbReplaceAll', responder))
