@@ -1,6 +1,7 @@
 import {
   unapply, converge, filter, o, contains, head, always, prop, last, reverse, pair, lt, equals, unnest,
-  sortBy, take, compose, map, merge, identity, objOf, nth, assoc, mergeAll, allPass, zip, of, flatten, gt
+  sortBy, take, compose, map, merge, identity, objOf, nth, assoc, mergeAll, allPass, zip, of, flatten, gt,
+  difference, apply, without
 } from 'ramda'
 import { williamsr, bollingerbands, obv, ema } from 'technicalindicators'
 import { log } from '../../utils/log'
@@ -9,6 +10,8 @@ const mainCurrency = 'ETH'
 const symbolsNumForAnalysis = 20
 const limit = 28
 const interval = '30m'
+
+let prevEnabled = []
 
 type MainInput = {
   fetchTicker: () => Promise<{ symbol: string, priceChangePercent: string }[]>,
@@ -43,6 +46,7 @@ const isOBVPositive = converge(lt, [ head, last ])
 const indicatorsArePositive = map(allPass([ o(isWRPositive, nth(1)), o(isBBPositive, nth(2)) ]))
 const getTruthSymbols = o(map(head), filter(o(equals(true), last)))
 const zip4 = o(map(unnest), converge(zip, [ converge(zip, [ nth(0), nth(1) ]), converge(zip, [ nth(2), nth(3) ]) ]))
+const issetDiff = <(xs: [ any[], any[] ]) => any[]>converge(difference, [ last, apply(without) ])
 
 export const analyzer = (symbols: string[], candles: number[][]): string[] => {
   const obvs = map(o(getEmaPair, calcOBV), candles) // remove this, don't need
@@ -54,7 +58,12 @@ export const analyzer = (symbols: string[], candles: number[][]): string[] => {
 
   log(map(flatten)(zip(states, compiling)))
 
-  return enabled
+  // TODO: test mode
+  const doubleEnabled: string[] = issetDiff([ prevEnabled, enabled ])
+  console.log({ enabled, doubleEnabled })
+  prevEnabled = enabled
+
+  return doubleEnabled
 }
 
 export default async ({ fetchTicker, fetchCandles, setEnabledSymbols, startSignallerProcess }: MainInput) => {
