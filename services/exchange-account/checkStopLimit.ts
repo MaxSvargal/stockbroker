@@ -11,7 +11,7 @@ const getSymbolPrice = (prices) => compose(parseFloat, flip(prop)(prices), prop(
 const pairOpenPriceVolatility = converge(pair, [ path(['open', 'price']), prop('volatilityPerc') ])
 const marginWithIncrease = (inc) => converge(subtract, [ head, converge(multiply, [ head, o(add(inc), last) ]) ])
 const mapSellState = (prices: string[], positions: {}[]) =>
-  map(converge(lt, [ getSymbolPrice(prices), o(marginWithIncrease(0.01), pairOpenPriceVolatility) ]), positions)
+  map(converge(lt, [ getSymbolPrice(prices), o(marginWithIncrease(0.02), pairOpenPriceVolatility) ]), positions)
 
 const checkStopLimit = requests => async () => {
   const { getOpenedPositions, getPrices, closePosition, sendOrder, myTrades } = requests
