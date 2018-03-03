@@ -35,8 +35,8 @@ const buyPass = allPass([
   // converge(gt, [ o(last, wrProp), always(-80) ])
 ])
 const sellPass = allPass([
-  converge(gt, [ prop('high'), compose(upperProp, last, bbProp) ]),
-  converge(gt, [ o(prev, wrProp), o(last, wrProp) ])
+  compose(lt(-20), prev, wrProp),
+  compose(gt(-20), last, wrProp)
 ])
 
 type MakeAnalysis = (a: string) => (xs: number[][][]) => { symbol: string, side: string, volatilityPerc: number, price: number, time: number } | null
