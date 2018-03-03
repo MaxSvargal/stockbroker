@@ -6,6 +6,7 @@ import {
 } from 'ramda'
 
 let timeOfLastSignal = 0
+let instantBuy = true
 
 const getCandlesParts: (a: any[][]) => number[][] = juxt(<any>map(o(map, nth), range(0, 6)))
 
@@ -71,6 +72,14 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
     log(`${symbol} SIG ${buySignal ? '🚀  BUY' : '🏁  SEL'} ${last(closeShort)}     ${new Date(last(timeShort)).toLocaleString()}`)
     return { symbol, volatilityPerc, side: buySignal ? 'BUY' : 'SELL', price: <number>last(closeShort), time: new Date().getTime() }
   }
+
+  if (equals(true, instantBuy)) {
+    instantBuy = false
+
+    log(`${symbol} SIG ${'🚀  INSTANT BUY'} ${last(closeShort)}     ${new Date(last(timeShort)).toLocaleString()}`)
+    return { symbol, volatilityPerc, side: 'BUY', price: <number>last(closeShort), time: new Date().getTime() }
+  }
+
   return null
 }
 
