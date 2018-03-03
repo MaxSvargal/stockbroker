@@ -7,7 +7,7 @@ import { williamsr, bollingerbands } from 'technicalindicators'
 import { log } from '../../utils/log'
 
 const mainCurrency = 'ETH'
-const symbolsNumForAnalysis = 20
+const symbolsNumForAnalysis = 30
 const limit = 28
 const interval = '15m'
 
