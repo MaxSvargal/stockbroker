@@ -1,17 +1,15 @@
 import {
   unapply, converge, filter, o, contains, head, always, prop, last, reverse, pair, lt, equals, unnest,
   sortBy, take, compose, map, merge, identity, objOf, nth, assoc, mergeAll, allPass, zip, of, flatten, gt,
-  difference, apply, without
+  difference, apply, without, takeLast, any, both
 } from 'ramda'
-import { williamsr, bollingerbands, obv, ema } from 'technicalindicators'
+import { williamsr, bollingerbands } from 'technicalindicators'
 import { log } from '../../utils/log'
 
 const mainCurrency = 'ETH'
 const symbolsNumForAnalysis = 20
 const limit = 28
-const interval = '30m'
-
-let prevEnabled = []
+const interval = '15m'
 
 type MainInput = {
   fetchTicker: () => Promise<{ symbol: string, priceChangePercent: string }[]>,
@@ -30,40 +28,26 @@ const objHigh = o(objOf('high'), map(o(parseFloat, nth(2))))
 const objLow = o(objOf('low'), map(o(parseFloat, nth(3))))
 const objClose = o(objOf('close'), map(o(parseFloat, nth(4))))
 const objValues = o(objOf('values'), map(o(parseFloat, nth(4))))
-const objVolume = o(objOf('volume'), map(o(parseInt, nth(5))))
 const assocPeriod = assoc('period')
 const assocStdDev = assoc('stdDev')
 const prepareCandlesToWR = converge(unapply(mergeAll), [ objLow, objClose, objHigh ])
-const prepareCandlesToOBV = converge(unapply(mergeAll), [ objClose, objVolume ])
-const calcOBV = compose(obv, prepareCandlesToOBV)
 const calcWR = compose(williamsr, assocPeriod(14), prepareCandlesToWR)
 const calcBB = compose(bollingerbands, assocPeriod(21), assocStdDev(2), objValues)
-const calcEMA = compose(last, ema, assocPeriod(4), objOf('values'))
-const getEmaPair = converge(pair, [ calcEMA, last ])
-const isBBPositive = allPass([ converge(lt, [ head, last ]), o(lt(0.4), head), o(gt(1.1), last) ])
-const isWRPositive = converge(lt, [ head, last ])
-const isOBVPositive = converge(lt, [ head, last ])
-const indicatorsArePositive = map(allPass([ o(isWRPositive, nth(1)), o(isBBPositive, nth(2)) ]))
+
+const wrIsPositive = allPass([ o(gt(-80), nth(0)), o(lt(-80), nth(1)), converge(lt, [ nth(1), nth(2) ]) ])
+const bbIsPositive = any(gt(0.1))
+const areIndicatorsPositive = o(map(both(o(wrIsPositive, head), o(bbIsPositive, last))), apply(zip))
 const getTruthSymbols = o(map(head), filter(o(equals(true), last)))
-const zip4 = o(map(unnest), converge(zip, [ converge(zip, [ nth(0), nth(1) ]), converge(zip, [ nth(2), nth(3) ]) ]))
-const issetDiff = <(xs: [ any[], any[] ]) => any[]>converge(difference, [ last, apply(without) ])
 
 export const analyzer = (symbols: string[], candles: number[][]): string[] => {
-  const obvs = map(o(getEmaPair, calcOBV), candles) // remove this, don't need
-  const wrs = map(o(getEmaPair, calcWR), candles)
-  const bbs = map(compose(getEmaPair, map(<any>prop('pb')), calcBB), candles)
-  const compiling = zip4([ symbols, wrs, bbs, obvs ])
-  const states: boolean[] = indicatorsArePositive(compiling)
+  const wrs = map(o(takeLast(3), calcWR), candles)
+  const bbs = map(compose(takeLast(7), map(prop('pb')), calcBB), candles)
+  const states: boolean[] = areIndicatorsPositive([ wrs, bbs ])
   const enabled: string[] = getTruthSymbols(zip(symbols, states))
 
-  log(map(flatten)(zip(states, compiling)))
+  log(zip(symbols, states))
 
-  // TODO: test mode
-  const doubleEnabled: string[] = issetDiff([ prevEnabled, enabled ])
-  console.log({ enabled, doubleEnabled })
-  prevEnabled = enabled
-
-  return doubleEnabled
+  return enabled
 }
 
 export default async ({ fetchTicker, fetchCandles, setEnabledSymbols, startSignallerProcess }: MainInput) => {

@@ -1,7 +1,8 @@
-import analysis from './analysis'
+import { repeat } from 'ramda'
+import { analyzer } from './analysis'
 
 describe('Trade Master Analysis', () => {
-  test('should work correctly', async () => {
+  test.skip('should work correctly', async () => {
     const ticker = [
       { symbol: 'NEOETH', priceChangePercent: '20.1' },
       { symbol: 'MCOETH', priceChangePercent: '0.2' },
@@ -47,9 +48,9 @@ describe('Trade Master Analysis', () => {
     await analysis({ fetchTicker, fetchCandles, setEnabledSymbols, startSignallerProcess })
 
     expect(fetchCandles).toHaveBeenCalledTimes(3)
-    expect(fetchCandles).toHaveBeenCalledWith({ interval: '30m', limit: 28, symbol: 'FUELETH' })
-    expect(fetchCandles).toHaveBeenCalledWith({ interval: '30m', limit: 28, symbol: 'NEOETH' })
-    expect(fetchCandles).toHaveBeenCalledWith({ interval: '30m', limit: 28, symbol: 'MCOETH' })
+    expect(fetchCandles).toHaveBeenCalledWith({ interval: '15m', limit: 28, symbol: 'FUELETH' })
+    expect(fetchCandles).toHaveBeenCalledWith({ interval: '15m', limit: 28, symbol: 'NEOETH' })
+    expect(fetchCandles).toHaveBeenCalledWith({ interval: '15m', limit: 28, symbol: 'MCOETH' })
   
     expect(startSignallerProcess).toHaveBeenCalledTimes(3)
     expect(startSignallerProcess).toHaveBeenCalledWith('FUELETH')
@@ -58,5 +59,63 @@ describe('Trade Master Analysis', () => {
 
     expect(setEnabledSymbols).toHaveBeenCalledTimes(1)
     expect(setEnabledSymbols).toHaveBeenCalledWith([ 'FUELETH', 'NEOETH', 'MCOETH' ])
+  })
+
+  test('should be work', () => {
+    const symbols = [ 'NEOETH', 'MCOETH' ]
+    const candles = [ [
+      [ 0, '0.2', '0.3', '0.1', '0.2', '100' ],
+      [ 0, '0.3', '0.4', '0.2', '0.3', '100' ],
+      [ 0, '0.4', '0.5', '0.3', '0.4', '100' ],
+      [ 0, '0.5', '0.6', '0.4', '0.5', '100' ],
+      [ 0, '0.6', '0.7', '0.5', '0.6', '100' ],
+      [ 0, '0.8', '0.8', '0.6', '0.7', '100' ],
+      [ 0, '0.9', '0.9', '0.7', '0.8', '100' ],
+      [ 0, '0.2', '0.3', '0.1', '0.2', '100' ],
+      [ 0, '0.3', '0.4', '0.2', '0.3', '100' ],
+      [ 0, '0.4', '0.5', '0.3', '0.4', '100' ],
+      [ 0, '0.5', '0.6', '0.4', '0.5', '100' ],
+      [ 0, '0.6', '0.7', '0.5', '0.6', '100' ],
+      [ 0, '0.8', '0.8', '0.6', '0.7', '100' ],
+      [ 0, '0.9', '0.9', '0.7', '0.8', '100' ],
+      [ 0, '0.2', '0.3', '0.1', '0.2', '100' ],
+      [ 0, '0.3', '0.4', '0.2', '0.3', '100' ],
+      [ 0, '0.4', '0.5', '0.3', '0.4', '100' ],
+      [ 0, '0.5', '0.6', '0.4', '0.5', '100' ],
+      [ 0, '0.2', '0.3', '0.1', '0.3', '100' ],
+      [ 0, '0.8', '0.8', '0.6', '0.7', '100' ],
+      [ 0, '0.9', '0.9', '0.7', '0.8', '100' ],
+      [ 0, '0.2', '0.3', '0.1', '0.2', '100' ],
+      [ 0, '0.3', '0.4', '0.2', '0.3', '100' ],
+      [ 0, '0.1', '0.1', '0.1', '0.1', '100' ],
+      [ 0, '0.3', '0.4', '0.2', '0.3', '100' ],
+      [ 0, '0.9', '0.9', '0.7', '0.8', '100' ],
+    ], [
+      [ 0, '0.2', '0.3', '0.1', '0.2', '100' ],
+      [ 0, '0.3', '0.4', '0.2', '0.3', '100' ],
+      [ 0, '0.4', '0.5', '0.3', '0.4', '100' ],
+      [ 0, '0.5', '0.6', '0.4', '0.5', '100' ],
+      [ 0, '0.6', '0.7', '0.5', '0.6', '100' ],
+      [ 0, '0.8', '0.8', '0.6', '0.7', '100' ],
+      [ 0, '0.9', '0.9', '0.7', '0.8', '100' ],
+      [ 0, '0.2', '0.3', '0.1', '0.2', '100' ],
+      [ 0, '0.3', '0.4', '0.2', '0.3', '100' ],
+      [ 0, '0.4', '0.5', '0.3', '0.4', '100' ],
+      [ 0, '0.5', '0.6', '0.4', '0.5', '100' ],
+      [ 0, '0.6', '0.7', '0.5', '0.6', '100' ],
+      [ 0, '0.8', '0.8', '0.6', '0.7', '100' ],
+      [ 0, '0.9', '0.9', '0.7', '0.8', '100' ],
+      [ 0, '0.2', '0.3', '0.1', '0.2', '100' ],
+      [ 0, '0.3', '0.4', '0.2', '0.3', '100' ],
+      [ 0, '0.4', '0.5', '0.3', '0.4', '100' ],
+      [ 0, '0.5', '0.6', '0.4', '0.5', '100' ],
+      [ 0, '0.2', '0.3', '0.1', '0.3', '100' ],
+      [ 0, '0.5', '0.6', '0.4', '0.5', '100' ],
+      [ 0, '0.6', '0.7', '0.5', '0.6', '100' ],
+      [ 0, '0.8', '0.8', '0.6', '0.7', '100' ],
+      [ 0, '0.9', '0.9', '0.7', '0.8', '100' ],
+    ] ]
+
+    expect(analyzer(symbols, candles)).toEqual([ 'NEOETH' ])
   })
 })

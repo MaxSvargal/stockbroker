@@ -12,7 +12,7 @@ const getCandlesParts: (a: any[][]) => number[][] = juxt(<any>map(o(map, nth), r
 const prev = <any>o(head, takeLast(2))
 const bbProp = <any>prop('bb')
 const wrProp = <any>prop('wr')
-const lowerProp = <any>prop('lower')
+const lowerProp = <any>prop('middle')
 const upperProp = <any>prop('upper')
 const getLowestLow = o(<() => number>reduce(min, Infinity), map(parseFloat))
 const calcEMA = compose(last, ema, assoc('period', 7), objOf('values'))
@@ -30,8 +30,8 @@ const getVolatilityPerc = o(
 const buyPass = allPass([
   converge(lt, [ prop('low'), compose(lowerProp, last, bbProp) ]),
   converge(lt, [ o(calcEMA, wrProp), o(last, wrProp) ]),
-  converge(lt, [ o(prev, wrProp), always(-80) ]),
-  converge(gt, [ o(last, wrProp), always(-80) ])
+  // converge(lt, [ o(prev, wrProp), always(-80) ]),
+  // converge(gt, [ o(last, wrProp), always(-80) ])
 ])
 const sellPass = allPass([
   converge(gt, [ prop('high'), compose(upperProp, last, bbProp) ]),
@@ -45,8 +45,8 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
 
   const bbShort = bollingerbands({ period: 21, stdDev: 2, values: map(parseFloat, closeShort) })
   const bbLong = bollingerbands({ period: 21, stdDev: 2, values: map(parseFloat, closeLong) })
-  const wrShort = williamsr({ period: 21, close: closeShort, low: lowShort, high: highShort })
-  const wrLong = williamsr({ period: 21, close: closeLong, low: lowLong, high: highLong })
+  const wrShort = williamsr({ period: 14, close: closeShort, low: lowShort, high: highShort })
+  const wrLong = williamsr({ period: 14, close: closeLong, low: lowLong, high: highLong })
   const lastPrice = o(parseFloat, last, closeShort)
 
   const buySignal = buyPass({ low: last(lowShort), bb: bbShort, wr: wrShort })
