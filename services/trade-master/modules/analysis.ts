@@ -36,18 +36,19 @@ const calcBB = compose(bollingerbands, assocPeriod(21), assocStdDev(2), objValue
 
 const groupBy3 = (a: any, b: any, i: number, xs: any[]) => [ init(xs), slice(i, i + 3, xs) ]
 const mapAccumIndexed = addIndex(mapAccum)
-const groupBy3Offset = compose(slice(0, -2), last, mapAccumIndexed(groupBy3, 0))
+const groupBy3Offset = compose(slice(0, -2), last, mapAccumIndexed(groupBy3, 0), takeLast(5))
 const checkWr = allPass([ o(gt(-80), nth(0)), o(lt(-80), nth(1)), o(lt(-80), nth(2)), converge(lt, [ nth(1), nth(2) ]) ])
 const anyWrPairIsPositive = o(<any>any(equals(true)), map(checkWr))
 const isProgressOfLastValues = converge(gt, [ o(last, last), o(last, head) ])
-const wrIsPositive = o(both(anyWrPairIsPositive, isProgressOfLastValues), groupBy3Offset)
+const wrAnyIsOver = any(lt(-20))
+const wrIsPositive = both(wrAnyIsOver, o(both(anyWrPairIsPositive, isProgressOfLastValues), groupBy3Offset))
 
 const bbIsPositive = any(gt(0.1))
 const areIndicatorsPositive = o(map(both(o(wrIsPositive, head), o(bbIsPositive, last))), apply(zip))
 const getTruthSymbols = o(map(head), filter(o(equals(true), last)))
 
 export const analyzer = (symbols: string[], candles: number[][]): string[] => {
-  const wrs = map(o(takeLast(5), calcWR), candles)
+  const wrs = map(o(takeLast(14), calcWR), candles)
   const bbs = map(compose(takeLast(7), map(prop('pb')), calcBB), candles)
   const states: boolean[] = areIndicatorsPositive([ wrs, bbs ])
   const enabled: string[] = getTruthSymbols(zip(symbols, states))
