@@ -37,7 +37,7 @@ const calcBB = compose(bollingerbands, assocPeriod(21), assocStdDev(2), objValue
 const groupBy3 = (a: any, b: any, i: number, xs: any[]) => [ init(xs), slice(i, i + 3, xs) ]
 const mapAccumIndexed = addIndex(mapAccum)
 const groupBy3Offset = compose(slice(0, -2), last, mapAccumIndexed(groupBy3, 0))
-const checkWr = allPass([ o(gt(-80), nth(0)), o(lt(-80), nth(1)), converge(lt, [ nth(1), nth(2) ]) ])
+const checkWr = allPass([ o(gt(-80), nth(0)), o(lt(-80), nth(1)), o(lt(-80), nth(2)), converge(lt, [ nth(1), nth(2) ]) ])
 const anyWrPairIsPositive = o(<any>any(equals(true)), map(checkWr))
 const isProgressOfLastValues = converge(gt, [ o(last, last), o(last, head) ])
 const wrIsPositive = o(both(anyWrPairIsPositive, isProgressOfLastValues), groupBy3Offset)
