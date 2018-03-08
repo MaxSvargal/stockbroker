@@ -5,13 +5,13 @@ apps:
     env     :
       DEBUG   : 'app:log,app:error'
 
-  - name    : 'PM2 Manager'
+  - name    : 'Manager PM2'
     script  : 'services/pm2-manager/index.ts'
     max_memory_restart: '120M'
     env     :
       DEBUG   : 'app:log,app:error'
 
-  - name    : 'Killer Signals'
+  - name    : 'Manager Signallers'
     script  : 'services/signals-killer/index.ts'
     max_memory_restart: '110M'
     env     :

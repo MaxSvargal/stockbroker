@@ -9,15 +9,15 @@ const exitProcess = (err: Error) => {
   process.exit(1)
 }
 const requesterStore = requesterCons({
-  name: 'Signals Killer Store Requester',
+  name: 'Signallers Manager Store Requester',
   key: 'db',
   requests: [ 'dbGet', 'dbGetAllRowsConcat' ]
 })
 const requesterProcesses = requesterCons({
-  name: 'Signals Killer Processes Requester',
+  name: 'Signallers Manager Processes Requester',
   key: 'processes',
-  requests: [ 'processStop' ]
+  requests: [ 'processStop', 'processStart' ]
 })
-const loopStream = periodic(120000)
+const loopStream = periodic(60000)
 
 main(exitProcess, loopStream, requesterStore, requesterProcesses)

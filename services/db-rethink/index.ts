@@ -7,7 +7,7 @@ import main from './main'
 const responder = responderCons({
   name: 'DB Rethink',
   key: 'db',
-  respondsTo: [ 'dbGet', 'dbGetAll', 'dbInsert', 'dbUpdate', 'dbCount', 'dbGetAllRowsConcat' ]
+  respondsTo: [ 'dbGet', 'dbGetAll', 'dbInsert', 'dbUpdate', 'dbCount', 'dbGetAllRowsConcat', 'dbReplace', 'dbFilterAllRowsConcat' ]
 })
 
 r.connect({
