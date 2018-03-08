@@ -13,11 +13,13 @@ type MainInput = {
 }
 
 // Move to module states
+// TODO: reqrite it. THINK!
+const m = n => 1000 * 60 * n
 const checkTimeOffset = cond([
-  [ o(equals(true), prop('15m')), always(1000 * 60 * 3) ],
-  [ o(equals(true), prop('1h')), always(1000 * 60 * 6) ],
-  [ o(equals(true), prop('4h')), always(1000 * 60 * 24) ],
-  [ T, always(1000 * 60 * 48) ]
+  [ o(equals(false), prop('4h')), always(m(50)) ],
+  [ o(equals(false), prop('1h')), always(m(30)) ],
+  [ o(equals(false), prop('15m')), always(m(10)) ],
+  [ T, always(m(3)) ]
 ])
 const compareTimes = ([ a, b ]: [ number, number ]) => Date.now() - b > new Date(a).getTime()
 const needToCheck = either(isNil, o(compareTimes, converge(pair, [ prop('timestamp'), checkTimeOffset ])))
