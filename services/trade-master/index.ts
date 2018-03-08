@@ -5,16 +5,10 @@ import { requesterCons, publisherCons } from '../utils/cote'
 
 import main from './main'
 
-const requesterProcess = requesterCons({
-  name: 'Trade Master Process Requester',
-  key: 'processes',
-  requests: [ 'processStart' ]
-})
-
 const requesterDb = requesterCons({
   name: 'Trade Master Database Requester',
   key: 'db',
-  requests: [ 'dbUpdate', 'dbReplaceAll' ]
+  requests: [ 'dbUpdate', 'dbReplaceAll', 'dbReplace', 'dbGet' ]
 })
 
 const exitProcess = (err: Event) => {
@@ -22,6 +16,6 @@ const exitProcess = (err: Event) => {
   process.exit(1)
 }
 
-const loopStream = delay(2000, periodic(240000))
+const loopStream = delay(2000, periodic(120000))
 
-main(exitProcess, loopStream, fetch, requesterProcess, requesterDb)
+main(exitProcess, loopStream, fetch, requesterDb)
