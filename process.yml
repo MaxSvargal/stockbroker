@@ -12,7 +12,7 @@ apps:
       DEBUG   : 'app:log,app:error'
 
   - name    : 'Manager Signallers'
-    script  : 'services/signals-killer/index.ts'
+    script  : 'services/signallers-manager/index.ts'
     max_memory_restart: '110M'
     env     :
       DEBUG   : 'app:log,app:error'
