@@ -9,16 +9,12 @@ const requestAccount = (id: string) => () =>
   ({ type: 'dbGet', table: 'accounts', id })
 const requestClosePosition = (data: { id: number }) =>
   ({ type: 'dbUpdate', table: 'positions', id: data.id, data })
-const requestAccountActiveSymbols = (id: string) => (activeSymbols: string[]) =>
-  ({ type: 'dbUpdate', table: 'accounts', id, data: { activeSymbols } })
 const requestInfoSymbol = (id: string) =>
   ({ type: 'dbGet', table: 'exchangeInfoSymbols', id })
 const requestOpenPosition = (data: {}) =>
   ({ type: 'dbInsert', table: 'positions', data })
 const requestOpenedPositions = (account: string) => () =>
   ({ type: 'dbGetAll', table: 'positions', by: { account }, filter: { closed: false } })
-const requestSymbolsEnabled = () =>
-  ({ type: 'dbGet', table: 'tradeState', id: 'symbolsEnabled' })
 
 const invokeSend = flip(invoker(1, 'send'))
 const invokeAccountInfo = flip(invoker(1, 'accountInfo'))
@@ -44,10 +40,8 @@ const main: Main = (exitProcess, account, binance, subscriber, requester, loopSt
 
   const requests = {
     getAccount:         o(request, requestAccount(account)),
-    setAccountSymbols:  o(request, requestAccountActiveSymbols(account)),
     getOpenedPositions: o(request, requestOpenedPositions(account)),
     getSymbolInfo:      o(request, requestInfoSymbol),
-    getSymbolsEnabled:  o(request, requestSymbolsEnabled),
     openPosition:       o(request, requestOpenPosition),
     closePosition:      o(request, requestClosePosition),
     accountInfo,

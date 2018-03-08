@@ -12,11 +12,6 @@ const findByAssetProp = o(find, propEq('asset'))
 const parseFreeProp = o(parseFloat, prop('free'))
 const filterBySymbol = o(filter, propEq('symbol'))
 
-const buySignalSymbolIsNotEnabled = both(propEq('side', 'BUY'), converge(complement(contains), [ prop('symbol'), prop('enabledSymbols') ]))
-const lastPositionIsClosed = both(o(equals('SELL'), head), o(propEq('length', 1), last))
-const getSymbolsOfPositions = o(uniq, map(prop('symbol')))
-const removeSymbolFromList = unapply(converge(reject, [ o(equals, head), last ]))
-
 const buyErrorsCondition = cond([
   [ o(equals(0), prop('avaliableChunks')), always(Error('Too much opened positions')) ],
   [ o(equals(0), prop('quantity')), always(Error('No funds avaliable to buy')) ],
@@ -34,10 +29,8 @@ const checkSignal = (account: string, requests: any) =>
   try {
     const {
       getAccount,
-      setAccountSymbols,
       getOpenedPositions,
       getSymbolInfo,
-      getSymbolsEnabled,
       openPosition,
       closePosition,
       accountInfo,
@@ -45,15 +38,10 @@ const checkSignal = (account: string, requests: any) =>
       myTrades
     } = requests
 
-    const { values: enabledSymbols } = await getSymbolsEnabled(null)
-
-    if (buySignalSymbolIsNotEnabled({ side, symbol, enabledSymbols }))
-      throw Error(`Symbol ${symbol} is not active, skip BUY signal.`)
-
     const [
       symbolInfo,
       openedPositions,
-      { activeSymbols, preferences: { chunksNumber = 8 } },
+      { preferences: { chunksNumber = 8 } },
       { balances }
     ] = await Promise.all([
       getSymbolInfo(symbol),
@@ -95,13 +83,6 @@ const checkSignal = (account: string, requests: any) =>
     const positionState = equals('BUY', side) ?
       await trade({ price, sendOrder, myTrades, openPosition, position: { account, symbol, quantity, volatilityPerc } }) :
       await trade({ price, sendOrder, myTrades, closePosition, positionToCover })
-
-    // TODO: check activeSymbols by checking the all opened positions
-    // TODO: simplify to one fn
-    if (lastPositionIsClosed([ side, openedPositionsOfSymbol ]))
-      await setAccountSymbols(removeSymbolFromList(symbol, activeSymbols))
-    else
-      await setAccountSymbols(getSymbolsOfPositions(openedPositions))
 
   } catch (err) {
     const errorEvent = {
