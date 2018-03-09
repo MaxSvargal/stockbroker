@@ -1,9 +1,12 @@
-import { curryN, o, equals, cond, always, either, isNil, converge, pair, prop, zipObj, composeP, tail, head, when, nth, T, not, length } from 'ramda'
+import {
+  curryN, o, equals, cond, always, either, isNil, converge, pair, prop,
+  composeP, tail, head, when, nth, T, not, length, both, zipObj
+} from 'ramda'
 
 import { log } from '../../utils/log'
 import { suitableSymbolsFromTicker } from './symbols'
 import { makeFetchCandles } from './candles'
-import { wrIsStartedGrow } from './indicators'
+import { wrIsStartedGrow, obvIsGrow } from './indicators'
 
 type MainInput = {
   fetchTicker: () => Promise<{ symbol: string, priceChangePercent: string }[]>,
@@ -29,9 +32,9 @@ const computeState = ([ symbol, candles ]: [ string, number[][] ]) =>
   zipSymbolState([
     Date.now(),
     symbol,
-    o(wrIsStartedGrow, nth(0), candles),
-    o(wrIsStartedGrow, nth(1), candles),
-    o(wrIsStartedGrow, nth(2), candles)
+    o(both(obvIsGrow, wrIsStartedGrow), nth(0), candles),
+    o(both(obvIsGrow, wrIsStartedGrow), nth(1), candles),
+    o(both(obvIsGrow, wrIsStartedGrow), nth(2), candles)
   ])
 
 const isNotLastIteration = o(o(not, equals(1)), length)
