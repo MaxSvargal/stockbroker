@@ -35,4 +35,4 @@ const wrIsStartedGrow = o(allPass([ isGrow, wrNotOverbought, wrNotOversold ]), w
 const obvIsGrow = compose(isGrow, pairEmaAndLast, calcOBV)
 const cciIsGrow = compose(both(isGrow, isOverZero), takeLast(2), calcCCI)
 
-export { wrIsStartedGrow, obvIsGrow, cciIsGrow }
+export { wrIsStartedGrow, wrIsJustGrow, obvIsGrow, cciIsGrow }
