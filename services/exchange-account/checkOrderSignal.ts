@@ -1,7 +1,7 @@
 import { log, error as logError } from '../utils/log'
 import {
-  o, cond, always, unapply, ifElse, equals, reject, complement, converge, last, divide, uniq, map,
-  length, subtract, contains, filter, prop, propEq, find, T, gt, isNil, both, append, head, path
+  o, cond, always, unapply, ifElse, equals, reject, complement, converge, last, divide, uniq, map, compose,
+  length, subtract, contains, filter, prop, propEq, find, T, gt, isNil, both, append, head, path, lte
 } from 'ramda'
 
 import trade from './modules/trade'
@@ -15,6 +15,7 @@ const filterBySymbol = o(filter, propEq('symbol'))
 const buyErrorsCondition = cond([
   [ o(equals(0), prop('avaliableChunks')), always(Error('Too much opened positions')) ],
   [ o(equals(0), prop('quantity')), always(Error('No funds avaliable to buy')) ],
+  [ compose(lte(1), length, prop('openedPositionsOfSymbol')), always(Error('Position for this symbol is already open')) ],
   [ T, always(null) ]
 ])
 const sellErrorsCondition = cond([
@@ -64,7 +65,7 @@ const checkSignal = (account: string, requests: any) =>
       const avaliableChunks = subtract(chunksNumber, length(openedPositions))
       const chunkAmount = divide(avaliableToBuy, avaliableChunks)
       const quantity = roundToMinQty(minQty, divide(chunkAmount, price))
-      const error = buyErrorsCondition({ avaliableChunks, quantity })
+      const error = buyErrorsCondition({ avaliableChunks, quantity, openedPositionsOfSymbol })
 
       return { quantity, error }
     }
