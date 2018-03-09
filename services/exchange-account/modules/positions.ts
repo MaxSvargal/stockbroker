@@ -1,5 +1,5 @@
 import {
-  curryN, subtract, apply, divide, curry, chain, pair, props, prop, compose, add, flip,
+  curryN, subtract, apply, divide, curry, chain, pair, props, prop, compose, add,
   constructN, pick, evolve, converge, objOf, always, o, merge, mergeAll, lt, path,
   unapply, multiply, head, last, tail, filter, pathSatisfies, gte, ifElse, map, find
 } from 'ramda'
@@ -68,7 +68,7 @@ const makeClosedPosition = <MakeClosedPosition>chain(makeCompleteObj, makeCloseO
 
 /* findOrderToCover */
 
-const minCoverPrice = unapply(converge(add, [ head, o(flip(divide)(1.5), apply(multiply)) ]) )
+const minCoverPrice = unapply(converge(add, [ head, apply(multiply) ]) )
 const minCoverPriceOfPos = converge(minCoverPrice, [ path([ 'open', 'price' ]), prop('volatilityPerc') ])
 const compareWithMinCover = curryN(2, unapply(converge(gte, [ head, o(minCoverPriceOfPos, last) ])))
 
