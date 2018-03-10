@@ -1,5 +1,5 @@
 import log from '../utils/log'
-import { williamsr, bollingerbands, cci, ema } from 'technicalindicators'
+import { williamsr, bollingerbands, ema } from 'technicalindicators'
 import {
   any, equals, range, head, lt, o, juxt, map, nth, takeLast, last, converge, gt, when, compose,
   prop, reduce, min, divide, subtract, ifElse, mean, unapply, allPass, always, multiply, objOf, assoc
@@ -12,7 +12,6 @@ const getCandlesParts: (a: any[][]) => number[][] = juxt(<any>map(o(map, nth), r
 const prev = <any>o(head, takeLast(2))
 const bbProp = <any>prop('bb')
 const wrProp = <any>prop('wr')
-const cciProp = <any>prop('cci')
 const lowerProp = <any>prop('middle')
 const upperProp = <any>prop('upper')
 const getLowestLow = o(<() => number>reduce(min, Infinity), map(parseFloat))
@@ -36,8 +35,7 @@ const buyPass = allPass([
 ])
 const sellPass = allPass([
   compose(lt(-20), prev, wrProp),
-  compose(gt(-20), last, wrProp),
-  compose(lt(100), last, cciProp) // OR CCI > 200 and CCI < 200
+  compose(gt(-20), last, wrProp)
 ])
 
 type MakeAnalysis = (a: string) => (xs: number[][][]) => { symbol: string, side: string, volatilityPerc: number, price: number, time: number } | null
@@ -47,13 +45,13 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
 
   const bbShort = bollingerbands({ period: 21, stdDev: 2, values: map(parseFloat, closeShort) })
   const bbLong = bollingerbands({ period: 21, stdDev: 2, values: map(parseFloat, closeLong) })
-  const wrShort = williamsr({ period: 14, close: closeShort, low: lowShort, high: highShort })
   const wrLong = williamsr({ period: 20, close: closeLong, low: lowLong, high: highLong })
   const cciLong = cci({ period: 20, high: map(parseFloat, highLong), low: map(parseFloat, lowLong), close: map(parseFloat, closeLong) })
+
   const lastPrice = o(parseFloat, last, closeShort)
 
   const buySignal = buyPass({ low: last(lowShort), bb: bbShort, wr: wrShort })
-  const sellSignal = sellPass({ high: last(highLong), bb: bbLong, wr: wrLong, cci: cciLong })
+  const sellSignal = sellPass({ high: last(highLong), bb: bbLong, wr: wrLong })
   const volatilityPerc = getVolatilityPerc([ lastPrice, o(upperProp, last, bbLong) ])
 
   // log({
