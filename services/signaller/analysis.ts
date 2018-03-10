@@ -48,7 +48,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
   const bbShort = bollingerbands({ period: 21, stdDev: 2, values: map(parseFloat, closeShort) })
   const bbLong = bollingerbands({ period: 21, stdDev: 2, values: map(parseFloat, closeLong) })
   const wrShort = williamsr({ period: 14, close: closeShort, low: lowShort, high: highShort })
-  const wrLong = williamsr({ period: 14, close: closeLong, low: lowLong, high: highLong })
+  const wrLong = williamsr({ period: 20, close: closeLong, low: lowLong, high: highLong })
   const cciLong = cci({ period: 20, high: map(parseFloat, highLong), low: map(parseFloat, lowLong), close: map(parseFloat, closeLong) })
   const lastPrice = o(parseFloat, last, closeShort)
 
