@@ -12,7 +12,7 @@ const pairOpenPriceVolatility = converge(pair, [ path(['open', 'price']), prop('
 const marginWithIncrease = (inc) => converge(subtract, [ head, converge(multiply, [ head, o(add(inc), last) ]) ])
 const mapSellState = (prices: string[], positions: {}[]) =>
   // TODO: simplify it, calculate increased value by another method
-  map(converge(lt, [ getSymbolPrice(prices), o(marginWithIncrease(0.03), pairOpenPriceVolatility) ]), positions)
+  map(converge(lt, [ getSymbolPrice(prices), o(marginWithIncrease(0.05), pairOpenPriceVolatility) ]), positions)
 
 const checkStopLimit = requests => async () => {
   const { getOpenedPositions, getPrices, closePosition, sendOrder, myTrades } = requests
