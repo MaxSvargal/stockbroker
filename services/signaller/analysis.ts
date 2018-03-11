@@ -13,7 +13,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m ]
   const [ timeShort, openShort, highShort, lowShort, closeShort ] = getCandlesParts(candles1m)
   const [ timeLong, openLong, highLong, lowLong, closeLong ] = getCandlesParts(candles5m)
 
-  const wrShort = williamsr({ period: 17, close: closeShort, low: lowShort, high: highShort })
+  const wrShort = williamsr({ period: 10, close: closeShort, low: lowShort, high: highShort })
   const wrLong = williamsr({ period: 58, close: closeLong, low: lowLong, high: highLong })
   const lastPrice = o(parseFloat, last, closeShort)
 
