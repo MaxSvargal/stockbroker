@@ -19,10 +19,10 @@ type MainInput = {
 // TODO: reqrite it. THINK!
 const m = n => 1000 * 60 * n
 const checkTimeOffset = cond([
-  [ o(equals(false), prop('4h')), always(m(50)) ],
-  [ o(equals(false), prop('1h')), always(m(30)) ],
-  [ o(equals(false), prop('15m')), always(m(10)) ],
-  [ T, always(m(3)) ]
+  [ o(equals(false), prop('4h')), always(m(30)) ],
+  [ o(equals(false), prop('1h')), always(m(15)) ],
+  [ o(equals(false), prop('15m')), always(m(5)) ],
+  [ T, always(m(2)) ]
 ])
 const compareTimes = ([ a, b ]: [ number, number ]) => Date.now() - b > new Date(a).getTime()
 const needToCheck = either(isNil, o(compareTimes, converge(pair, [ prop('timestamp'), checkTimeOffset ])))
