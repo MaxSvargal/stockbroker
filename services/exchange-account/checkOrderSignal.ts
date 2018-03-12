@@ -24,9 +24,9 @@ const sellErrorsCondition = cond([
   [ T, always(null) ]
 ])
 
-type SignalRequest = { symbol: string, side: 'BUY' | 'SELL', price: number, volatilityPerc: number }
+type SignalRequest = { symbol: string, side: 'BUY' | 'SELL', price: number, forced: boolean }
 const checkSignal = (account: string, requests: any) =>
-  async ({ symbol, side, price, volatilityPerc }: SignalRequest) => {
+  async ({ symbol, side, price, forced }: SignalRequest) => {
   try {
     const {
       getAccount,
@@ -73,7 +73,7 @@ const checkSignal = (account: string, requests: any) =>
     const execSell = () => {
       const findBySlaveCurrency = findByAssetProp(slaveCurrency)
       const avaliableToSell = o(parseFreeProp, findBySlaveCurrency)(balances)
-      const positionToCover = findPositionToCover(price, openedPositionsOfSymbol)
+      const positionToCover = findPositionToCover(forced ? Infinity : price, openedPositionsOfSymbol)
       const chunkAmount = path([ 'open', 'origQty' ], positionToCover)
       const quantity = roundToMinQty(minQty, chunkAmountToSellCond([ avaliableToSell, chunkAmount ]))
       const error = sellErrorsCondition({ positionToCover, quantity, avaliableToSell })
@@ -86,7 +86,7 @@ const checkSignal = (account: string, requests: any) =>
     if (error) throw error
 
     const positionState = equals('BUY', side) ?
-      await trade({ price, sendOrder, myTrades, openPosition, position: { account, symbol, quantity, volatilityPerc } }) :
+      await trade({ price, sendOrder, myTrades, openPosition, position: { account, symbol, quantity } }) :
       await trade({ price, sendOrder, myTrades, closePosition, positionToCover })
 
   } catch (err) {

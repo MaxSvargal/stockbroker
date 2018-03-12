@@ -23,12 +23,12 @@ const makeObjFromProps = (name: string) => converge(objOf, [ always(name), pickP
 /* makeOpenedPosition */
 
 const openPositionObjPredicates = [
-  pick([ 'account', 'symbol', 'volatilityPerc' ]),
+  pick([ 'account', 'symbol' ]),
   makeObjFromProps('open'),
   always({ closed: false })
 ]
 
-type MakeOpenedPosition = (xs: [ Order, Trade, { account: string, volatilityPerc: number } ]) => Position
+type MakeOpenedPosition = (xs: [ Order, Trade, { account: string } ]) => Position
 const makeOpenedPosition = <MakeOpenedPosition>o(convMergeAll(<any>openPositionObjPredicates), mergeAll)
 
 
@@ -69,10 +69,10 @@ const makeClosedPosition = <MakeClosedPosition>chain(makeCompleteObj, makeCloseO
 /* findOrderToCover */
 
 const minCoverPrice = unapply(converge(add, [ head, apply(multiply) ]) )
-const minCoverPriceOfPos = converge(minCoverPrice, [ path([ 'open', 'price' ]), always(0.007) /* prop('volatilityPerc') */ ])
+const minCoverPriceOfPos = converge(minCoverPrice, [ path([ 'open', 'price' ]), always(0.007) ])
 const compareWithMinCover = curryN(2, unapply(converge(gte, [ head, o(minCoverPriceOfPos, last) ])))
 
-type FindPositionToCover = (a: Price, b: { volatilityPerc: number, open: { price: number } }[]) => Position
+type FindPositionToCover = (a: Price, b: { open: { price: number } }[]) => Position
 const findPositionToCover = unapply(converge(find, [ o(compareWithMinCover, head), last ]))
 
 

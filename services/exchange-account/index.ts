@@ -6,7 +6,7 @@ const { ACCOUNT, KEY, SECRET } = process.env
 
 const subscriber = subscriberCons({
   name: `Exchange Account ${ACCOUNT}`,
-  subscribesTo: [ 'newSignal', 'exitFromSymbols' ]
+  subscribesTo: [ 'newSignal' ]
 })
 
 const requester = requesterCons({

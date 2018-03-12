@@ -3,7 +3,6 @@ import { Requester, Subscriber } from 'cote'
 import { o, flip, invoker, map, applyTo } from 'ramda'
 
 import checkOrderSignal from './checkOrderSignal'
-import checkStopLimit from './checkStopLimit'
 
 const requestAccount = (id: string) => () =>
   ({ type: 'dbGet', table: 'accounts', id })
@@ -33,7 +32,6 @@ type Account = string
 type Main = (a: ExitProcess, b: Account, c: Binance, d: Subscriber, e: Requester, f: Stream) => void
 const main: Main = (exitProcess, account, binance, subscriber, requester, loopStream) => {
   const propagateSignalStream = fromEvent('newSignal', subscriber)
-  const exitFromSymbolsStream = fromEvent('exitFromSymbols', subscriber)
   const binanceInvokers = [ invokeAccountInfo, invokeOrder, invokeMyTrades, invokePrices ]
   const [ accountInfo, sendOrder, myTrades, getPrices ] = map(applyTo(binance), binanceInvokers)
   const request = invokeSend(requester)
@@ -51,7 +49,6 @@ const main: Main = (exitProcess, account, binance, subscriber, requester, loopSt
   }
 
   observe(checkOrderSignal(account, requests), propagateSignalStream)
-  observe(checkStopLimit(requests), loopStream)
 }
 
 export default main
