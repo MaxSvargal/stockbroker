@@ -20,7 +20,7 @@ const calcWR = compose(williamsr, assocPeriod(14), prepareCandlesToWR)
 const calcBB = compose(bollingerbands, assocPeriod(21), assocStdDev(2), objValues)
 const calcOBV = compose(obv, prepareCandlesToOBV)
 const calcCCI = compose(cci, assocPeriod(20), prepareCandlesToCCI)
-const calcEMA = compose(last, ema, assocPeriod(4), objOf('values'))
+const calcEMA = compose(last, ema, assocPeriod(7), objOf('values'))
 const pairEmaAndLast = converge(pair, [ calcEMA, last ])
 
 const isGrow = <(a: any) => boolean>apply(lt)
