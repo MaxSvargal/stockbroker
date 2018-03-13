@@ -5,7 +5,7 @@ import { Requester, Publisher } from 'cote'
 import makeAnalysis from './analysis'
 
 const limit = 30
-const candlesFrames = [ '1m', '15m', '1h' ]
+const candlesFrames = [ '1m', '15m', '2h' ]
 
 const invokePublish = invoker(2, 'publish')
 const invokePublishNewSignal = flip(invokePublish('newSignal'))
