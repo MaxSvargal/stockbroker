@@ -4,7 +4,7 @@ import { Requester, Publisher } from 'cote'
 
 import makeAnalysis from './analysis'
 
-const limit = 30
+const limit = 36
 const candlesFrames = [ '1m', '15m', '2h' ]
 
 const invokePublish = invoker(2, 'publish')
