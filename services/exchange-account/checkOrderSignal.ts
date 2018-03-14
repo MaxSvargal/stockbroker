@@ -20,7 +20,7 @@ const buyErrorsCondition = cond([
 ])
 const sellErrorsCondition = cond([
   [ o(isNil, prop('positionToCover')), always(Error('No position to cover')) ],
-  // [ converge(gt, [ prop('quantity'), prop('avaliableToSell') ]), always(Error('No funds avaliable to cover position')) ],
+  [ converge(gt, [ prop('quantity'), prop('avaliableToSell') ]), always(Error('No funds avaliable to cover position')) ],
   [ T, always(null) ]
 ])
 
@@ -39,7 +39,7 @@ const checkSignal = (account: string, requests: any) =>
       myTrades
     } = requests
 
-    let [
+    const [
       symbolInfo,
       openedPositions,
       { preferences: { chunksNumber = 8 } },
@@ -51,10 +51,6 @@ const checkSignal = (account: string, requests: any) =>
       accountInfo(null)
     ])
 
-    balances = [
-      { asset: 'BTC', free: '0.2' }
-    ]
-
     const [ slaveCurrency, masterCurrency ] = takePairFromSymbol(symbol)
     const openedPositionsOfSymbol = filterBySymbol(symbol)(openedPositions)
     const minQty = getMinQtyFromSymbolInfo(symbolInfo)
@@ -64,7 +60,7 @@ const checkSignal = (account: string, requests: any) =>
       const avaliableToBuy = o(parseFreeProp, findByMasterCurrency)(balances)
       const avaliableChunks = subtract(chunksNumber, length(openedPositions))
       const chunkAmount = divide(avaliableToBuy, avaliableChunks)
-      const quantity = roundToMinQty(minQty, divide(chunkAmount, price))
+      const quantity: number = roundToMinQty(minQty, divide(chunkAmount, price))
       const error = buyErrorsCondition({ avaliableChunks, quantity, openedPositionsOfSymbol })
 
       return { quantity, error }
@@ -75,7 +71,7 @@ const checkSignal = (account: string, requests: any) =>
       const avaliableToSell = o(parseFreeProp, findBySlaveCurrency)(balances)
       const positionToCover = findPositionToCover(forced ? Infinity : price, openedPositionsOfSymbol)
       const chunkAmount = path([ 'open', 'origQty' ], positionToCover)
-      const quantity = roundToMinQty(minQty, chunkAmountToSellCond([ avaliableToSell, chunkAmount ]))
+      const quantity: number = roundToMinQty(minQty, chunkAmountToSellCond([ avaliableToSell, chunkAmount ]))
       const error = sellErrorsCondition({ positionToCover, quantity, avaliableToSell })
 
       return { quantity, error, positionToCover }
@@ -86,8 +82,8 @@ const checkSignal = (account: string, requests: any) =>
     if (error) throw error
 
     const positionState = equals('BUY', side) ?
-      await trade({ price, sendOrder, myTrades, openPosition, position: { account, symbol, quantity } }) :
-      await trade({ price, sendOrder, myTrades, closePosition, positionToCover })
+      await trade({ sendOrder, myTrades, openPosition, position: { account, symbol, quantity } }) :
+      await trade({ sendOrder, myTrades, closePosition, positionToCover })
 
   } catch (err) {
     const errorEvent = {
