@@ -11,7 +11,7 @@ export type Trade = { id: number, orderId: number, time: number, price: string, 
 type PositionSide = { id: number, orderId: number, qty: number, origQty: number, time: Date, price: number, commission: number, commissionAsset: string }
 export type Position = { id: number, account: string, symbol: string, closed: boolean, profitAmount?: number, profitPerc?: number, open: PositionSide, close?: PositionSide }
 
-const fee = 0.0015
+const fee = 0.0005
 const convMergeAll = converge(unapply(mergeAll))
 const date = constructN(1, Date)
 const pickFromOrderTrade = pick([ 'id', 'time', 'price', 'qty', 'commission', 'commissionAsset', 'orderId', 'origQty' ])
@@ -46,7 +46,8 @@ type CalcProfit = (a: [ [ number, number ], [ number, number ] ]) => number
 const calcProfitAmount: CalcProfit = converge(subtract, [ o(divside, last), o(divside, head) ])
 
 const margin = converge(divide, [ converge(subtract, [ last, head ]), ifElse(converge(lt, [ head, last ]), head, last) ])
-const calcProfitPerc: CalcProfit = o(converge(multiply, [ always(100), margin ]), map(head))
+const marginWithFee = converge(subtract, [ margin, always(multiply(fee, 2)) ])
+const calcProfitPerc = compose(multiply(100), marginWithFee, map(head))
 
 type AmountPropsPair = (a: { price: number, origQty: number }) => [ number, number ]
 const amountPropsPair = <AmountPropsPair>props([ 'price', 'origQty' ])
