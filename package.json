@@ -47,6 +47,7 @@
   },
   "scripts": {
     "dev-ui": "node ./services/ui",
+    "ui-build": "next build",
     "test": "jest",
     "dev-exchange-listener": "nodemon ./services/exchange-listener --watch services/exchange-listener",
     "dev-redis-persist": "nodemon ./services/redis-persist --watch services/redis-persist",
