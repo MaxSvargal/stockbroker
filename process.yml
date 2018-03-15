@@ -27,7 +27,7 @@ apps:
   #   script  : 'services/logger-signals/index.ts'
 
   - name    : 'Web UI'
-    max_memory_restart: '200M'
+    max_memory_restart: '280M'
     script  : 'services/ui/index.js'
 
   - name    : 'Account maxsvargal'
