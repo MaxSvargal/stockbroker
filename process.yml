@@ -29,6 +29,8 @@ apps:
   - name    : 'Web UI'
     max_memory_restart: '280M'
     script  : 'services/ui/index.js'
+    env     :
+      NODE_ENV: 'production'
 
   - name    : 'Account maxsvargal'
     script  : 'services/exchange-account/index.ts'
