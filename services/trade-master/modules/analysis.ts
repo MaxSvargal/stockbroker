@@ -1,12 +1,12 @@
 import {
   curryN, o, equals, cond, always, either, isNil, converge, pair, prop,
-  composeP, tail, head, when, nth, T, not, length, both, zipObj
+  composeP, tail, head, when, nth, T, not, length, both, zipObj, allPass
 } from 'ramda'
 
 import { log } from '../../utils/log'
 import { suitableSymbolsFromTicker } from './symbols'
 import { makeFetchCandles } from './candles'
-import { wrIsJustGrow, wrIsStartedGrow, obvIsGrow, cciIsGrow } from './indicators'
+import { wrIsJustGrow, wrIsStartedGrow, obvIsGrow, cciIsGrow, emaIsPositive } from './indicators'
 
 type MainInput = {
   fetchTicker: () => Promise<{ symbol: string, priceChangePercent: string }[]>,
@@ -17,12 +17,13 @@ type MainInput = {
 
 // Move to module states
 // TODO: reqrite it. THINK!
+const propEqFalse: (a: string) => (b: {}) => boolean = converge(equals, [ always(false), prop ])
 const m = n => 1000 * 60 * n
 const checkTimeOffset = cond([
-  [ o(equals(false), prop('4h')), always(m(30)) ],
-  [ o(equals(false), prop('1h')), always(m(15)) ],
-  [ o(equals(false), prop('15m')), always(m(5)) ],
-  [ T, always(m(2)) ]
+  [ propEqFalse('4h'), always(m(30)) ],
+  [ propEqFalse('1h'), always(m(15)) ],
+  [ propEqFalse('15m'), always(m(6)) ],
+  [ T, always(m(3)) ]
 ])
 const compareTimes = ([ a, b ]: [ number, number ]) => Date.now() - b > new Date(a).getTime()
 const needToCheck = either(isNil, o(compareTimes, converge(pair, [ prop('timestamp'), checkTimeOffset ])))
@@ -33,7 +34,7 @@ const computeState = ([ symbol, candles ]: [ string, number[][] ]) =>
     Date.now(),
     symbol,
     o(both(obvIsGrow, wrIsStartedGrow), nth(0), candles),
-    o(both(obvIsGrow, wrIsStartedGrow), nth(1), candles),
+    o(both(obvIsGrow, emaIsPositive), nth(1), candles),
     o(both(obvIsGrow, cciIsGrow), nth(2), candles)
   ])
 

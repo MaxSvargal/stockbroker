@@ -16,14 +16,18 @@ const assocStdDev = assoc('stdDev')
 const prepareCandlesToWR = converge(unapply(mergeAll), [ objLow, objClose, objHigh ])
 const prepareCandlesToOBV = converge(unapply(mergeAll), [ objClose, objVolume ])
 const prepareCandlesToCCI = converge(unapply(mergeAll), [ objOpen, objHigh, objLow, objClose ])
+const prepareCandlesToEMA = map(o(parseFloat, nth(4)))
 const calcWR = compose(williamsr, assocPeriod(21), prepareCandlesToWR)
 const calcBB = compose(bollingerbands, assocPeriod(21), assocStdDev(2), objValues)
 const calcOBV = compose(obv, prepareCandlesToOBV)
 const calcCCI = compose(cci, assocPeriod(20), prepareCandlesToCCI)
 const calcEMA = compose(last, ema, assocPeriod(7), objOf('values'))
+const calcEMALong = compose(last, ema, assocPeriod(25), objOf('values'))
 const pairEmaAndLast = converge(pair, [ calcEMA, last ])
+const pairEmaShortAndLong = o(converge(pair, [ calcEMA, calcEMALong ]), prepareCandlesToEMA)
 
 const isGrow = <(a: any) => boolean>apply(lt)
+const isGrowAbs = <(a: any) => boolean>apply(gt)
 const isOverZero = <any>all(lt(0))
 
 const wrPair = o(pairEmaAndLast, calcWR)
@@ -33,5 +37,6 @@ const wrIsJustGrow = o(isGrow, wrPair)
 const wrIsStartedGrow = o(allPass([ isGrow, wrNotOverbought, wrNotOversold ]), wrPair)
 const obvIsGrow = compose(isGrow, pairEmaAndLast, calcOBV)
 const cciIsGrow = compose(both(isGrow, isOverZero), takeLast(2), calcCCI)
+const emaIsPositive = compose(isGrowAbs, pairEmaShortAndLong)
 
-export { wrIsStartedGrow, wrIsJustGrow, obvIsGrow, cciIsGrow }
+export { wrIsStartedGrow, wrIsJustGrow, obvIsGrow, cciIsGrow, emaIsPositive }
