@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { filter, propEq, merge, o, prop, values, fromPairs, map, props, compose, length } from 'ramda'
 
+import Item from './positionsOpenListItem'
+
 const filterOpened = filter(propEq('closed', false))
 const makeSymbolPriceObj = compose(fromPairs, map(props([ 's', 'c' ])), values)
 
@@ -24,23 +26,12 @@ export default class extends Component {
           <strong style={ styles.headCounter }>{ length(opened) } / 12</strong>
         </div>
         <div style={ styles.list }>
-          { opened.map(p => (
-            <div key={ p.id } style={ styles.row }>
-              <div style={ styles.header } >{ p.symbol }</div>
-              <div style={ styles.prices } >
-                <div style={ styles.column } >
-                  <div>bought</div>
-                  <div>expect</div>
-                  <div>curent</div>
-                </div>
-                <div style={ styles.column } >
-                  <div><strong>{ p.open.price }</strong></div>
-                  <div><strong>{ (p.open.price + (p.open.price * 0.007)).toFixed(8) }</strong></div>
-                  <div><strong>{ prop(p.symbol, this.state.ticker) }</strong></div>
-                </div>
-              </div>
-            </div>
-          )) }
+          { opened.map(pos =>
+            <Item
+              key={ pos.id }
+              position={ pos }
+              ticker={ prop(pos.symbol, this.state.ticker) } />
+          ) }
         </div>
       </div>
     )
@@ -70,27 +61,6 @@ export default class extends Component {
         display: 'flex',
         flexFlow: 'row wrap',
         height: '25vh'
-      },
-      row: {
-        display: 'flex',
-        flexFlow: 'row nowrap',
-        flexBasis: '23vw', // TODO fix it
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '0.5rem'
-      },
-      header: {
-        marginRight: '0.5rem',
-        fontSize: '2.25rem'
-      },
-      prices: {
-        fontSize: '0.8rem',
-        lineHeight: '1.34em',
-        display: 'flex',
-        flexFlow: 'row nowrap'
-      },
-      column: {
-        margin: '0 .25rem'
       }
     }
   }

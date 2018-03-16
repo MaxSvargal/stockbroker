@@ -13,6 +13,7 @@ export default class extends Component {
   render() {
     const { positions } = this.props
     const styles = this.getStyles()
+
     return !this.state.loaded ? <div/> : (
       <div style={ styles.root } >
         <PositionsOpenList positions={ positions } />
