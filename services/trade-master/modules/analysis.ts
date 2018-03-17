@@ -6,7 +6,7 @@ import {
 import { log } from '../../utils/log'
 import { suitableSymbolsFromTicker } from './symbols'
 import { makeFetchCandles } from './candles'
-import { wrIsJustGrow, wrIsStartedGrow, obvIsGrow, cciIsGrow, emaIsPositive } from './indicators'
+import { wrIsStartedGrow, obvIsGrow, cciIsGrow } from './indicators'
 
 type MainInput = {
   fetchTicker: () => Promise<{ symbol: string, priceChangePercent: string }[]>,
@@ -33,9 +33,9 @@ const computeState = ([ symbol, candles ]: [ string, number[][] ]) =>
   zipSymbolState([
     Date.now(),
     symbol,
-    o(allPass([ obvIsGrow, emaIsPositive, wrIsJustGrow ]), nth(0), candles),
-    o(allPass([ obvIsGrow, emaIsPositive, wrIsStartedGrow ]), nth(1), candles),
-    o(both(obvIsGrow, cciIsGrow), nth(2), candles)
+    o(both(obvIsGrow, cciIsGrow), nth(0), candles),
+    o(both(obvIsGrow, cciIsGrow), nth(1), candles),
+    o(both(obvIsGrow, wrIsStartedGrow), nth(2), candles)
   ])
 
 const isNotLastIteration = o(o(not, equals(1)), length)
