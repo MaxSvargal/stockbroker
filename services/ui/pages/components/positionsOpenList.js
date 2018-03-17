@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { filter, propEq, merge, o, prop, values, fromPairs, map, props, compose, length } from 'ramda'
+import { filter, propEq, merge, o, prop, values, fromPairs, map, props, compose, length, reverse } from 'ramda'
 
 import Item from './positionsOpenListItem'
 
@@ -18,7 +18,7 @@ export default class extends Component {
   render() {
     const { positions, chunksNumber } = this.props
     const styles = this.getStyles()
-    const opened = filterOpened(positions)
+    const opened = o(reverse, filterOpened, positions)
 
     return (
       <div style={ styles.root }>
