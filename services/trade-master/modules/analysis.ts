@@ -1,12 +1,12 @@
 import {
-  curryN, o, equals, cond, always, either, isNil, converge, pair, prop,
-  composeP, tail, head, when, nth, T, not, length, both, zipObj, allPass
+    always, both, composeP, cond, converge, either, equals, head, isNil, length, not, nth, o, pair,
+    prop, T, tail, when, zipObj,
 } from 'ramda'
 
 import { log } from '../../utils/log'
-import { suitableSymbolsFromTicker } from './symbols'
 import { makeFetchCandles } from './candles'
-import { wrIsStartedGrow, obvIsGrow, cciIsGrow } from './indicators'
+import { cciIsGrow, obvIsGrow, wrIsJustGrow, wrIsStartedGrow } from './indicators'
+import { suitableSymbolsFromTicker } from './symbols'
 
 type MainInput = {
   fetchTicker: () => Promise<{ symbol: string, priceChangePercent: string }[]>,
@@ -18,12 +18,12 @@ type MainInput = {
 // Move to module states
 // TODO: reqrite it. THINK!
 const propEqFalse: (a: string) => (b: {}) => boolean = converge(equals, [ always(false), prop ])
-const m = n => 1000 * 60 * n
+const m = (n: number): number => 1000 * 60 * n
 const checkTimeOffset = cond([
   [ propEqFalse('4h'), always(m(30)) ],
   [ propEqFalse('1h'), always(m(15)) ],
   [ propEqFalse('15m'), always(m(6)) ],
-  [ T, always(m(3)) ]
+  [ T, always(m(3)) ],
 ])
 const compareTimes = ([ a, b ]: [ number, number ]) => Date.now() - b > new Date(a).getTime()
 const needToCheck = either(isNil, o(compareTimes, converge(pair, [ prop('timestamp'), checkTimeOffset ])))
@@ -34,8 +34,8 @@ const computeState = ([ symbol, candles ]: [ string, number[][] ]) =>
     Date.now(),
     symbol,
     o(both(obvIsGrow, cciIsGrow), nth(0), candles),
-    o(both(obvIsGrow, cciIsGrow), nth(1), candles),
-    o(both(obvIsGrow, wrIsStartedGrow), nth(2), candles)
+    o(both(obvIsGrow, wrIsJustGrow), nth(1), candles),
+    o(both(obvIsGrow, wrIsStartedGrow), nth(2), candles),
   ])
 
 const isNotLastIteration = o(o(not, equals(1)), length)
@@ -45,11 +45,12 @@ export const fetchCandlesRecursively = (requests: FetchReqs) =>
   async (symbols: string[]): Promise<any> => {
     const { fetchSymbolState, fetchCandles, saveSymbolState } = requests
     const doFetch = fetchCandlesRecursively(requests)
-    const symbol = head(symbols)
+    const symbol = head(symbols) as string
     const currState = await fetchSymbolState(symbol)
 
-    if (needToCheck(currState))
+    if (needToCheck(currState)) {
       await composeP(o(saveSymbolState, computeState), makeFetchCandles(fetchCandles))(symbol)
+    }
     return when(isNotLastIteration, o(doFetch, tail))(symbols)
   }
 
