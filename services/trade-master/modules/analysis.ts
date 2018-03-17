@@ -1,11 +1,11 @@
 import {
     always, both, composeP, cond, converge, either, equals, head, isNil, length, not, nth, o, pair,
-    prop, T, tail, when, zipObj,
+    prop, T, tail, when, zipObj, allPass,
 } from 'ramda'
 
 import { log } from '../../utils/log'
 import { makeFetchCandles } from './candles'
-import { cciIsGrow, obvIsGrow, wrIsJustGrow, wrIsStartedGrow } from './indicators'
+import { cciIsGrow, obvIsGrow, emaIsPositive, wrIsStartedGrow } from './indicators'
 import { suitableSymbolsFromTicker } from './symbols'
 
 type MainInput = {
@@ -33,8 +33,8 @@ const computeState = ([ symbol, candles ]: [ string, number[][] ]) =>
   zipSymbolState([
     Date.now(),
     symbol,
-    o(both(obvIsGrow, cciIsGrow), nth(0), candles),
-    o(both(obvIsGrow, wrIsJustGrow), nth(1), candles),
+    o(allPass([ obvIsGrow, cciIsGrow, emaIsPositive ]), nth(0), candles),
+    o(allPass([ obvIsGrow, cciIsGrow, wrIsStartedGrow ]), nth(1), candles),
     o(both(obvIsGrow, wrIsStartedGrow), nth(2), candles),
   ])
 
