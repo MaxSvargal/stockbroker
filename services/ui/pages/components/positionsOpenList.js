@@ -16,15 +16,12 @@ export default class extends Component {
   }
 
   render() {
+    const { positions, chunksNumber } = this.props
     const styles = this.getStyles()
-    const opened = filterOpened(this.props.positions)
+    const opened = filterOpened(positions)
 
     return (
       <div style={ styles.root }>
-        <div style={ styles.head }>
-          <h2 style={ styles.h2 }>Opened positions</h2>
-          <strong style={ styles.headCounter }>{ length(opened) } / { this.props.chunksNumber }</strong>
-        </div>
         <div style={ styles.list }>
           { opened.map(pos =>
             <Item
@@ -43,24 +40,10 @@ export default class extends Component {
         width: '100vw',
         overflow: 'scroll'
       },
-      head: {
-        display: 'flex',
-        flexFlow: 'row nowrap',
-        alignItems: 'center',
-        marginBottom: '.5rem'
-      },
-      h2: {
-        margin: 0
-      },
-      headCounter: {
-        fontSize: '0.9rem',
-        margin: '0 1rem',
-        color: '#999'
-      },
       list: {
         display: 'flex',
         flexFlow: 'row wrap',
-        height: '25vh'
+        justifyContent: 'space-around'
       }
     }
   }

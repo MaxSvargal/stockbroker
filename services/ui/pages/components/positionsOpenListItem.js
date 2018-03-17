@@ -33,11 +33,15 @@ export default class extends Component {
       root: (price, ticker) => ({
         display: 'flex',
         flexFlow: 'row nowrap',
-        flexBasis: '23vw', // TODO fix it
-        justifyContent: 'center',
         alignItems: 'center',
-        padding: '0.5rem',
-        color: ticker > price ? '#3fb0ac' : '#963019'
+        alignContent: 'stretch',
+        justifyContent: 'center',
+        padding: '1vw',
+        color: ticker > price ? '#4B6227' : '#804743',
+        background: ticker > price ? '#F3F7EE' : '#FFF7F6',
+        border: `1px solid ${ticker > price ? '#D7EDB6' : '#FFDCD9'}`,
+        flexGrow: 1,
+        flexBasis: 0
       }),
       header: {
         marginRight: '0.5rem',

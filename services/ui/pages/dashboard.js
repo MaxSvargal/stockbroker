@@ -4,6 +4,7 @@ import ProfitWaterfall from './components/profitWaterfall'
 import ProfitLine from './components/profitLine'
 import PositionsTimeline from './components/positionsTimeline'
 import PositionsOpenList from './components/positionsOpenList'
+import Balance from './components/balance'
 
 export default class extends Component {
   static getInitialProps = async ({ query: { positions, profile } }) => ({ positions, profile })
@@ -17,9 +18,10 @@ export default class extends Component {
 
     return !this.state.loaded ? <div/> : (
       <div style={ styles.root } >
-        <PositionsOpenList
-          positions={ positions }
-          chunksNumber={ preferences.chunksNumber } />
+        <div style={ styles.row } >
+          <Balance positions={ positions } chunksNumber={ preferences.chunksNumber } />
+        </div>
+        <PositionsOpenList positions={ positions } />
         <div style={ styles.row } >
           <ProfitWaterfall positions={ positions } />
           <ProfitLine positions={ positions } />
