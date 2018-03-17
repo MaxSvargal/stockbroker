@@ -1,20 +1,28 @@
 import React, { Component } from 'react'
-import { filter, propEq, prop, map, compose, sum, o, length } from 'ramda'
+import { apply, filter, propEq, prop, map, compose, sum, o, length, reject, isNil, path, converge, multiply, divide } from 'ramda'
 
-const filterClosed = filter(propEq('closed', true))
 const filterOpened = filter(propEq('closed', false))
-const getBalance = compose(sum, map(prop('profitAmount')), filterClosed)
+const filterClosed = filter(propEq('closed', true))
+const getBalance = compose(sum, reject(isNil), map(prop('profitAmount')))
+const sumOfAmounts = o(sum, map(converge(multiply, [ path([ 'open', 'price' ]), path([ 'open', 'origQty' ]) ])))
+const profitPerc = o(multiply(100), apply(divide))
 
 export default class extends Component {
   render() {
     const { positions, chunksNumber } = this.props
     const balance = getBalance(positions)
+    const amount = o(sumOfAmounts, filterClosed, positions)
+    const profit = profitPerc([ balance, amount ])
+
     const openedLen = o(length, filterOpened, positions)
     const styles = this.getStyles()
 
     return (
       <div style={ styles.root }>
-        <div style={ styles.row }>Profit balance: <strong>{ balance.toFixed(8) } BTC</strong></div>
+        <div style={ styles.row }>
+          Profit balance: <strong>{ balance.toFixed(8) } BTC</strong> |
+          <small> +{ profit.toFixed(4) }% of { amount.toFixed(8) } BTC</small>
+        </div>
         <div style={ styles.row }>Opened positions: <strong>{ openedLen } / { chunksNumber }</strong></div>
       </div>
     )
