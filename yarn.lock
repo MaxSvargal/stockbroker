@@ -162,9 +162,9 @@
   version "0.0.30"
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-0.0.30.tgz#dc1e40f7af3b9c815013a7860e6252f6352a84df"
 
-"@types/jest@22.1.0":
-  version "22.1.0"
-  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-22.1.0.tgz#c1de03bbac66fac4cc741f7a69cb73bc01a1707c"
+"@types/jest@22.2.0":
+  version "22.2.0"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-22.2.0.tgz#55ce83139f7ad1b48b414c3927746614c6963c0f"
 
 "@types/long@^3.0.32":
   version "3.0.32"
@@ -187,9 +187,9 @@
   version "9.4.6"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-9.4.6.tgz#d8176d864ee48753d053783e4e463aec86b8d82e"
 
-"@types/node@9.4.0":
-  version "9.4.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.4.0.tgz#b85a0bcf1e1cc84eb4901b7e96966aedc6f078d1"
+"@types/node@9.4.7":
+  version "9.4.7"
+  resolved "http://registry.npmjs.org/@types/node/-/node-9.4.7.tgz#57d81cd98719df2c9de118f2d5f3b1120dcd7275"
 
 "@types/node@^6.0.96":
   version "6.0.101"
@@ -207,9 +207,9 @@
   version "16.0.40"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-16.0.40.tgz#caabc2296886f40b67f6fc80f0f3464476461df9"
 
-"@types/rethinkdb@^2.3.8":
-  version "2.3.8"
-  resolved "https://registry.yarnpkg.com/@types/rethinkdb/-/rethinkdb-2.3.8.tgz#961f78f0e731668631891bd1199722bb4a2258a8"
+"@types/rethinkdb@^2.3.9":
+  version "2.3.9"
+  resolved "https://registry.yarnpkg.com/@types/rethinkdb/-/rethinkdb-2.3.9.tgz#f3c387e663591abf9edb00405487d09ec79cd14f"
   dependencies:
     "@types/node" "*"
 
@@ -1217,13 +1217,14 @@ big.js@^3.1.3:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-3.2.0.tgz#a5fc298b81b9e0dca2e458824784b65c52ba588e"
 
-binance-api-node@0.5.5:
-  version "0.5.5"
-  resolved "https://registry.yarnpkg.com/binance-api-node/-/binance-api-node-0.5.5.tgz#f32b90564a8d65b855a316382ada1ad05cf943a9"
+binance-api-node@0.7.3:
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/binance-api-node/-/binance-api-node-0.7.3.tgz#e29aa75e824633d1e5bfcd47c04cb06ef8116408"
   dependencies:
+    html5-websocket "^2.0.2"
     isomorphic-fetch "^2.2.1"
     lodash.zipobject "^4.1.3"
-    ws "^3.2.0"
+    reconnecting-websocket "^3.2.2"
 
 binary-extensions@^1.0.0:
   version "1.11.0"
@@ -2894,9 +2895,9 @@ glamor@^2.20.40:
     prop-types "^15.5.10"
     through "^2.3.8"
 
-glamorous@^4.11.4:
-  version "4.12.0"
-  resolved "https://registry.yarnpkg.com/glamorous/-/glamorous-4.12.0.tgz#47b864326ca37e1f1ea6d523b3d23402f6657af1"
+glamorous@^4.12.1:
+  version "4.12.1"
+  resolved "https://registry.yarnpkg.com/glamorous/-/glamorous-4.12.1.tgz#bcfa00f3d24c9232da33bc2b415e0d3ca7b10f68"
   dependencies:
     brcast "^3.0.0"
     fast-memoize "^2.2.7"
@@ -3210,6 +3211,12 @@ html-entities@^1.2.0:
 html-tag-names@^1.1.1:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/html-tag-names/-/html-tag-names-1.1.2.tgz#f65168964c5a9c82675efda882875dcb2a875c22"
+
+html5-websocket@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/html5-websocket/-/html5-websocket-2.0.2.tgz#52bff70507b61c7457ed693fed47ad9244dab438"
+  dependencies:
+    ws "^3.1.0"
 
 htmlescape@1.1.1:
   version "1.1.1"
@@ -4782,9 +4789,9 @@ next@5.0.0:
     write-file-webpack-plugin "4.2.0"
     xss-filters "1.2.7"
 
-node-fetch@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.0.0.tgz#982bba43ecd4f2922a29cc186a6bbb0bb73fcba6"
+node-fetch@2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.1.1.tgz#369ca70b82f50c86496104a6c776d274f4e4a2d4"
 
 node-fetch@^1.0.1:
   version "1.7.3"
@@ -4854,9 +4861,9 @@ node-uuid@^1.4.3:
   version "1.4.8"
   resolved "https://registry.yarnpkg.com/node-uuid/-/node-uuid-1.4.8.tgz#b040eb0923968afabf8d32fb1f17f1167fdab907"
 
-nodemon@^1.14.0:
-  version "1.17.1"
-  resolved "https://registry.yarnpkg.com/nodemon/-/nodemon-1.17.1.tgz#cdb4bc53d7a86d6162143a1a44d7adf927d8652f"
+nodemon@^1.17.2:
+  version "1.17.2"
+  resolved "https://registry.yarnpkg.com/nodemon/-/nodemon-1.17.2.tgz#17c0062629610e03dd01241c576f1c4068da9fdd"
   dependencies:
     chokidar "^2.0.2"
     debug "^3.1.0"
@@ -5719,6 +5726,10 @@ rechoir@^0.6.2:
   dependencies:
     resolve "^1.1.6"
 
+reconnecting-websocket@^3.2.2:
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/reconnecting-websocket/-/reconnecting-websocket-3.2.2.tgz#8097514e926e9855e03c39e76efa2e3d1f371bee"
+
 recursive-copy@2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/recursive-copy/-/recursive-copy-2.0.6.tgz#d590f9eb5f165b96a1b80bc8f9cbcb5c6f9c89e9"
@@ -6578,9 +6589,9 @@ tar@^2.2.1:
     fstream "^1.0.2"
     inherits "2"
 
-technicalindicators@^1.0.21:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/technicalindicators/-/technicalindicators-1.1.4.tgz#1d62c6d8db31c93c0dea62292e78fab8c6a7ed22"
+technicalindicators@^1.1.8:
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/technicalindicators/-/technicalindicators-1.1.8.tgz#aa7ffc6764f8a35f45fd907e5cdf46b6f8406286"
   dependencies:
     "@types/node" "^6.0.96"
     babel-polyfill "^6.23.0"
@@ -7206,7 +7217,7 @@ write-file-webpack-plugin@4.2.0:
     mkdirp "^0.5.1"
     moment "^2.11.2"
 
-ws@^3.2.0, ws@~3.3.1:
+ws@^3.1.0, ws@~3.3.1:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/ws/-/ws-3.3.3.tgz#f1cf84fe2d5e901ebce94efaece785f187a228f2"
   dependencies:
