@@ -1,7 +1,7 @@
 const r = require('rethinkdb')
+const connect = async () => await r.connect({ host: 'localhost', port: 28015 }) 
 
-const getPositions = async (account) => {
-  const conn = await r.connect({ host: 'localhost', port: 28015 })
+const getPositions = (conn) => async (account) => {
   const cursor = await r.db('stockbroker')
     .table('positions')
     .getAll(account, { index: 'account' })
@@ -10,4 +10,10 @@ const getPositions = async (account) => {
   return await cursor.toArray()
 }
 
-module.exports = { getPositions }
+const getProfile = (conn) => async (account) =>
+  await r.db('stockbroker')
+    .table('accounts')
+    .get(account)
+    .run(conn)
+
+module.exports = { connect, getPositions, getProfile }

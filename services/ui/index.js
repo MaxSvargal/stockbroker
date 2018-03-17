@@ -1,7 +1,8 @@
 const Koa = require('koa')
-const next = require('next')
 const Router = require('koa-router')
-const { getPositions } = require('./db')
+const next = require('next')
+const auth = require('koa-basic-auth')
+const { connect, getPositions, getProfile } = require('./db')
 
 const port = parseInt(process.env.PORT, 10) || 3000
 const dev = process.env.NODE_ENV !== 'production'
@@ -16,8 +17,10 @@ app.prepare()
   const router = new Router()
 
   router.get('/dashboard', async ctx => {
-    const positions = await getPositions(account)
-    await app.render(ctx.req, ctx.res, '/dashboard', { positions })
+    const conn = await connect()
+    const positions = await getPositions(conn)(account)
+    const profile = await getProfile(conn)(account)
+    await app.render(ctx.req, ctx.res, '/dashboard', { positions, profile })
     ctx.respond = false
   })
 
@@ -36,6 +39,20 @@ app.prepare()
     await next()
   })
 
+  server.use(async (ctx, next) => {
+    try {
+      await next()
+    } catch (err) {
+      if (err.status === 401) {
+        ctx.status = 401
+        ctx.set('WWW-Authenticate', 'Basic')
+        ctx.body = 'NaNaNaN Batman!'
+      } else {
+        throw err
+      }
+    }
+  })
+  server.use(auth({ name: 'bullionist', pass: '#bullionist!' }))
   server.use(router.routes())
   server.listen(port, (err) => {
     if (err) throw err

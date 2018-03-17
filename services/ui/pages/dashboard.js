@@ -6,17 +6,20 @@ import PositionsTimeline from './components/positionsTimeline'
 import PositionsOpenList from './components/positionsOpenList'
 
 export default class extends Component {
-  static getInitialProps = async ({ query: { positions } }) => ({ positions })
+  static getInitialProps = async ({ query: { positions, profile } }) => ({ positions, profile })
   state = { loaded: false }
+
   componentDidMount() { this.setState({ loaded: true }) }
 
   render() {
-    const { positions } = this.props
+    const { positions, profile: { preferences } } = this.props
     const styles = this.getStyles()
 
     return !this.state.loaded ? <div/> : (
       <div style={ styles.root } >
-        <PositionsOpenList positions={ positions } />
+        <PositionsOpenList
+          positions={ positions }
+          chunksNumber={ preferences.chunksNumber } />
         <div style={ styles.row } >
           <ProfitWaterfall positions={ positions } />
           <ProfitLine positions={ positions } />

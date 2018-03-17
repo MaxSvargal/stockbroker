@@ -23,7 +23,7 @@ export default class extends Component {
       <div style={ styles.root }>
         <div style={ styles.head }>
           <h2 style={ styles.h2 }>Opened positions</h2>
-          <strong style={ styles.headCounter }>{ length(opened) } / 12</strong>
+          <strong style={ styles.headCounter }>{ length(opened) } / { this.props.chunksNumber }</strong>
         </div>
         <div style={ styles.list }>
           { opened.map(pos =>
