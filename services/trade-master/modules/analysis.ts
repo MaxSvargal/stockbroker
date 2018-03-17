@@ -33,8 +33,8 @@ const computeState = ([ symbol, candles ]: [ string, number[][] ]) =>
   zipSymbolState([
     Date.now(),
     symbol,
-    o(both(obvIsGrow, wrIsStartedGrow), nth(0), candles),
-    o(both(obvIsGrow, emaIsPositive), nth(1), candles),
+    o(allPass([ obvIsGrow, emaIsPositive, wrIsJustGrow ]), nth(0), candles),
+    o(allPass([ obvIsGrow, emaIsPositive, wrIsStartedGrow ]), nth(1), candles),
     o(both(obvIsGrow, cciIsGrow), nth(2), candles)
   ])
 
