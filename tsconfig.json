@@ -18,7 +18,9 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
   },
   "exclude": [
     "build",
