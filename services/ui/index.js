@@ -2,6 +2,7 @@ const Koa = require('koa')
 const Router = require('koa-router')
 const next = require('next')
 const auth = require('koa-basic-auth')
+const mount = require('koa-mount')
 const { connect, getPositions, getProfile } = require('./db')
 
 const port = parseInt(process.env.PORT, 10) || 3000
@@ -52,7 +53,7 @@ app.prepare()
       }
     }
   })
-  server.use(auth({ name: 'bullionist', pass: '#bullionist!' }))
+  server.use(mount('/dashboard', auth({ name: 'bullionist', pass: '#bullionist!' })))
   server.use(router.routes())
   server.listen(port, (err) => {
     if (err) throw err
