@@ -1,11 +1,11 @@
-import { o, map, props, flip, invoker, curry, compose, when, not, isNil } from 'ramda'
-import { Stream, periodic, observe } from 'most'
-import { Requester, Publisher } from 'cote'
+import { Publisher } from 'cote'
+import { observe, Stream } from 'most'
+import { compose, curry, flip, invoker, isNil, map, not, o, props, when } from 'ramda'
 
 import makeAnalysis from './analysis'
 
 const limit = 36
-const candlesFrames = [ '1m', '15m', '2h' ]
+const candlesFrames = [ '1m', '15m', '4h' ]
 
 const invokePublish = invoker(2, 'publish')
 const invokePublishNewSignal = flip(invokePublish('newSignal'))
