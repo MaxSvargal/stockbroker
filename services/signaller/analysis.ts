@@ -5,8 +5,6 @@ import { williamsr } from 'technicalindicators'
 
 import log from '../utils/log'
 
-let instantBuy = true
-
 const getCandlesParts: (a: any[][]) => number[][] =
   juxt(map(o(map as any, nth), range(0, 6)) as any)
 
@@ -47,13 +45,6 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m, 
       time: new Date().getTime(),
       forced: forcedSellSignal,
     }
-  }
-
-  if (equals(true, instantBuy)) {
-    instantBuy = false
-
-    log(`${symbol} SIG ${'🚀  INSTANT BUY'} ${last(closeShort)}`)
-    return { symbol, side: 'BUY', price: last(closeShort), time: new Date().getTime() }
   }
 
   return null
