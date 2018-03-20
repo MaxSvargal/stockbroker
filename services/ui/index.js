@@ -3,6 +3,7 @@ const Router = require('koa-router')
 const next = require('next')
 const auth = require('koa-basic-auth')
 const mount = require('koa-mount')
+const fetch = require('isomorphic-fetch')
 const { connect, getPositions, getProfile } = require('./db')
 
 const port = parseInt(process.env.PORT, 10) || 3000
@@ -40,6 +41,12 @@ app.prepare()
   router.get('/api/profile', async ctx => {
     const conn = await connect()
     ctx.body = await getProfile(conn)(account)
+  })
+
+  router.get('/api/candles/:symbol/:interval/:limit', async ctx => {
+    const { symbol, interval, limit } = ctx.params
+    const res = await fetch(`https://api.binance.com/api/v1/klines?interval=${interval}&limit=${limit}&symbol=${symbol}`)
+    ctx.body = await res.json()
   })
 
   router.get('*', async ctx => {

@@ -44,9 +44,7 @@ export default class extends Component {
   }
 
   async componentDidMount () {
-    const res = await window.fetch(
-      `https://api.binance.com/api/v1/klines?interval=15m&limit=96&symbol=${this.props.position.symbol}`
-    )
+    const res = await window.fetch(`${location.origin}/api/candles/${this.props.position.symbol}/15m/96`)
     const candles = await res.json()
     this.setState({ candles: candles })
   }
@@ -73,13 +71,13 @@ export default class extends Component {
           <Div display='flex' margin='0 1rem' lineHeight='1.8rem' >
             <Div fontSize='1.14rem' color={ticker > openPrice ? '#9e9d24' : '#d84315' }>
               <div>{ ticker || '~' }</div>
-              <div>{ openPrice }</div>
               <div>{ getPriceWProfit(openPrice).toFixed(8) }</div>
+              <div>{ openPrice }</div>
             </Div>
             <Div fontSize='.8rem' color={ticker > openPrice ? '#c0ca33' : '#ef6c00' } marginLeft='.5rem'>
               <div>curent</div>
-              <div>bought</div>
               <div>expect</div>
+              <div>bought</div>
             </Div>
           </Div>
         </Div>

@@ -21,8 +21,8 @@ export default class extends Component {
     if (positions && profile) return { positions, profile }
 
     const reqs = await Promise.all([
-      fetch('http://localhost:3000/api/positions'),
-      fetch('http://localhost:3000/api/profile')
+      fetch(`${location.origin}/api/positions`),
+      fetch(`${location.origin}/api/profile`)
     ])
     const [ posJson, profJson ] = await Promise.all(reqs.map(v => v.json()))
     return { positions: posJson, profile: profJson }
