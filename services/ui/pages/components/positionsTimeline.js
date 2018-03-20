@@ -9,6 +9,7 @@ export default class extends Component {
   }
 
   render() {
+    console.log(this.props)
     const data = this.getRows(this.props.positions)
 
     return <Chart
@@ -21,11 +22,8 @@ export default class extends Component {
         { id: 'closed', type: 'date' }
       ] }
       rows={ data }
-      width="100%"
-      height="100%"
-      options={ {
-        height: 800
-      } }
+      width="99%"
+      height="100vh"
       chartPackage={ [ 'timeline' ] }
     />
   }

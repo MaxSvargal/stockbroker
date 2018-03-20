@@ -20,20 +20,45 @@ export default class extends Component {
   render() {
     const data = this.composeProfitRows()(this.props.positions)
 
-    return <Chart
-      chartType='LineChart'
-      columns={ [
-        { label: 'time', type: 'datetime' },
-        { label: 'balance', type: 'number' }
-      ] }
-      rows={ data }
-      legend={ true }
-      options={ {
-        hAxis: { title: 'Time' },
-        vAxis: { title: 'Balance' },
-        curveType: 'function'
-      } }
-      width="100%"
-    />
+    return <div style={{ position: 'relative', overflow: 'hidden' }}>
+      <div style={{ margin: '-3rem 0 0 -3rem', width: '120%' }}>
+        <Chart
+          chartType='LineChart'
+          columns={ [
+            { label: 'time', type: 'datetime' },
+            { label: 'balance', type: 'number' }
+          ] }
+          rows={ data }
+          legend={ true }
+          options={ {
+            enableInteractivity: false,
+            legend: 'none',
+            hAxis: { title: 'Time' },
+            vAxis: { title: 'Balance', format: 'decimal' },
+            curveType: 'function',
+            colors: [ '#03a9f4' ],
+            hAxis: {
+              title: 'Day, Hour',
+              titleTextStyle: {
+                color: '#b0bec5'
+              },
+              textStyle: {
+                color: '#b0bec5'
+              }
+            },
+            vAxis: {
+              title: 'Absolute Profit',
+              gridlines: {
+                color: '#cfd8dc'
+              },
+              textStyle: {
+                color: '#b0bec5'
+              }
+            }
+          } }
+          width="100%"
+        />
+      </div>
+    </div>
   }
 }

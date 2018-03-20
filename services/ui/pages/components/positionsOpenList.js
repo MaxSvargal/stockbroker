@@ -21,29 +21,25 @@ export default class extends Component {
     const opened = o(reverse, filterOpened, positions)
 
     return (
-      <div style={ styles.root }>
-        <div style={ styles.list }>
-          { opened.map(pos =>
-            <Item
-              key={ pos.id }
-              position={ pos }
-              ticker={ prop(pos.symbol, this.state.ticker) } />
-          ) }
-        </div>
+      <div style={ styles.list }>
+        { opened.slice(0, 12).map(pos =>
+          <Item
+            key={ pos.id }
+            position={ pos }
+            ticker={ prop(pos.symbol, this.state.ticker) } />
+        ) }
       </div>
     )
   }
 
   getStyles() {
     return {
-      root: {
-        width: '100vw',
-        overflow: 'scroll'
-      },
       list: {
         display: 'flex',
-        flexFlow: 'row wrap',
-        justifyContent: 'space-around'
+        flexFlow: 'column nowrap',
+        justifyContent: 'space-around',
+        height: '100%',
+        overflow: 'scroll'
       }
     }
   }

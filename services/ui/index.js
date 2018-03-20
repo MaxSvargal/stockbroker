@@ -25,9 +25,21 @@ app.prepare()
     ctx.respond = false
   })
 
-  router.get('/b', async ctx => {
-    await app.render(ctx.req, ctx.res, '/a', ctx.query)
+  router.get('/timeline', async ctx => {
+    const conn = await connect()
+    const positions = await getPositions(conn)(account)
+    await app.render(ctx.req, ctx.res, '/timeline', { positions })
     ctx.respond = false
+  })
+
+  router.get('/api/positions', async ctx => {
+    const conn = await connect()
+    ctx.body = await getPositions(conn)(account)
+  })
+
+  router.get('/api/profile', async ctx => {
+    const conn = await connect()
+    ctx.body = await getProfile(conn)(account)
   })
 
   router.get('*', async ctx => {

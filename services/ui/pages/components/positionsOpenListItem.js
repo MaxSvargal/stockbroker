@@ -1,61 +1,89 @@
 import React, { Component } from 'react'
+import { o, map, nth, converge, pair, path, prop } from 'ramda'
+import glamorous, { Div } from 'glamorous'
+
+import CandlesChart from './candlesChart'
+
+const Container = glamorous.div(({ positive }) => ({
+  position: 'relative',
+  overflow: 'hiddden',
+  display: 'flex',
+  flexFlow: 'row nowrap',
+  alignItems: 'center',
+  alignContent: 'stretch',
+  justifyContent: 'space-evently',
+  color: positive ? '#4B6227' : '#804743',
+  background: '#fafafa',
+  borderTop: `1px solid ${positive ? '#D7EDB6' : '#fff'}`,
+  borderBottom: `1px solid ${positive ? '#D7EDB6' : '#fce4ec'}`,
+  '> *': {
+    flex: '1 100%'
+  }
+}))
+
+const HeadTitle = glamorous.div(({ positive }) => ({
+  position: 'absolute',
+  height: '100%',
+  top: '0',
+  left: '0',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: '3.14rem',
+  wordSpacing: '1rem',
+  margin: '0 1rem',
+  color: positive ? '#c0ca33' : '#f48fb1'
+}))
 
 export default class extends Component {
-  shouldComponentUpdate(nextProps) {
-    return this.props.ticker !== nextProps.ticker
+  state = { candles: [] }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.props.ticker !== nextProps.ticker ||
+      this.state.candles.length !== nextState.candles.length // TODO: fix it
+  }
+
+  async componentDidMount () {
+    const res = await window.fetch(
+      `https://api.binance.com/api/v1/klines?interval=15m&limit=96&symbol=${this.props.position.symbol}`
+    )
+    const candles = await res.json()
+    this.setState({ candles: candles })
+  }
+
+  static getPriceWProfit (price) {
+    return price + (price * 0.007)
   }
 
   render() {
-    const styles = this.getStyles()
-    const { position: p, ticker } = this.props
+    const { position, ticker } = this.props
+    const { getPriceWProfit } = this.constructor
+
+    const openPrice = path([ 'open', 'price' ], position)
+    const candles = map(o(parseFloat, nth(4)), this.state.candles)
+    const chadlesChartData = candles.map((v, i) => [ i, v, getPriceWProfit(openPrice) ])
 
     return (
-      <div style={ styles.root(p.open.price, ticker) }>
-        <div style={ styles.header } >{ p.symbol }</div>
-        <div style={ styles.prices } >
-          <div style={ styles.column } >
-            <div>bought</div>
-            <div>expect</div>
-            <div>curent</div>
-          </div>
-          <div style={ styles.column } >
-            <div><strong>{ p.open.price }</strong></div>
-            <div><strong>{ (p.open.price + (p.open.price * 0.007)).toFixed(8) }</strong></div>
-            <div><strong>{ ticker }</strong></div>
-          </div>
-        </div>
-      </div>
+      <Container positive={ ticker > openPrice } >
+        <Div flex='10'>
+          <CandlesChart data={ chadlesChartData } type={ ticker > openPrice ? 'positive' : 'default' } />
+          <HeadTitle positive={ ticker > openPrice }>{ prop('symbol', position) }</HeadTitle>
+        </Div>
+        <Div flex='2'>
+          <Div display='flex' margin='0 1rem' lineHeight='1.8rem' >
+            <Div fontSize='1.14rem' color={ticker > openPrice ? '#9e9d24' : '#d84315' }>
+              <div>{ ticker || '~' }</div>
+              <div>{ openPrice }</div>
+              <div>{ getPriceWProfit(openPrice).toFixed(8) }</div>
+            </Div>
+            <Div fontSize='.8rem' color={ticker > openPrice ? '#c0ca33' : '#ef6c00' } marginLeft='.5rem'>
+              <div>curent</div>
+              <div>bought</div>
+              <div>expect</div>
+            </Div>
+          </Div>
+        </Div>
+      </Container>
     )
-  }
-
-  getStyles() {
-    return {
-      root: (price, ticker) => ({
-        display: 'flex',
-        flexFlow: 'row nowrap',
-        alignItems: 'center',
-        alignContent: 'stretch',
-        justifyContent: 'center',
-        padding: '1vw',
-        color: ticker > price ? '#4B6227' : '#804743',
-        background: ticker > price ? '#F3F7EE' : '#FFF7F6',
-        border: `1px solid ${ticker > price ? '#D7EDB6' : '#FFDCD9'}`,
-        flexGrow: 1,
-        flexBasis: 0
-      }),
-      header: {
-        marginRight: '0.5rem',
-        fontSize: '2.25rem'
-      },
-      prices: {
-        fontSize: '0.8rem',
-        lineHeight: '1.34em',
-        display: 'flex',
-        flexFlow: 'row nowrap'
-      },
-      column: {
-        margin: '0 .25rem'
-      }
-    }
   }
 }
