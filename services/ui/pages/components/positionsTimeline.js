@@ -9,7 +9,6 @@ export default class extends Component {
   }
 
   render() {
-    console.log(this.props)
     const data = this.getRows(this.props.positions)
 
     return <Chart

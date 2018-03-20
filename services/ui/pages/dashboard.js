@@ -32,7 +32,6 @@ export default class extends Component {
 
   render() {
     const { positions, profile } = this.props
-    console.log(this.props)
     
     css.global('html, body', {
       background: '#fff',
