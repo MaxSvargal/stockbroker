@@ -30,6 +30,7 @@ export default class extends Component {
             ],
             enableInteractivity: false,
             hAxis: {
+              logScale: true,
               baseline: 0,
               baselineColor: 'transparent',
               gridlines: {
@@ -51,6 +52,7 @@ export default class extends Component {
               }
             },
             vAxis: {
+              logScale: true,
               baseline: 0,
               baselineColor: 'transparent',
               gridlines: {
