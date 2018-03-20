@@ -15,10 +15,7 @@ const Container = glamorous.div(({ positive }) => ({
   color: positive ? '#4B6227' : '#804743',
   background: '#fafafa',
   borderTop: `1px solid ${positive ? '#D7EDB6' : '#fff'}`,
-  borderBottom: `1px solid ${positive ? '#D7EDB6' : '#fce4ec'}`,
-  '> *': {
-    flex: '1 100%'
-  }
+  borderBottom: `1px solid ${positive ? '#D7EDB6' : '#fce4ec'}`
 }))
 
 const HeadTitle = glamorous.div(({ positive }) => ({
