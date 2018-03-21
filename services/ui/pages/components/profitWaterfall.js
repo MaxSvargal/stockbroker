@@ -43,44 +43,45 @@ export default class extends Component {
   render () {
     const data = o(this.getCandlesOfProfit(), this.composeProfitRows(), this.props.positions)
     return <div style={{ position: 'relative', overflow: 'hidden' }}>
-      <div style={{ margin: '-3rem 0 0 -3rem', width: '120%' }}>
-        <Chart
-          chartTitle='Waterfall'
-          chartType='CandlestickChart'
-          width='100%'
-          data={[
-            ['DATE', "val1", "val2", "val3", "val4"],
-            ...data
-          ]}
-          options={{
-            enableInteractivity: false,
-            legend: 'none',
-            bar: { groupWidth: '100%' },
-            candlestick: {
-              fallingColor: { strokeWidth: 0, fill: '#f06292' },
-              risingColor: { strokeWidth: 0, fill: '#4db6ac' },
+      <Chart
+        chartTitle='Waterfall'
+        chartType='CandlestickChart'
+        width='100%'
+        data={[
+          ['DATE', "val1", "val2", "val3", "val4"],
+          ...data
+        ]}
+        options={{
+          enableInteractivity: false,
+          legend: 'none',
+          bar: { groupWidth: '100%' },
+          candlestick: {
+            fallingColor: { strokeWidth: 0, fill: '#f06292' },
+            risingColor: { strokeWidth: 0, fill: '#4db6ac' },
+          },
+          hAxis: {
+            title: 'Day, Hour',
+            titleTextStyle: {
+              color: '#b0bec5'
             },
-            hAxis: {
-              title: 'Day, Hour',
-              titleTextStyle: {
-                color: '#b0bec5'
-              },
-              textStyle: {
-                color: '#b0bec5'
-              }
-            },
-            vAxis: {
-              title: 'Absolute Profit',
-              gridlines: {
-                color: '#cfd8dc'
-              },
-              textStyle: {
-                color: '#b0bec5'
-              }
+            textStyle: {
+              color: '#b0bec5'
             }
-          }}
-        />
-      </div>
+          },
+          vAxis: {
+            title: 'Absolute Profit',
+            titleTextStyle: {
+              color: '#b0bec5'
+            },
+            gridlines: {
+              color: '#cfd8dc'
+            },
+            textStyle: {
+              color: '#b0bec5'
+            }
+          }
+        }}
+      />
     </div>
   }
 }

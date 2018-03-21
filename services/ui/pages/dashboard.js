@@ -1,16 +1,10 @@
 import React, { Component } from 'react'
-import Link from 'next/link'
 import { rehydrate, css } from 'glamor'
 import glamorous from 'glamorous'
 
 import Balance from './components/balance'
-import CandlesChart from './components/candlesChart'
 import Menu from './components/menu'
 import PositionsOpenList from './components/positionsOpenList'
-import PositionsTimeline from './components/positionsTimeline'
-import ProfitLine from './components/profitLine'
-import ProfitWaterfall from './components/profitWaterfall'
-import Toggler from './components/toggler'
 
 if (typeof window !== 'undefined') rehydrate(window.__NEXT_DATA__.ids)
 
@@ -45,33 +39,33 @@ export default class extends Component {
     const Container = glamorous.div({
       height: '100vh',
       display: 'grid',
-      grid: '25vh 1fr / 5rem 1fr 1fr',
+      grid: '25vh 1fr / 5rem 1fr',
       gridTemplateAreas: `
-        "sidebar header1 header2"
+        "sidebar header header"
         "sidebar main main"
-        "sidebar footer footer"
-      `
+      `,
+      '@media(max-width: 480px)': {
+        grid: '5rem / 1fr',
+        gridTemplateAreas: `
+          "sidebar"
+          "header"
+          "main"
+        `
+      }
     })
 
-    const HeaderBalance = glamorous.div({ gridArea: 'header1' })
-    const HeaderGraph = glamorous.div({ gridArea: 'header2', overflow: 'hidden' })
-    const MainPositions = glamorous.div({ gridArea: 'main' })
+    const Header = glamorous.div({ gridArea: 'header' })
+    const Main = glamorous.div({ gridArea: 'main' })
 
     return !this.state.loaded ? <div/> : (
       <Container>
         <Menu />
-        <HeaderBalance>
-          <Balance positions={ positions } chunksNumber={ profile && profile.preferences.chunksNumber } />
-        </HeaderBalance>
-        <HeaderGraph>
-          <Toggler>
-            <ProfitWaterfall positions={ positions } />
-            <ProfitLine positions={ positions } />
-          </Toggler>
-        </HeaderGraph>
-        <MainPositions>
+        <Header>
+          <Balance positions={ positions } profile={ profile } />
+        </Header>
+        <Main>
           <PositionsOpenList positions={ positions } />
-        </MainPositions>
+        </Main>
       </Container>
     )
   }
