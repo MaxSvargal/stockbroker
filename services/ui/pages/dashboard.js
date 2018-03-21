@@ -39,7 +39,7 @@ export default class extends Component {
     const Container = glamorous.div({
       height: '100vh',
       display: 'grid',
-      grid: '25vh 1fr / 5rem 1fr',
+      grid: '30vh 1fr / 5rem 1fr',
       gridTemplateAreas: `
         "sidebar header header"
         "sidebar main main"
