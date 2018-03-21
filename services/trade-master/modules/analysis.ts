@@ -34,7 +34,7 @@ const computeState = ([ symbol, candles ]: [ string, number[][] ]) =>
     Date.now(),
     symbol,
     o(allPass([ obvIsGrow, cciIsGrow, emaIsPositive ]), nth(0), candles),
-    o(both(obvIsGrow, cciIsGrow), nth(1), candles),
+    o(allPass([ obvIsGrow, cciIsGrow, wrIsStartedGrow ]), nth(1), candles),
     o(both(obvIsGrow, wrIsStartedGrow), nth(2), candles),
   ])
 
