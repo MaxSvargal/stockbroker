@@ -71,7 +71,7 @@ export default class extends Component {
               <div>{ ticker || '~' }</div>
               <div>{ getPriceWProfit(openPrice).toFixed(8) }</div>
               <div>{ openPrice }</div>
-              <Div fontSize='.75em'>{ moment(path([ 'open', 'time' ], position)).format('hh:mm, D MMM') }</Div>
+              <Div fontSize='.75em'>{ moment(path([ 'open', 'time' ], position)).format('HH:mm, D MMM') }</Div>
             </Div>
             <Div fontSize='.8rem' color={ticker > openPrice ? '#c0ca33' : '#ef6c00' } marginLeft='.5rem'>
               <div>curent</div>

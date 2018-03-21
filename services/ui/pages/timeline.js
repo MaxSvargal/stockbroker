@@ -13,7 +13,7 @@ export default class extends Component {
   static async getInitialProps ({ query: { positions } }) {
     if (positions) return { positions }
 
-    const res = await fetch('http://localhost:3000/api/positions')
+    const res = await fetch(`${location.origin}/api/positions`)
     const json = await res.json()
     return { positions: json }
   }

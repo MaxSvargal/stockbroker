@@ -26,7 +26,7 @@ export default class extends Component {
             },
             colors: [
               this.props.type === 'positive' ? '#d4e157' : '#ec407a',
-              '#006064'
+              this.props.type === 'positive' ? '#2e7d32' : '#8e24aa'
             ],
             enableInteractivity: false,
             hAxis: {
@@ -48,7 +48,7 @@ export default class extends Component {
               },
               1: {
                 areaOpacity: 0,
-                lineDashStyle: [ 1, 4 ]
+                lineDashStyle: [ 1, 12 ]
               }
             },
             vAxis: {

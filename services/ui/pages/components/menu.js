@@ -9,10 +9,12 @@ export default class extends Component {
       background: '#37474f',
       display: 'flex',
       flexFlow: 'column wrap',
-      alignItems: 'center'
+      alignItems: 'center',
+      padding: '1rem 0'
     })
 
     const MenuItem = glamorous.div({
+      cursor: 'pointer',
       color: '#ff7043',
       fontSize: '5rem',
       textAlign: 'center',
@@ -25,7 +27,7 @@ export default class extends Component {
         opacity: 0
       },
       ':hover': {
-        color: '#ffa726',
+        color: '#ffa726'
       },
       ':hover > small': {
         opacity: 1
