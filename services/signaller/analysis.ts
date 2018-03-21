@@ -22,7 +22,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m, 
 
   const wrShort = williamsr({ period: 10, close: closeShort, low: lowShort, high: highShort })
   const wrLong = williamsr({ period: 20, close: closeLong, low: lowLong, high: highLong })
-  const wrVLong = williamsr({ period: 20, close: closeVLong, low: lowVLong, high: highVLong })
+  const wrVLong = williamsr({ period: 28, close: closeVLong, low: lowVLong, high: highVLong })
   const lastPrice = o(parseFloat, last, closeShort)
 
   const buySignal = buyPass(wrShort)
