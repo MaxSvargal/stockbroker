@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { o, map, nth, converge, pair, path, prop } from 'ramda'
 import glamorous, { Div } from 'glamorous'
+import moment from 'moment'
 
 import CandlesChart from './candlesChart'
 
@@ -41,7 +42,7 @@ export default class extends Component {
   }
 
   async componentDidMount () {
-    const res = await window.fetch(`${location.origin}/api/candles/${this.props.position.symbol}/15m/96`)
+    const res = await window.fetch(`${location.origin}/api/candles/${this.props.position.symbol}/30m/48`)
     const candles = await res.json()
     this.setState({ candles: candles })
   }
@@ -70,11 +71,13 @@ export default class extends Component {
               <div>{ ticker || '~' }</div>
               <div>{ getPriceWProfit(openPrice).toFixed(8) }</div>
               <div>{ openPrice }</div>
+              <Div fontSize='.75em'>{ moment(path([ 'open', 'time' ], position)).format('hh:mm, D MMM') }</Div>
             </Div>
             <Div fontSize='.8rem' color={ticker > openPrice ? '#c0ca33' : '#ef6c00' } marginLeft='.5rem'>
               <div>curent</div>
               <div>expect</div>
               <div>bought</div>
+              <div>from</div>
             </Div>
           </Div>
         </Div>

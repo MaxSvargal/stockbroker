@@ -3,7 +3,7 @@ import { Chart } from 'react-google-charts'
 
 export default class extends Component {
   render () {
-    return <div style={{ position: 'relative', overflow: 'hidden', height: '6rem', width: '100%' }}>
+    return <div style={{ position: 'relative', overflow: 'hidden', height: '8rem', width: '100%' }}>
       { this.props.data && this.props.data.length <= 0 ? <div/> :
         <Chart
           chartType='AreaChart'
@@ -22,7 +22,7 @@ export default class extends Component {
               left: 0,
               top: 0,
               width: '100%',
-              height: '6rem'
+              height: '8rem'
             },
             colors: [
               this.props.type === 'positive' ? '#d4e157' : '#ec407a',
