@@ -15,10 +15,10 @@ const sellPass = both(o(lt(-20), prev), o(gt(-20), last))
 type MakeAnalysis = (a: string) => (xs: number[][][]) =>
   { symbol: string, side: string, price: number, time: number } | null
 
-const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles15m, candles4h ]) => {
+const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m, candles2h ]) => {
   const [ , , highShort, lowShort, closeShort ] = getCandlesParts(candles1m)
-  const [ , , highLong, lowLong, closeLong ] = getCandlesParts(candles15m)
-  const [ , , highVLong, lowVLong, closeVLong ] = getCandlesParts(candles4h)
+  const [ , , highLong, lowLong, closeLong ] = getCandlesParts(candles5m)
+  const [ , , highVLong, lowVLong, closeVLong ] = getCandlesParts(candles2h)
 
   const wrShort = williamsr({ period: 10, close: closeShort, low: lowShort, high: highShort })
   const wrLong = williamsr({ period: 14, close: closeLong, low: lowLong, high: highLong })
