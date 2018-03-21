@@ -10,7 +10,7 @@ import Toggler from './toggler'
 import PeriodSelector from './periodSelector'
 
 const getOpenedLength = o(length, filter(propEq('closed', false)))
-const timeInPeriod = period => time => time && !moment().isAfter(moment(time), period)
+const timeInPeriod = period => time => time && !moment().isAfter(moment(time).add(period))
 const openTimeInPeriod = converge(pathSatisfies, [ timeInPeriod, always([ 'close', 'time' ]) ])
 const filterCandlesByPeriod = period => filter(both(propEq('closed', true), openTimeInPeriod(period)))
 

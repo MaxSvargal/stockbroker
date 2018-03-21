@@ -33,10 +33,10 @@ export default class extends Component {
 
     return (
       <Menu>
-        <MenuItem onClick={this.onClick('day')}>day</MenuItem>
-        <MenuItem onClick={this.onClick('week')}>week</MenuItem>
-        <MenuItem onClick={this.onClick('month')}>month</MenuItem>
-        <MenuItem onClick={this.onClick('year')}>year</MenuItem>
+        <MenuItem onClick={this.onClick({ days: 1 })}>day</MenuItem>
+        <MenuItem onClick={this.onClick({ days: 7 })}>week</MenuItem>
+        <MenuItem onClick={this.onClick({ days: 30 })}>month</MenuItem>
+        <MenuItem onClick={this.onClick({ years: 1 })}>year</MenuItem>
       </Menu>
     )
   }
