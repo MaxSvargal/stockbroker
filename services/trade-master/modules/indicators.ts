@@ -22,9 +22,10 @@ const calcBB = compose(bollingerbands, assocPeriod(21), assocStdDev(2), objValue
 const calcOBV = compose(obv, prepareCandlesToOBV)
 const calcCCI = compose(cci, assocPeriod(20), prepareCandlesToCCI)
 const calcEMA = compose(last, ema, assocPeriod(4), objOf('values'))
-const calcEMALong = compose(last, ema, assocPeriod(25), objOf('values'))
+const calcEMAMedium = compose(last, ema, assocPeriod(9), objOf('values'))
+const calcEMALong = compose(last, ema, assocPeriod(28), objOf('values'))
 const pairEmaAndLast = converge(pair, [ calcEMA, last ])
-const pairEmaShortAndLong = o(converge(pair, [ calcEMA, calcEMALong ]), prepareCandlesToEMA)
+const pairEmaShortAndLong = o(converge(pair, [ calcEMAMedium, calcEMALong ]), prepareCandlesToEMA)
 
 const isGrow = <(a: any) => boolean>apply(lt)
 const isGrowAbs = <(a: any) => boolean>apply(gt)
