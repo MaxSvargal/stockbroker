@@ -23,11 +23,12 @@
     "next": "5.0.0",
     "node-fetch": "2.1.1",
     "pm2": "2.10.1",
-    "prop-types": "^15.6.0",
+    "prop-types": "^15.6.1",
     "ramda": "^0.25.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-google-charts": "^1.5.5",
+    "react-icons-kit": "^1.0.7",
     "rethinkdb": "^2.3.3",
     "technicalindicators": "^1.1.8",
     "ts-node": "5.0.1"

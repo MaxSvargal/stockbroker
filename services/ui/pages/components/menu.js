@@ -1,6 +1,11 @@
 import React, { Component } from 'react'
 import Link from 'next/link'
 import glamorous from 'glamorous'
+import Icon from 'react-icons-kit'
+import { ic_history as history } from 'react-icons-kit/md/ic_history'
+import { ic_notifications as notify } from 'react-icons-kit/md/ic_notifications'
+import { ic_timeline as timeline } from 'react-icons-kit/md/ic_timeline'
+import { ic_settings as settings } from 'react-icons-kit/md/ic_settings'
 
 export default class extends Component {
   render() {
@@ -36,8 +41,10 @@ export default class extends Component {
 
     return (
       <Menu>
-        <Link href='/dashboard'><MenuItem>★<small>Dashboard</small></MenuItem></Link>
-        <Link href='/timeline'><MenuItem>⚎<small>Timeline</small></MenuItem></Link>
+        <Link href='/dashboard'><MenuItem><Icon icon={notify} size={32} /><small>Dashboard</small></MenuItem></Link>
+        <Link href='/closed'><MenuItem><Icon icon={history} size={32} /><small>History</small></MenuItem></Link>
+        <Link href='/timeline'><MenuItem><Icon icon={timeline} size={32} /><small>Timeline</small></MenuItem></Link>
+        <Link href='/settings'><MenuItem><Icon icon={settings} size={32} /><small>Settings</small></MenuItem></Link>
       </Menu>
     )
   }
