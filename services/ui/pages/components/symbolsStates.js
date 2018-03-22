@@ -2,15 +2,23 @@ import React, { Component } from 'react'
 import glamorous, { Div } from 'glamorous'
 import {
   propEq, cond, T, always, equals, sortBy, props, o, join, reverse, compose,
-  converge, pair, nth, match
+  converge, pair, nth, match, concat
 } from 'ramda'
 
+const symbolBaseURI = 'https://www.binance.com/tradeDetail.html?symbol='
 const takePairFromSymbol = compose(converge(pair, [ nth(1), nth(2) ]), match(/(.+)(...)/))
+const makeExchangeSymbolURI = compose(concat(symbolBaseURI), join('_'), takePairFromSymbol)
 
 const getSymbolStateType = cond([
   [ propEq('15m', true), always('enabled') ],
   [ propEq('1h', true), always('prepared') ],
   [ T, always('growing') ]
+])
+
+const getSymbolStateTitle = cond([
+  [ propEq('15m', true), always('is ready to buy') ],
+  [ propEq('1h', true), always('is started grow') ],
+  [ T, always('is grow globally') ]
 ])
 
 const SymbolBlock = glamorous.a(({ type }) => ({
@@ -37,8 +45,11 @@ export default class extends Component {
       <Div display='flex' flexFlow='row wrap' justifyContent='space-between'>
         { sorted.map(v => (
           <SymbolBlock
+            key={v.symbol}
             type={getSymbolStateType(v)}
-            href={`https://www.binance.com/tradeDetail.html?symbol=${o(join('_'), takePairFromSymbol, v.symbol)}`}
+            href={makeExchangeSymbolURI(v.symbol)}
+            title={`${v.symbol} ${getSymbolStateTitle(v)}`}
+            target='_blank'
             >{ v.symbol }
           </SymbolBlock>
         )) }

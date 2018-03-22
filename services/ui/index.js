@@ -53,6 +53,11 @@ app.prepare()
     ctx.body = await getProfile(conn)(account)
   })
 
+  router.get('/api/symbolsState', async ctx => {
+    const conn = await connect()
+    ctx.body = await getSymbolsState(conn)(account)
+  })
+
   router.get('/api/candles/:symbol/:interval/:limit', async ctx => {
     const { symbol, interval, limit } = ctx.params
     const res = await fetch(`https://api.binance.com/api/v1/klines?interval=${interval}&limit=${limit}&symbol=${symbol}`)
