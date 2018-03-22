@@ -17,11 +17,10 @@ export default class extends Component {
 
   render() {
     const { positions, chunksNumber } = this.props
-    const styles = this.getStyles()
     const opened = o(reverse, filterOpened, positions)
 
     return (
-      <div style={ styles.list }>
+      <div>
         { opened.slice(0, 12).map(pos =>
           <Item
             key={ pos.id }
@@ -30,17 +29,5 @@ export default class extends Component {
         ) }
       </div>
     )
-  }
-
-  getStyles() {
-    return {
-      list: {
-        display: 'flex',
-        flexFlow: 'column nowrap',
-        justifyContent: 'space-around',
-        height: '100%',
-        overflow: 'scroll'
-      }
-    }
   }
 }

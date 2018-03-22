@@ -16,4 +16,12 @@ const getProfile = (conn) => async (account) =>
     .get(account)
     .run(conn)
 
-module.exports = { connect, getPositions, getProfile }
+const getSymbolsState = (conn) => async (account) => {
+  const cursor = await r.db('stockbroker')
+    .table('symbolsState')
+    .filter({ '4h': true })
+    .run(conn)
+  return await cursor.toArray()
+}
+
+module.exports = { connect, getPositions, getProfile, getSymbolsState }

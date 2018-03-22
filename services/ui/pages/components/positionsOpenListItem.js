@@ -6,8 +6,8 @@ import moment from 'moment'
 import CandlesChart from './candlesChart'
 
 const Container = glamorous.div(({ positive }) => ({
+  height: '8rem',
   position: 'relative',
-  overflow: 'hiddden',
   display: 'flex',
   flexFlow: 'row nowrap',
   alignItems: 'center',
@@ -21,7 +21,6 @@ const Container = glamorous.div(({ positive }) => ({
 
 const HeadTitle = glamorous.div(({ positive }) => ({
   position: 'absolute',
-  height: '100%',
   top: '0',
   left: '0',
   display: 'flex',

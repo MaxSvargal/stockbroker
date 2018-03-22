@@ -4,7 +4,7 @@ const next = require('next')
 const auth = require('koa-basic-auth')
 const mount = require('koa-mount')
 const fetch = require('isomorphic-fetch')
-const { connect, getPositions, getProfile } = require('./db')
+const { connect, getPositions, getProfile, getSymbolsState } = require('./db')
 
 const port = parseInt(process.env.PORT, 10) || 3000
 const dev = process.env.NODE_ENV !== 'production'
@@ -20,9 +20,12 @@ app.prepare()
 
   router.get('/dashboard', async ctx => {
     const conn = await connect()
-    const positions = await getPositions(conn)(account)
-    const profile = await getProfile(conn)(account)
-    await app.render(ctx.req, ctx.res, '/dashboard', { positions, profile })
+    const [ positions, profile, symbolsState ] = await Promise.all([
+      getPositions(conn)(account),
+      getProfile(conn)(account),
+      getSymbolsState(conn)(account)
+    ])
+    await app.render(ctx.req, ctx.res, '/dashboard', { positions, profile, symbolsState })
     ctx.respond = false
   })
 
@@ -30,6 +33,13 @@ app.prepare()
     const conn = await connect()
     const positions = await getPositions(conn)(account)
     await app.render(ctx.req, ctx.res, '/timeline', { positions })
+    ctx.respond = false
+  })
+
+  router.get('/closed', async ctx => {
+    const conn = await connect()
+    const positions = await getPositions(conn)(account)
+    await app.render(ctx.req, ctx.res, '/closed', { positions })
     ctx.respond = false
   })
 
