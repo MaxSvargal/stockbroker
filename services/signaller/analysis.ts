@@ -27,7 +27,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m, 
 
   const buySignal = buyPass(wrShort)
   const sellSignal = sellPass(wrLong)
-  // const forcedSellSignal = sellPass(wrVLong)
+  const forcedSellSignal = false //sellPass(wrVLong)
 
   // если курс пересёк минимальный профит сверху-вниз, то продавать по цене минимального профита
 
