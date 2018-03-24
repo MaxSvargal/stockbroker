@@ -7,12 +7,10 @@ import CandlesChart from './candlesChart'
 
 const Container = glamorous.div(({ positive }) => ({
   height: '8rem',
-  position: 'relative',
-  display: 'flex',
-  flexFlow: 'row nowrap',
+  display: 'grid',
+  grid: '1fr / 1fr 12rem',
   alignItems: 'center',
-  alignContent: 'stretch',
-  justifyContent: 'space-evently',
+  justifyItems: 'start',
   color: positive ? '#4B6227' : '#804743',
   background: '#fafafa',
   borderTop: `1px solid ${positive ? '#D7EDB6' : '#fff'}`,
@@ -20,13 +18,6 @@ const Container = glamorous.div(({ positive }) => ({
 }))
 
 const HeadTitle = glamorous.div(({ positive }) => ({
-  position: 'absolute',
-  height: '8rem',
-  top: '0',
-  left: '0',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
   fontSize: '3.14rem',
   wordSpacing: '1rem',
   margin: '0 1rem',
@@ -70,11 +61,17 @@ export default class extends Component {
 
     return (
       <Container positive={ ticker > openPrice } >
-        <Div flex='10'>
-          <CandlesChart data={ chadlesChartData } type={ ticker > openPrice ? 'positive' : 'default' } />
+        <Div gridArea='1 / 1 / 1 / 1' width='100%'>
+          <CandlesChart
+            width='100%'
+            height='8rem'
+            data={ chadlesChartData }
+            type={ ticker > openPrice ? 'positive' : 'default' } />
+        </Div>
+        <Div gridArea='1 / 1 / 1 / 1' zIndex='999'>
           <HeadTitle positive={ ticker > openPrice }>{ prop('symbol', position) }</HeadTitle>
         </Div>
-        <Div flex='2'>
+        <Div gridArea='1 / 2 / 1 / 2'>
           <Div display='flex' margin='0 1rem' lineHeight='1.8rem' >
             <Div fontSize='1.14rem' color={ticker > openPrice ? '#9e9d24' : '#d84315' }>
               <div>{ ticker || '~' }</div>
