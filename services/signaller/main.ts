@@ -5,7 +5,7 @@ import { compose, curry, flip, invoker, isNil, map, not, o, props, when } from '
 import makeAnalysis from './analysis'
 
 const limit = 36
-const candlesFrames = [ '1m', '15m' ]
+const candlesFrames = [ '1m', '5m' ]
 
 const invokePublish = invoker(2, 'publish')
 const invokePublishNewSignal = flip(invokePublish('newSignal'))
