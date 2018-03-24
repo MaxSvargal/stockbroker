@@ -21,6 +21,7 @@ const Container = glamorous.div(({ positive }) => ({
 
 const HeadTitle = glamorous.div(({ positive }) => ({
   position: 'absolute',
+  height: '8rem',
   top: '0',
   left: '0',
   display: 'flex',
