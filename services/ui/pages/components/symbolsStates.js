@@ -36,13 +36,20 @@ const SymbolBlock = glamorous.a(({ type }) => ({
   flexGrow: 1
 }))
 
+const ListContainer = glamorous.div({
+  display: 'flex',
+  flexFlow: 'row wrap',
+  maxHeight: '70vh',
+  overflowY: 'auto'
+})
+
 export default class extends Component {
   render () {
     const { data } = this.props
     const sorted = o(reverse, sortBy(props([ '15m', '1h' ])), data)
 
     return <Div alignSelf='flex-end' >
-      <Div display='flex' flexFlow='row wrap' justifyContent='space-between'>
+      <ListContainer>
         { sorted.map(v => (
           <SymbolBlock
             key={v.symbol}
@@ -53,7 +60,7 @@ export default class extends Component {
             >{ v.symbol }
           </SymbolBlock>
         )) }
-      </Div>
+      </ListContainer>
     </Div>
   }
 }

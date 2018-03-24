@@ -21,7 +21,7 @@ export default class extends Component {
 
     return (
       <div>
-        { opened.slice(0, 12).map(pos =>
+        { opened.map(pos =>
           <Item
             key={ pos.id }
             position={ pos }
