@@ -1,8 +1,8 @@
 import {
-  o, objOf, map, nth, assoc, converge, unapply, mergeAll, compose,
-  head, last, lt, gt, both, allPass, pair, takeLast, all, apply
+  all, allPass, apply, assoc, both, compose, converge, gt, last, lt, map, mergeAll, nth, o, objOf,
+  pair, prop, unapply,
 } from 'ramda'
-import { williamsr, bollingerbands, obv, cci, ema } from 'technicalindicators'
+import { bollingerbands, cci, ema, obv, williamsr } from 'technicalindicators'
 
 const objOpen = o(objOf('open'), map(o(parseFloat, nth(1))))
 const objHigh = o(objOf('high'), map(o(parseFloat, nth(2))))
@@ -32,12 +32,22 @@ const isGrowAbs = <(a: any) => boolean>apply(gt)
 const isOverZero = <any>all(lt(0))
 
 const wrPair = o(pairEmaAndLast, calcWR)
-const wrNotOverbought = o(gt(-60), last)
-const wrNotOversold = o(lt(-90), last)
+const wrNotOverbought = o(gt(-20), last)
+const wrNotOversold = o(lt(-80), last)
 const wrIsJustGrow = o(isGrow, wrPair)
 const wrIsStartedGrow = o(allPass([ isGrow, wrNotOverbought, wrNotOversold ]), wrPair)
+const wrIsNotOverbought = o(both(isGrow, wrNotOverbought), wrPair)
 const obvIsGrow = compose(isGrow, pairEmaAndLast, calcOBV)
-const cciIsGrow = compose(both(isGrow, isOverZero), takeLast(2), calcCCI)
+const cciIsGrow = compose(both(isGrow, isOverZero), pairEmaAndLast, calcCCI)
 const emaIsPositive = compose(isGrowAbs, pairEmaShortAndLong)
+const bbIsNotOverbought = compose(both(gt(1), lt(0.5)), o(prop('pb'), last), calcBB)
 
-export { wrIsStartedGrow, wrIsJustGrow, obvIsGrow, cciIsGrow, emaIsPositive }
+export {
+  wrIsStartedGrow,
+  wrIsJustGrow,
+  wrIsNotOverbought,
+  obvIsGrow,
+  cciIsGrow,
+  emaIsPositive,
+  bbIsNotOverbought,
+}

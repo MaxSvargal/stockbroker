@@ -57,7 +57,7 @@ export default class extends Component {
             <Div>
               <Label>Amount / Comission</Label>
               <Div>{ v.open.origQty } { v.symbol }</Div>
-              <Div>{ v.close.commission } { v.close.commissionAsset }</Div>
+              <Div>{ v.open.comission + v.close.commission } { v.close.commissionAsset }</Div>
             </Div>
           </Item>
         )) }
