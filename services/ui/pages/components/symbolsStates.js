@@ -23,16 +23,15 @@ const getSymbolStateTitle = cond([
 
 const SymbolBlock = glamorous.a(({ type }) => ({
   background: cond([
-    [ equals('enabled'), always('#ffa726') ],
-    [ equals('prepared'), always('#81c784') ],
-    [ equals('growing'), always('#7986cb') ]
+    [ equals('enabled'), always('#7e57c2') ],
+    [ equals('prepared'), always('#7986cb') ],
+    [ equals('growing'), always('#78909c') ]
   ])(type),
   textDecoration: 'none',
   padding: '.5rem .25rem',
-  borderBottom: '1px solid #fafafa',
-  color: '#fff',
+  color: '#eeeeee',
   textAlign: 'center',
-  fontSize: '.9rem',
+  fontSize: '.8rem',
   flexGrow: 1
 }))
 
