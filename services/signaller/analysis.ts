@@ -9,7 +9,7 @@ const getCandlesParts: (a: any[][]) => number[][] =
   juxt(map(o(map as any, nth), range(0, 6)) as any)
 
 const prev = o(head, takeLast(2))
-const buyPass = o(lt(-80), last)
+const buyPass = both(o(gt(-80), prev), o(lt(-80), last))
 const sellPass = both(o(lt(-20), prev), o(gt(-20), last))
 
 type MakeAnalysis = (a: string) => (xs: number[][][]) =>
@@ -27,7 +27,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles5m, 
 
   const buySignal = buyPass(wrShort)
   const sellSignal = sellPass(wrLong)
-  const forcedSellSignal = sellPass(wrVLong)
+  // const forcedSellSignal = sellPass(wrVLong)
 
   // если курс пересёк минимальный профит сверху-вниз, то продавать по цене минимального профита
 
