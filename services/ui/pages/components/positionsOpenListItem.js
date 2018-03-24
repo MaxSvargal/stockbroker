@@ -35,19 +35,28 @@ const HeadTitle = glamorous.div(({ positive }) => ({
 export default class extends Component {
   state = { candles: [] }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return this.props.ticker !== nextProps.ticker ||
-      this.state.candles.length !== nextState.candles.length // TODO: fix it
+  static getPriceWProfit (price) {
+    return price + (price * 0.007)
   }
 
-  async componentDidMount () {
+  updateCandles = async () => {
     const res = await window.fetch(`${location.origin}/api/candles/${this.props.position.symbol}/30m/48`)
     const candles = await res.json()
     this.setState({ candles: candles })
   }
 
-  static getPriceWProfit (price) {
-    return price + (price * 0.007)
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.props.ticker !== nextProps.ticker ||
+      this.state.candles.length !== nextState.candles.length // TODO: fix it
+  }
+
+  componentDidMount () {
+    this.updateCandles()
+    this.updateInterval = setInterval(this.updateCandles, 1000 * 120)
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.updateInterval)
   }
 
   render() {
