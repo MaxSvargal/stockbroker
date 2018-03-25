@@ -28,7 +28,7 @@ export default class extends Component {
   state = { candles: [] }
 
   static getPriceWProfit (price) {
-    return price + (price * 0.007)
+    return price + (price * 0.006)
   }
 
   updateCandles = async () => {

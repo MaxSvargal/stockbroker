@@ -12,6 +12,7 @@ type PositionSide = { id: number, orderId: number, qty: number, origQty: number,
 export type Position = { id: number, account: string, symbol: string, closed: boolean, profitAmount?: number, profitPerc?: number, open: PositionSide, close?: PositionSide }
 
 const fee = 0.0005
+const minProfit = 0.006
 const convMergeAll = converge(unapply(mergeAll))
 const date = constructN(1, Date)
 const pickFromOrderTrade = pick([ 'id', 'time', 'price', 'qty', 'commission', 'commissionAsset', 'orderId', 'origQty' ])
@@ -70,7 +71,7 @@ const makeClosedPosition = <MakeClosedPosition>chain(makeCompleteObj, makeCloseO
 /* findOrderToCover */
 
 const minCoverPrice = unapply(converge(add, [ head, apply(multiply) ]) )
-const minCoverPriceOfPos = converge(minCoverPrice, [ path([ 'open', 'price' ]), always(0.007) ])
+const minCoverPriceOfPos = converge(minCoverPrice, [ path([ 'open', 'price' ]), always(minProfit) ])
 const compareWithMinCover = curryN(2, unapply(converge(gte, [ head, o(minCoverPriceOfPos, last) ])))
 
 type FindPositionToCover = (a: Price, b: { open: { price: number } }[]) => Position
