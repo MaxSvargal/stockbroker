@@ -17,8 +17,8 @@ apps:
     env     :
       DEBUG   : 'app:log,app:error'
 
-  - name    : 'Manager Signallers'
-    script  : 'services/signallers-manager/index.ts'
+  - name    : 'Signaller'
+    script  : 'services/signaller/index.ts'
     max_memory_restart: '110M'
     env     :
       DEBUG   : 'app:log,app:error'
