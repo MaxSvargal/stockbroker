@@ -45,6 +45,8 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles15m 
       time: new Date().getTime(),
       forced: forcedSellSignal,
     }
+  } else {
+    log(`${symbol} has no signal at ${last(closeShort)} | WRS ${last(wrShort)} / ${last(wrLong)}`)
   }
 
   return null
