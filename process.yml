@@ -5,6 +5,12 @@ apps:
     env     :
       DEBUG   : 'app:log,app:error'
 
+  - name    : 'Manager Accounts'
+    script  : 'services/accounts-manager/index.ts'
+    max_memory_restart: '130M'
+    env     :
+      DEBUG   : 'app:log,app:error'
+
   - name    : 'Manager PM2'
     script  : 'services/pm2-manager/index.ts'
     max_memory_restart: '120M'
@@ -22,23 +28,3 @@ apps:
     max_memory_restart: '130M'
     env     :
       DEBUG   : 'app:log,app:error'
-
-  # - name    : 'Logger Signals'
-  #   script  : 'services/logger-signals/index.ts'
-
-  - name    : 'Account maxsvargal'
-    script  : 'services/exchange-account/index.ts'
-    env     :
-      DEBUG   : 'app:log,app:error'
-      ACCOUNT : 'maxsvargal'
-      KEY     : 'HBAgVcBmHOVu6y7iHJ09VAk47udV0x2n0jYRzKCvORJCo6TTQtOAqTkLU4c4QTjL'
-      SECRET  : 'm5zLxJT0syB41hCDdcqUQAKj00IbRpQYAP198k1IjAsiXVJVecX3PnZvuRCELaXt'
-      MODE    : 'development'
-
-  - name    : 'Account lesorub'
-    script  : 'services/exchange-account/index.ts'
-    env     :
-      DEBUG   : 'app:log,app:error'
-      ACCOUNT : 'lesorub'
-      KEY     : 'eao80LqrskiOzaANnizUAJjU4f85p6Ucy02Ag11YX8V4s7RMh1xbffSDc710w3ci'
-      SECRET  : 'nAVQtqgWU3jd1IqeJlcceyhS2GJWV2P9N6Hpz65ygGl1J55n70ERJqm8qouK04VH'

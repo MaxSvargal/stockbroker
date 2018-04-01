@@ -6,3 +6,4 @@ build
 src/server/accounts/*
 accounts.config.js
 services/ui/.next
+services/exchange-account/secret.txt

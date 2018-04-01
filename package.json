@@ -36,6 +36,7 @@
   },
   "scripts": {
     "test": "jest",
+    "dev-accounts-manager": "nodemon ./services/accounts-manager --watch services/accounts-manager",
     "dev-exchange-account": "nodemon ./services/exchange-account --watch services/exchange-account",
     "dev-trade-master": "nodemon ./services/trade-master --watch services/trade-master",
     "dev-pm2-manager": "nodemon ./services/pm2-manager --watch services/pm2-manager",

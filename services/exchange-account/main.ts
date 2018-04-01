@@ -13,7 +13,7 @@ const requestInfoSymbol = (id: string) =>
 const requestOpenPosition = (data: {}) =>
   ({ type: 'dbInsert', table: 'positions', data })
 const requestOpenedPositions = (account: string) => () =>
-  ({ type: 'dbGetAll', table: 'positions', by: { account }, filter: { closed: false } })
+  ({ type: 'dbFilterBy', table: 'positions', by: { account }, filter: { closed: false } })
 
 const invokeSend = flip(invoker(1, 'send'))
 const invokeAccountInfo = flip(invoker(1, 'accountInfo'))
