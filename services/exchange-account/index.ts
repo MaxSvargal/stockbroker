@@ -24,9 +24,9 @@ const exitProcess = (err: Error) => {
 
 const getKeysPair = o(props([ 'key', 'secret' ]) as any, prop('binance') as any)
 
-requester.send({ type: 'dbGet', table: 'accounts', id: account }).then(account => {
+requester.send({ type: 'dbGet', table: 'accounts', id: account }).then(accountRes => {
   try {
-    const [ apiKey, apiSecret ] = o(map(decrypt), getKeysPair, account)
+    const [ apiKey, apiSecret ] = o(map(decrypt), getKeysPair, accountRes)
     const binance = binanceCons({ apiKey, apiSecret })
     const checkStopLimitLoopStream = periodic(60000)
 
