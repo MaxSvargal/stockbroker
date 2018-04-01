@@ -5,7 +5,7 @@ import { williamsr } from 'technicalindicators'
 
 import log from '../utils/log'
 
-const getCandlesParts: (a: any[][]) => number[][] =
+const getCandlesParts: (a: any[][]) => any[][] =
   juxt(map(o(map as any, nth), range(0, 6)) as any)
 
 const prev = o(head, takeLast(2))
@@ -18,11 +18,9 @@ type MakeAnalysis = (a: string) => (xs: number[][][]) =>
 const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles15m ]) => {
   const [ , , highShort, lowShort, closeShort ] = getCandlesParts(candles1m)
   const [ , , highLong, lowLong, closeLong ] = getCandlesParts(candles15m)
-  // const [ , , highVLong, lowVLong, closeVLong ] = getCandlesParts(candles2h)
 
-  const wrShort = williamsr({ period: 14, close: closeShort, low: lowShort, high: highShort })
+  const wrShort = williamsr({ period: 10, close: closeShort, low: lowShort, high: highShort })
   const wrLong = williamsr({ period: 14, close: closeLong, low: lowLong, high: highLong })
-  // const wrVLong = williamsr({ period: 28, close: closeVLong, low: lowVLong, high: highVLong })
   const lastPrice = o(parseFloat, last, closeShort)
 
   const buySignal = buyPass(wrShort)

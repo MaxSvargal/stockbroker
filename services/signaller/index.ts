@@ -1,21 +1,22 @@
 import { periodic } from 'most'
-import { requesterCons, publisherCons, binanceCons } from '../utils/cote'
+import * as fetch from 'isomorphic-fetch'
+import { requesterCons, publisherCons } from '../utils/cote'
 
 import main from './main'
 
-// Options
-const { SYMBOL = 'BNBUSDT' } = process.env
-const symbol = SYMBOL
-const name = `Signaller ${symbol}`
-const broadcasts = [ 'newSignal' ]
-
-// Constructors
 const exitProcess = (err: Error) => {
   console.error(err)
   process.exit(1)
 }
-const binance = binanceCons({})
-const publisher = publisherCons({ name, broadcasts })
-const mainLoopStream = periodic(30000)
+const requester = requesterCons({
+  name: 'Signaller Store Requester',
+  key: 'db',
+  requests: [ 'filterAllRowsConcat' ],
+})
+const publisher = publisherCons({
+  name: 'Signaller Publisher',
+  broadcasts: [ 'newSignal' ]
+})
+const mainLoopStream = periodic(50000)
 
-main(exitProcess, mainLoopStream, binance, publisher, symbol)
+main(exitProcess, mainLoopStream, requester, publisher, fetch)

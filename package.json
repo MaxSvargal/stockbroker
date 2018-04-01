@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@types/isomorphic-fetch": "^0.0.34",
     "aes256": "^1.0.3",
     "binance-api-node": "0.7.3",
     "cote": "^0.16.0",
