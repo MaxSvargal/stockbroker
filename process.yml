@@ -1,7 +1,7 @@
 apps:
   - name    : 'DB Rethink'
     script  : 'services/db-rethink/index.ts'
-    max_memory_restart: '120M'
+    max_memory_restart: '140M'
     env     :
       DEBUG   : 'app:log,app:error'
 
@@ -19,7 +19,7 @@ apps:
 
   - name    : 'Signaller'
     script  : 'services/signaller/index.ts'
-    max_memory_restart: '110M'
+    max_memory_restart: '150M'
     env     :
       DEBUG   : 'app:log,app:error'
 
