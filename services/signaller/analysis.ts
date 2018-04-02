@@ -1,33 +1,33 @@
 import {
-  any, both, equals, gt, head, juxt, last, lt, map, nth, o, range, takeLast,
+  any, both, equals, gt, head, last, lt, map, nth, o, prop, takeLast, apply, props, compose, merge, objOf
 } from 'ramda'
-import { williamsr } from 'technicalindicators'
+import { stochasticrsi } from 'technicalindicators'
 
 import log from '../utils/log'
 
-const getCandlesParts: (a: any[][]) => any[][] =
-  juxt(map(o(map as any, nth), range(0, 6)) as any)
-
-const prev = o(head, takeLast(2))
-const buyPass = both(o(gt(-80), prev), o(lt(-80), last))
-const sellPass = both(o(lt(-20), prev), o(gt(-20), last))
+type CompareStochRsi = (a: { k: number, d: number }[]) => boolean[]
+const compareStochRsi: CompareStochRsi = compose(map(apply(gt)), map(props([ 'k', 'd' ])), takeLast(2)) as any
+const isSRUp = o(both(o(equals(false), head), o(equals(true), last)), compareStochRsi)
+const isSRDrop = o(both(o(equals(true), head), o(equals(false), last)), compareStochRsi)
+const mapClosePrices = map(o(parseFloat, nth(4)))
+const stochRsiProps = { rsiPeriod: 14, stochasticPeriod: 12, kPeriod: 3, dPeriod: 4 }
+const isSRNotOverbought = compose(gt(50), prop('stochRSI'), last)
+const isSRNotOversold = compose(lt(50), prop('stochRSI'), last)
 
 type MakeAnalysis = (a: string) => (xs: number[][][]) =>
   { symbol: string, side: string, price: number, time: number } | null
 
-const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles15m ]) => {
-  const [ , , highShort, lowShort, closeShort ] = getCandlesParts(candles1m)
-  const [ , , highLong, lowLong, closeLong ] = getCandlesParts(candles15m)
+const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles5m, candles15m ]) => {
+  const shortClosePrices = mapClosePrices(candles5m)
+  const longClosePrices = mapClosePrices(candles15m)
 
-  const wrShort = williamsr({ period: 10, close: closeShort, low: lowShort, high: highShort })
-  const wrLong = williamsr({ period: 10, close: closeLong, low: lowLong, high: highLong })
-  const lastPrice = o(parseFloat, last, closeShort)
+  const rsiStochShort = stochasticrsi(merge(stochRsiProps, objOf('values', shortClosePrices)))
+  const rsiStochLong = stochasticrsi(merge(stochRsiProps, objOf('values', longClosePrices)))
+  const lastPrice = last(shortClosePrices)
 
-  const buySignal = buyPass(wrShort)
-  const sellSignal = sellPass(wrLong)
+  const buySignal = both(isSRNotOverbought, isSRUp)(rsiStochShort)
+  const sellSignal = both(isSRNotOversold, isSRDrop)(rsiStochLong)
   const forcedSellSignal = false //sellPass(wrVLong)
-
-  // если курс пересёк минимальный профит сверху-вниз, то продавать по цене минимального профита
 
   // log({
   //   now: new Date().toLocaleString(),
@@ -46,7 +46,7 @@ const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles15m 
       forced: forcedSellSignal,
     }
   } else {
-    log(`${symbol} has no signal at ${last(closeShort)} | WRS ${map(parseInt, takeLast(2, wrShort))} / ${map(parseInt, takeLast(2, wrLong))}`)
+    log(`${symbol} has no signal at ${lastPrice}`)
   }
 
   return null
