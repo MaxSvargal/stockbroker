@@ -9,7 +9,7 @@ const candlesFrames = [ '1m', '15m' ]
 const requestGetEnabledSymbols = {
   type: 'dbFilterAllRowsConcat',
   table: 'symbolsState',
-  filter: { '4h': true, '1h': true },
+  filter: { '4h': true },
   row: 'symbol',
 }
 
