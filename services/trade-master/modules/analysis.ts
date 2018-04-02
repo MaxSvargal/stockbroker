@@ -5,7 +5,7 @@ import {
 
 import { log } from '../../utils/log'
 import { makeFetchCandles } from './candles'
-import { obvIsGrow, cciIsGrow, wrIsNotOverbought, bbIsNotOverbought } from './indicators'
+import { obvIsGrow, cciIsGrow, wrIsNotOverbought, wrIsJustGrow, bbIsNotOverbought } from './indicators'
 import { suitableSymbolsFromTicker } from './symbols'
 
 type MainInput = {
@@ -35,7 +35,7 @@ const computeState = ([ symbol, candles ]: [ string, number[][] ]) =>
     symbol,
     o(allPass([ obvIsGrow, cciIsGrow, wrIsNotOverbought ]), nth(0), candles),
     o(allPass([ obvIsGrow, cciIsGrow, wrIsNotOverbought ]), nth(1), candles),
-    o(both(obvIsGrow, bbIsNotOverbought), nth(2), candles),
+    o(allPass([ obvIsGrow, wrIsJustGrow, bbIsNotOverbought ]), nth(2), candles),
   ])
 
 const isNotLastIteration = o(o(not, equals(1)), length)
