@@ -35,7 +35,7 @@ const computeState = ([ symbol, candles ]: [ string, number[][] ]) =>
     symbol,
     o(allPass([ obvIsGrow, cciIsGrow, wrIsNotOverbought ]), nth(0), candles),
     o(allPass([ obvIsGrow, cciIsGrow, wrIsNotOverbought ]), nth(1), candles),
-    o(allPass([ obvIsGrow, wrIsJustGrow, bbIsNotOverbought ]), nth(2), candles),
+    o(allPass([ obvIsGrow, bbIsNotOverbought ]), nth(2), candles),
   ])
 
 const isNotLastIteration = o(o(not, equals(1)), length)
