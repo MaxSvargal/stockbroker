@@ -5,7 +5,7 @@ import { curry, flip, invoker, isNil, map, not, o, when, applyTo } from 'ramda'
 import makeAnalysis from './analysis'
 
 const limit = 28
-const candlesFrames = [ '5m', '15m' ]
+const candlesFrames = [ '1m', '15m' ]
 const requestGetEnabledSymbols = {
   type: 'dbFilterAllRowsConcat',
   table: 'symbolsState',

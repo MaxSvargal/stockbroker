@@ -17,8 +17,8 @@ const isSRNotOversold = compose(lt(50), prop('stochRSI'), last)
 type MakeAnalysis = (a: string) => (xs: number[][][]) =>
   { symbol: string, side: string, price: number, time: number } | null
 
-const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles5m, candles15m ]) => {
-  const shortClosePrices = mapClosePrices(candles5m)
+const makeAnalysis: MakeAnalysis = (symbol: string) => ([ candles1m, candles15m ]) => {
+  const shortClosePrices = mapClosePrices(candles1m)
   const longClosePrices = mapClosePrices(candles15m)
 
   const rsiStochShort = stochasticrsi(merge(stochRsiProps, objOf('values', shortClosePrices)))
