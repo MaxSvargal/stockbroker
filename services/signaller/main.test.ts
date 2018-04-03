@@ -31,8 +31,12 @@ describe('Trade Master', () => {
 
     expect(requester.send).toHaveBeenCalledTimes(1)
     expect(fetch).toHaveBeenCalledTimes(6)
-    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=NEOBTC&interval=15m&limit=36')
-    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=NEOBTC&interval=1m&limit=36')
+    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=ETHBTC&interval=15m&limit=20')
+    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=ETHBTC&interval=15m&limit=20')
+    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=MCOBTC&interval=15m&limit=20')
+    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=MCOBTC&interval=15m&limit=20')
+    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=NEOBTC&interval=15m&limit=20')
+    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=NEOBTC&interval=15m&limit=20')
 
     expect(publisher.publish).toHaveBeenCalledTimes(3)
     expect(publisher.publish).toBeCalledWith('newSignal', expect.objectContaining({ symbol: 'MCOBTC' }))
