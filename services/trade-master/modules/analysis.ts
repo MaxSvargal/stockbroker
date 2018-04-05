@@ -5,7 +5,7 @@ import {
 
 import { log } from '../../utils/log'
 import { makeFetchCandles } from './candles'
-import { obvIsGrow, cciIsGrow, wrIsNotOverbought, wrIsJustGrow, bbIsNotOverbought } from './indicators'
+import { obvIsGrow, obvEmaIsGrow, cciEmaIsGrow, cciIsOverZero, wr7IsNotOverbought, wr14IsNotOverbought, wr14IsBeginGrow } from './indicators'
 import { suitableSymbolsFromTicker } from './symbols'
 
 type MainInput = {
@@ -33,9 +33,9 @@ const computeState = ([ symbol, candles ]: [ string, number[][] ]) =>
   zipSymbolState([
     Date.now(),
     symbol,
-    o(allPass([ obvIsGrow, cciIsGrow, wrIsNotOverbought ]), nth(0), candles),
-    o(allPass([ obvIsGrow, cciIsGrow, wrIsNotOverbought ]), nth(1), candles),
-    o(allPass([ obvIsGrow, bbIsNotOverbought ]), nth(2), candles),
+    o(allPass([ obvEmaIsGrow, cciEmaIsGrow, cciIsOverZero, wr7IsNotOverbought ]), nth(0), candles),
+    o(allPass([ wr14IsNotOverbought ]), nth(1), candles),
+    o(allPass([ obvIsGrow, wr14IsBeginGrow ]), nth(2), candles),
   ])
 
 const isNotLastIteration = o(o(not, equals(1)), length)

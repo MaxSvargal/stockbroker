@@ -2,7 +2,7 @@ import { map, zipObj, o, append, converge, xprod, head, of, last, compose, pair 
 
 type CandlesRequest = { limit: number, symbol: string, interval: string }
 
-const limit = 28
+const limit = 50
 const intervals = [ '4h', '1h', '15m' ]
 const zipReqArrToObj = map(zipObj([ 'interval', 'symbol', 'limit' ]))
 const mapAppend = o(map, append)
