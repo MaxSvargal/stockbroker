@@ -2,11 +2,13 @@ import main from './main'
 import { just } from 'most'
 import { run } from 'most-test'
 
-const makeRequester = (enabledSymbols: string[]) => ({
-  send: jest.fn().mockReturnValueOnce(Promise.resolve(enabledSymbols))
+const makeRequester = (toBuy: string[], toSell: string[]) => ({
+  send: jest.fn()
+    .mockReturnValueOnce(Promise.resolve(toBuy))
+    .mockReturnValueOnce(Promise.resolve(toSell))
 })
 const makePublisher = () => ({
-  publish: jest.fn().mockReturnValueOnce('OK')
+  publish: jest.fn().mockReturnValue('OK')
 })
 const makeFetch = (candles: any[][]) =>
   jest.fn().mockReturnValue(Promise.resolve({ json: () => Promise.resolve(candles) }))
@@ -14,36 +16,403 @@ const makeFetch = (candles: any[][]) =>
 describe('Trade Master', () => {
   test('should work correctly', async () => {
     const exitProcess = jest.fn()
-    const requester = makeRequester([ 'NEOBTC', 'MCOBTC', 'ETHBTC' ])
+    const requester = makeRequester([ 'NEOBTC', 'MCOBTC' ], [ 'XRPBTC', 'ETHBTC' ])
     const publisher = makePublisher()
     const mainLoopStream = just({})
     const env = run(mainLoopStream)
     const fetch = makeFetch([
-      [ 0, '1', '2', '0.5', '1.5', '100' ],
-      [ 0, '1.5', '2.5', '1.5', '2', '100' ],
-      [ 0, '2', '3', '1.5', '2.5', '100' ],
-      [ 0, '2.5', '3.5', '2', '3', '100' ],
-      [ 0, '1', '1', '0', '0', '100' ]
+      [
+        1522944600000,
+        "0.01769800",
+        "0.01771400",
+        "0.01763200",
+        "0.01769600",
+        "326.55000000",
+        1522944899999,
+        "5.76991292",
+        155,
+        "146.61000000",
+        "2.59223217",
+        "0"
+      ],
+      [
+        1522944900000,
+        "0.01767900",
+        "0.01774900",
+        "0.01767800",
+        "0.01771000",
+        "366.14000000",
+        1522945199999,
+        "6.48421701",
+        160,
+        "228.47000000",
+        "4.04699817",
+        "0"
+      ],
+      [
+        1522945200000,
+        "0.01770000",
+        "0.01771800",
+        "0.01767900",
+        "0.01768200",
+        "248.90000000",
+        1522945499999,
+        "4.40412126",
+        84,
+        "164.50000000",
+        "2.91125752",
+        "0"
+      ],
+      [
+        1522945500000,
+        "0.01768800",
+        "0.01771100",
+        "0.01768200",
+        "0.01769700",
+        "298.01000000",
+        1522945799999,
+        "5.27429377",
+        86,
+        "144.66000000",
+        "2.56066756",
+        "0"
+      ],
+      [
+        1522945800000,
+        "0.01769700",
+        "0.01773600",
+        "0.01769300",
+        "0.01771300",
+        "328.00000000",
+        1522946099999,
+        "5.80763697",
+        100,
+        "219.80000000",
+        "3.89250635",
+        "0"
+      ],
+      [
+        1522946100000,
+        "0.01771300",
+        "0.01773500",
+        "0.01769200",
+        "0.01771800",
+        "382.05000000",
+        1522946399999,
+        "6.76449515",
+        133,
+        "138.03000000",
+        "2.44474084",
+        "0"
+      ],
+      [
+        1522946400000,
+        "0.01771200",
+        "0.01773800",
+        "0.01769600",
+        "0.01771900",
+        "357.23000000",
+        1522946699999,
+        "6.32942980",
+        95,
+        "254.43000000",
+        "4.50931808",
+        "0"
+      ],
+      [
+        1522946700000,
+        "0.01771000",
+        "0.01773700",
+        "0.01769500",
+        "0.01772000",
+        "311.07000000",
+        1522946999999,
+        "5.51221954",
+        105,
+        "221.14000000",
+        "3.91899789",
+        "0"
+      ],
+      [
+        1522947000000,
+        "0.01772000",
+        "0.01772000",
+        "0.01756100",
+        "0.01764300",
+        "773.46000000",
+        1522947299999,
+        "13.65706660",
+        243,
+        "306.32000000",
+        "5.41084512",
+        "0"
+      ],
+      [
+        1522947300000,
+        "0.01762700",
+        "0.01766500",
+        "0.01760300",
+        "0.01764200",
+        "372.65000000",
+        1522947599999,
+        "6.57082075",
+        124,
+        "232.68000000",
+        "4.10309772",
+        "0"
+      ],
+      [
+        1522947600000,
+        "0.01764200",
+        "0.01769900",
+        "0.01764100",
+        "0.01766700",
+        "343.73000000",
+        1522947899999,
+        "6.07298847",
+        105,
+        "272.43000000",
+        "4.81330115",
+        "0"
+      ],
+      [
+        1522947900000,
+        "0.01766800",
+        "0.01767700",
+        "0.01764600",
+        "0.01767200",
+        "375.36000000",
+        1522948199999,
+        "6.62980712",
+        66,
+        "283.53000000",
+        "5.00898052",
+        "0"
+      ],
+      [
+        1522948200000,
+        "0.01765300",
+        "0.01767300",
+        "0.01761700",
+        "0.01765500",
+        "333.12000000",
+        1522948499999,
+        "5.87871661",
+        85,
+        "277.70000000",
+        "4.90127300",
+        "0"
+      ],
+      [
+        1522948500000,
+        "0.01763900",
+        "0.01769900",
+        "0.01763800",
+        "0.01766500",
+        "690.30000000",
+        1522948799999,
+        "12.19958884",
+        89,
+        "342.89000000",
+        "6.05980916",
+        "0"
+      ],
+      [
+        1522948800000,
+        "0.01766800",
+        "0.01770000",
+        "0.01763200",
+        "0.01763200",
+        "267.75000000",
+        1522949099999,
+        "4.73071014",
+        110,
+        "116.60000000",
+        "2.06097711",
+        "0"
+      ],
+      [
+        1522949100000,
+        "0.01765500",
+        "0.01766200",
+        "0.01756300",
+        "0.01759800",
+        "385.45000000",
+        1522949399999,
+        "6.78105894",
+        160,
+        "221.01000000",
+        "3.88904914",
+        "0"
+      ],
+      [
+        1522949400000,
+        "0.01758900",
+        "0.01761300",
+        "0.01755800",
+        "0.01757900",
+        "312.66000000",
+        1522949699999,
+        "5.50081461",
+        141,
+        "188.58000000",
+        "3.31729067",
+        "0"
+      ],
+      [
+        1522949700000,
+        "0.01757900",
+        "0.01759500",
+        "0.01754900",
+        "0.01756300",
+        "236.16000000",
+        1522949999999,
+        "4.14792764",
+        129,
+        "118.96000000",
+        "2.09012596",
+        "0"
+      ],
+      [
+        1522950000000,
+        "0.01756200",
+        "0.01767100",
+        "0.01755000",
+        "0.01767000",
+        "329.83000000",
+        1522950299999,
+        "5.81108011",
+        175,
+        "231.41000000",
+        "4.07958685",
+        "0"
+      ],
+      [
+        1522950300000,
+        "0.01765700",
+        "0.01770500",
+        "0.01764500",
+        "0.01764800",
+        "268.73000000",
+        1522950599999,
+        "4.74742243",
+        128,
+        "155.62000000",
+        "2.75046134",
+        "0"
+      ],
+      [
+        1522950600000,
+        "0.01764800",
+        "0.01769900",
+        "0.01763100",
+        "0.01765200",
+        "602.78000000",
+        1522950899999,
+        "10.63989356",
+        133,
+        "283.93000000",
+        "5.01170557",
+        "0"
+      ],
+      [
+        1522950900000,
+        "0.01765200",
+        "0.01767000",
+        "0.01762400",
+        "0.01764600",
+        "257.15000000",
+        1522951199999,
+        "4.53628004",
+        58,
+        "128.30000000",
+        "2.26352136",
+        "0"
+      ],
+      [
+        1522951200000,
+        "0.01764600",
+        "0.01765900",
+        "0.01758100",
+        "0.01759400",
+        "326.91000000",
+        1522951499999,
+        "5.75323668",
+        94,
+        "224.61000000",
+        "3.95226981",
+        "0"
+      ],
+      [
+        1522951500000,
+        "0.01759500",
+        "0.01766700",
+        "0.01759500",
+        "0.01766600",
+        "340.05000000",
+        1522951799999,
+        "5.99804985",
+        100,
+        "301.71000000",
+        "5.32179045",
+        "0"
+      ],
+      [
+        1522951800000,
+        "0.01767900",
+        "0.01768600",
+        "0.01763900",
+        "0.01765700",
+        "101.59000000",
+        1522952099999,
+        "1.79442819",
+        89,
+        "53.06000000",
+        "0.93732190",
+        "0"
+      ],
+      [
+        1522952100000,
+        "0.01766000",
+        "0.01767000",
+        "0.01761100",
+        "0.01764800",
+        "487.82000000",
+        1522952399999,
+        "8.60608891",
+        124,
+        "277.71000000",
+        "4.90049278",
+        "0"
+      ],
+      [
+        1522952400000,
+        "0.01764800",
+        "0.01764800",
+        "0.01763700",
+        "0.01763500",
+        "33.56000000",
+        1522952699999,
+        "0.59211468",
+        11,
+        "33.56000000",
+        "0.59211468",
+        "0"
+      ]
     ])
 
     main(exitProcess, mainLoopStream, requester, publisher, fetch)
     await env.tick()
 
-    expect(requester.send).toHaveBeenCalledTimes(1)
-    expect(fetch).toHaveBeenCalledTimes(6)
-    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=ETHBTC&interval=15m&limit=20')
-    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=ETHBTC&interval=15m&limit=20')
-    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=MCOBTC&interval=15m&limit=20')
-    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=MCOBTC&interval=15m&limit=20')
-    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=NEOBTC&interval=15m&limit=20')
-    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=NEOBTC&interval=15m&limit=20')
-
-    expect(publisher.publish).toHaveBeenCalledTimes(3)
-    expect(publisher.publish).toBeCalledWith('newSignal', expect.objectContaining({ symbol: 'MCOBTC' }))
-    expect(publisher.publish).toBeCalledWith('newSignal', expect.objectContaining({ symbol: 'ETHBTC' }))
-    expect(publisher.publish).toBeCalledWith('newSignal', expect.objectContaining({ symbol: 'NEOBTC' }))
-  
-    await env.tick()
     expect(requester.send).toHaveBeenCalledTimes(2)
+    expect(fetch).toHaveBeenCalledTimes(4)
+    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=NEOBTC&interval=1m&limit=40')
+    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=MCOBTC&interval=1m&limit=40')
+    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=XRPBTC&interval=5m&limit=40')
+    expect(fetch).toHaveBeenCalledWith('https://binance.com/api/v1/klines?symbol=ETHBTC&interval=5m&limit=40')
+
+    expect(publisher.publish).toHaveBeenCalledTimes(2)
+    expect(publisher.publish).toBeCalledWith('newSignal', { price: 0.017635, symbol: 'XRPBTC', side: 'SELL' })
+    expect(publisher.publish).toBeCalledWith('newSignal', { price: 0.017635, symbol: 'ETHBTC', side: 'SELL' })
   })
 })

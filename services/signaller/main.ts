@@ -1,15 +1,22 @@
 import { Requester, Publisher } from 'cote'
 import { observe, Stream } from 'most'
-import { curry, flip, invoker, isNil, map, not, o, when, applyTo } from 'ramda'
+import { curry, flip, invoker, map, o, concat, zip } from 'ramda'
+import { log, error } from '../utils/log'
 
-import makeAnalysis from './analysis'
+import makeAnalysisBuys from './modules/checkBuy'
+import makeAnalysisSells from './modules/checkSell'
 
-const limit = 28
-const candlesFrames = [ '1m', '15m' ]
-const requestGetEnabledSymbols = {
+const limit = 40
+const requestSymbolsToBuy = {
   type: 'dbFilterAllRowsConcat',
   table: 'symbolsState',
   filter: { '4h': true, '1h': true, '15m': true },
+  row: 'symbol',
+}
+const requestSymbolsToSell = {
+  type: 'dbFilterAllRowsConcat',
+  table: 'positions',
+  filter: { 'closed': false },
   row: 'symbol',
 }
 
@@ -28,20 +35,30 @@ type ExitProcess = (a: Error) => void
 type Main = (a: ExitProcess, b: Stream<{}>, c: Requester, d: Publisher, e: Function) => void
 
 const main: Main = (exitProcess, mainLoopStream, requester, publisher, fetch) => {
-  const publish = invokePublishNewSignal(publisher)
-  const candlesRequestsForSymbols = map(makeGetCandles(fetch, limit), candlesFrames)
-  const evalAnalysis = curry((symbol, candles) => o(when(o(not, isNil), publish), makeAnalysis(symbol), candles))
+  const publishSignals = map(invokePublishNewSignal(publisher))
+  const request = invokeSend(requester) as (a: {}) => Promise<any>
+  const fetchCandles = makeGetCandles(fetch, limit)
 
-  const startAnalysisForSymbol = (symbol: string) =>
-    Promise.all(map(applyTo(symbol), candlesRequestsForSymbols))
-      .then(evalAnalysis(symbol))
+  const iterate = async () => {
+    try {
+      const [ symbolsToBuy, symbolsToSell ] = await Promise.all([ request(requestSymbolsToBuy), request(requestSymbolsToSell) ])
+      const candlesForBuy = await Promise.all(map(fetchCandles('1m'), symbolsToBuy))
+      const candlesForSell = await Promise.all(map(fetchCandles('5m'), symbolsToSell))
+      const buysSignals = makeAnalysisBuys(zip(symbolsToBuy, candlesForBuy))
+      const sellsSignals = makeAnalysisSells(zip(symbolsToSell, candlesForSell))
 
-  const startAnalysis = () =>
-    invokeSend(requester)(requestGetEnabledSymbols)
-      .then(map(startAnalysisForSymbol))
-      .catch(exitProcess)
+      log('Symbols to buy: %o', symbolsToBuy)
+      log('Symbols to sell: %o', symbolsToSell)
+      log('Signals: \n%O', concat(buysSignals, sellsSignals))
 
-  observe(startAnalysis, mainLoopStream)
+      return publishSignals(concat(buysSignals, sellsSignals))
+    } catch (err) {
+      error(err)
+      return exitProcess(err)
+    }
+  }
+
+  observe(iterate, mainLoopStream)
 }
 
 export default main
