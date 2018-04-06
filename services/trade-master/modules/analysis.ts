@@ -5,7 +5,7 @@ import {
 
 import { log } from '../../utils/log'
 import { makeFetchCandles } from './candles'
-import { obvIsGrow, obvEmaIsGrow, cciEmaIsGrow, cciIsOverZero, wr7IsNotOverbought, wr14IsNotOverbought, wr14IsBeginGrow } from './indicators'
+import { obvIsGrow, obvEmaIsGrow, cciEmaIsGrow, cciIsOverZero, wrIsJustGrow, wr7IsNotOverbought, wr14IsNotOverbought, wr14IsBeginGrow } from './indicators'
 import { suitableSymbolsFromTicker } from './symbols'
 
 type MainInput = {
@@ -34,7 +34,7 @@ const computeState = ([ symbol, candles ]: [ string, number[][] ]) =>
     Date.now(),
     symbol,
     o(allPass([ obvEmaIsGrow, cciEmaIsGrow, cciIsOverZero, wr7IsNotOverbought ]), nth(0), candles),
-    o(allPass([ obvEmaIsGrow, wr14IsNotOverbought ]), nth(1), candles),
+    o(allPass([ obvEmaIsGrow, wrIsJustGrow, wr14IsNotOverbought ]), nth(1), candles),
     o(allPass([ obvIsGrow, wr14IsBeginGrow ]), nth(2), candles),
   ])
 
