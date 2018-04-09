@@ -1,18 +1,18 @@
 import {
-  curryN, subtract, apply, divide, curry, chain, pair, props, prop, compose, add,
+  curryN, subtract, apply, divide, chain, pair, props, prop, compose, add, init,
   constructN, pick, evolve, converge, objOf, always, o, merge, mergeAll, lt, path,
-  unapply, multiply, head, last, tail, filter, pathSatisfies, gte, ifElse, map, find
+  unapply, multiply, head, last, tail, gte, ifElse, map, find
 } from 'ramda'
 
 type Price = number
 type Perc = number
+type MinProfit = number
 export type Order = { orderId: number, origQty: string, side: string, symbol: string }
 export type Trade = { id: number, orderId: number, time: number, price: string, qty: string, commission: string, commissionAsset: string }
 type PositionSide = { id: number, orderId: number, qty: number, origQty: number, time: Date, price: number, commission: number, commissionAsset: string }
 export type Position = { id: number, account: string, symbol: string, closed: boolean, profitAmount?: number, profitPerc?: number, open: PositionSide, close?: PositionSide }
 
 const fee = 0.0005
-const minProfit = 0.006
 const convMergeAll = converge(unapply(mergeAll))
 const date = constructN(1, Date)
 const pickFromOrderTrade = pick([ 'id', 'time', 'price', 'qty', 'commission', 'commissionAsset', 'orderId', 'origQty' ])
@@ -70,12 +70,11 @@ const makeClosedPosition = <MakeClosedPosition>chain(makeCompleteObj, makeCloseO
 
 /* findOrderToCover */
 
-const minCoverPrice = unapply(converge(add, [ head, apply(multiply) ]) )
-const minCoverPriceOfPos = converge(minCoverPrice, [ path([ 'open', 'price' ]), always(minProfit) ])
-const compareWithMinCover = curryN(2, unapply(converge(gte, [ head, o(minCoverPriceOfPos, last) ])))
+const minCoverPrice = converge(subtract, [ head, apply(multiply) ])
+const compareWithMinCover = curryN(2, unapply(converge(gte, [ o(minCoverPrice, head), o(path([ 'open', 'price' ]), last) ])))
 
-type FindPositionToCover = (a: Price, b: { open: { price: number } }[]) => Position
-const findPositionToCover = unapply(converge(find, [ o(compareWithMinCover, head), last ]))
+type FindPositionToCover = (a: Price, b: MinProfit, c: { open: { price: number } }[] ) => Position
+const findPositionToCover = unapply(converge(find, [ o(compareWithMinCover, init), last ]))
 
 
 /* chunkAmountToSellCond */
