@@ -1,4 +1,4 @@
-import { error as logError } from '../utils/log'
+import { log, error as logError } from '../utils/log'
 import { o, cond, always, ifElse, equals, converge, divide, compose, length, subtract, filter, prop, propEq, find, T, gt, isNil, path, lte } from 'ramda'
 
 import trade from './modules/trade'
@@ -59,7 +59,7 @@ const checkSignal = (account: string, requests: any) =>
       const chunkAmount = divide(avaliableToBuy, avaliableChunks)
       const quantity: number = roundToMinQty(minQty, divide(chunkAmount, price))
       const error = buyErrorsCondition({ avaliableChunks, quantity, openedPositionsOfSymbol })
-
+      log({ avaliableToBuy, avaliableChunks, chunkAmount, quantity })
       return { quantity, error }
     }
 
