@@ -69,7 +69,7 @@ const checkSignal = (account: string, requests: any) =>
       const positionToCover = findPositionToCover(openedPositionsOfSymbol, minProfit, forced ? Infinity : price)
       const chunkAmount = path([ 'open', 'origQty' ], positionToCover)
       const quantity: number = roundToMinQty(minQty, chunkAmountToSellCond([ avaliableToSell, chunkAmount ]))
-      log({ positionToCover, quantity, avaliableToSell, price, forced })
+      log({ symbol, openedPositionsOfSymbol, positionToCover, quantity, avaliableToSell, price, forced })
       const error = sellErrorsCondition({ positionToCover, quantity, avaliableToSell })
 
       return { quantity, error, positionToCover }
