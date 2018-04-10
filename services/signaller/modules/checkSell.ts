@@ -1,13 +1,13 @@
 import { map, merge, o, reject, equals, last, ifElse, always, both } from 'ramda'
 import { closePricesAsValues, makeSignal } from './check'
-import { calcStochRsi, stochRsiIsFall, stochRsiAboveMedium } from './indicators'
+import { calcStochRsi, stochRsiIsFall } from './indicators'
 
 type Symbol = string
 type Candle = any[]
 type SymbolCandles = [ Symbol, Candle[] ]
 
 const stochRsiProps = { rsiPeriod: 14, stochasticPeriod: 3, kPeriod: 3, dPeriod: 3 }
-const stochRsiCheck = o(both(stochRsiIsFall, stochRsiAboveMedium), calcStochRsi)
+const stochRsiCheck = o(stochRsiIsFall, calcStochRsi)
 const checkFn = o(o(stochRsiCheck, merge(stochRsiProps)), closePricesAsValues)
 const checkSignal = ifElse(o(checkFn, last), makeSignal('SELL'), always(null))
 const main = o(reject(equals(null)), map(checkSignal))
