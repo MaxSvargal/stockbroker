@@ -1,9 +1,12 @@
 import { log, error as logError } from '../utils/log'
-import { o, cond, always, ifElse, equals, converge, divide, compose, length, subtract, filter, prop, propEq, find, T, gt, isNil, path, lte } from 'ramda'
+import {
+  o, cond, always, unapply, ifElse, equals, reject, complement, converge, last, divide, uniq, map, compose,
+  length, subtract, contains, filter, prop, propEq, find, T, gt, isNil, both, append, head, path, lte
+} from 'ramda'
 
 import trade from './modules/trade'
-import { findPositionToCover, chunkAmountToSellCond } from './modules/positions'
 import { roundToMinQty, getMinQtyFromSymbolInfo, takePairFromSymbol } from './shared'
+import { findPositionToCover, chunkAmountToSellCond, makeOpenedPosition, makeClosedPosition, Order, Trade, Position } from './modules/positions'
 
 const findByAssetProp = o(find, propEq('asset'))
 const parseFreeProp = o(parseFloat, prop('free'))
@@ -39,7 +42,7 @@ const checkSignal = (account: string, requests: any) =>
     const [
       symbolInfo,
       openedPositions,
-      { preferences: { chunksNumber = 8, minProfit = 0.006 } },
+      { preferences: { chunksNumber = 8 } },
       { balances }
     ] = await Promise.all([
       getSymbolInfo(symbol),
@@ -59,17 +62,16 @@ const checkSignal = (account: string, requests: any) =>
       const chunkAmount = divide(avaliableToBuy, avaliableChunks)
       const quantity: number = roundToMinQty(minQty, divide(chunkAmount, price))
       const error = buyErrorsCondition({ avaliableChunks, quantity, openedPositionsOfSymbol })
-      log({ avaliableToBuy, avaliableChunks, chunkAmount, quantity })
+
       return { quantity, error }
     }
 
     const execSell = () => {
       const findBySlaveCurrency = findByAssetProp(slaveCurrency)
       const avaliableToSell = o(parseFreeProp, findBySlaveCurrency)(balances)
-      const positionToCover = findPositionToCover(openedPositionsOfSymbol, minProfit, forced ? Infinity : price)
+      const positionToCover = findPositionToCover(forced ? Infinity : price, openedPositionsOfSymbol)
       const chunkAmount = path([ 'open', 'origQty' ], positionToCover)
       const quantity: number = roundToMinQty(minQty, chunkAmountToSellCond([ avaliableToSell, chunkAmount ]))
-      log({ symbol, openedPositionsOfSymbol, positionToCover, quantity, avaliableToSell, price, forced })
       const error = sellErrorsCondition({ positionToCover, quantity, avaliableToSell })
 
       return { quantity, error, positionToCover }
@@ -79,7 +81,7 @@ const checkSignal = (account: string, requests: any) =>
     const { quantity, error, positionToCover } = getTradeSide(side)
     if (error) throw error
 
-    equals('BUY', side) ?
+    const positionState = equals('BUY', side) ?
       await trade({ sendOrder, myTrades, openPosition, position: { account, symbol, quantity } }) :
       await trade({ sendOrder, myTrades, closePosition, positionToCover })
 

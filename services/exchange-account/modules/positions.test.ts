@@ -46,8 +46,8 @@ describe('Exchange Account Positions', () => {
     expect(makeClosedPosition([ position, order, trade ])).toEqual({
       id: 0,
       closed: true,
-      profitAmount: 0.0004997500000000002,
-      profitPerc: 1.2986013986014022,
+      profitAmount: 0.0004994999999999999,
+      profitPerc: 1.013986013986014,
       close: {
         id: 1,
         orderId: 214,
@@ -62,8 +62,6 @@ describe('Exchange Account Positions', () => {
   })
 
   test('findPositionToCover should work correctly', () => {
-    expect(findPositionToCover(2.02, 0.005, [ { open: { price: 2 } } ] )).toEqual({ open: { price: 2 } })
-    expect(findPositionToCover(3.1, 0.1, [ { open: { price: 2.7 } } ] )).toEqual({ open: { price: 2.7 } })
-    expect(findPositionToCover(2.01, 0.005, [ { open: { price: 2 } } ] )).toEqual(undefined)
+    
   })
 })
