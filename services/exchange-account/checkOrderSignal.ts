@@ -44,7 +44,7 @@ const checkSignal = (account: string, requests: any) =>
     const [
       symbolInfo,
       openedPositions,
-      { preferences: { chunksNumber = 8 } },
+      { preferences: { chunksNumber = 8, minProfit = 0.006 } },
       { balances }
     ] = await Promise.all([
       getSymbolInfo(symbol),
@@ -71,7 +71,7 @@ const checkSignal = (account: string, requests: any) =>
     const execSell = () => {
       const findBySlaveCurrency = findByAssetProp(slaveCurrency)
       const avaliableToSell = o(parseFreeProp, findBySlaveCurrency)(balances)
-      const positionToCover = findPositionToCover(forced ? Infinity : price, openedPositionsOfSymbol)
+      const positionToCover = findPositionToCover(forced ? Infinity : price, minProfit, openedPositionsOfSymbol)
       const chunkAmount = path([ 'open', 'origQty' ], positionToCover)
       const quantity: number = roundToMinQty(minQty, chunkAmountToSellCond([ avaliableToSell, chunkAmount ]))
       const error = sellErrorsCondition({ positionToCover, quantity, avaliableToSell })
