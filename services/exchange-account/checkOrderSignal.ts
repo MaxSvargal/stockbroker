@@ -24,10 +24,12 @@ const sellErrorsCondition = cond([
   [ T, always(null) ]
 ])
 
-type SignalRequest = { symbol: string, side: 'BUY' | 'SELL', price: number, forced: boolean }
-const checkSignal = (account: string, requests: any) =>
-  async ({ symbol, side, price, forced }: SignalRequest) => {
+type SignalRequest = { account?: string, symbol: string, side: 'BUY' | 'SELL', price: number, forced: boolean }
+const checkSignal = (currAccount: string, requests: any) =>
+  async ({ account, symbol, side, price, forced }: SignalRequest) => {
   try {
+    if (account && account !== currAccount) return null
+
     const {
       getAccount,
       getOpenedPositions,
