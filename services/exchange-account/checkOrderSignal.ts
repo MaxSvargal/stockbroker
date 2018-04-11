@@ -25,10 +25,10 @@ const sellErrorsCondition = cond([
 ])
 
 type SignalRequest = { account?: string, symbol: string, side: 'BUY' | 'SELL', price: number, forced: boolean }
-const checkSignal = (currAccount: string, requests: any) =>
-  async ({ account, symbol, side, price, forced }: SignalRequest) => {
+const checkSignal = (account: string, requests: any) =>
+  async ({ account: signalAccount, symbol, side, price, forced }: SignalRequest) => {
   try {
-    if (account && account !== currAccount) return null
+    if (signalAccount && signalAccount !== account) return null
 
     const {
       getAccount,
@@ -83,7 +83,7 @@ const checkSignal = (currAccount: string, requests: any) =>
     const { quantity, error, positionToCover } = getTradeSide(side)
     if (error) throw error
 
-    const positionState = equals('BUY', side) ?
+    return equals('BUY', side) ?
       await trade({ sendOrder, myTrades, openPosition, position: { account, symbol, quantity } }) :
       await trade({ sendOrder, myTrades, closePosition, positionToCover })
 
