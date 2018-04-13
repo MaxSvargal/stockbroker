@@ -1,12 +1,9 @@
-import { log, error as logError } from '../utils/log'
-import {
-  o, cond, always, unapply, ifElse, equals, reject, complement, converge, last, divide, uniq, map, compose,
-  length, subtract, contains, filter, prop, propEq, find, T, gt, isNil, both, append, head, path, lte
-} from 'ramda'
+import { error as logError } from '../utils/log'
+import { o, cond, always, ifElse, equals, converge, divide, compose, length, subtract, filter, prop, propEq, find, T, gt, isNil, path, lte } from 'ramda'
 
 import trade from './modules/trade'
 import { roundToMinQty, getMinQtyFromSymbolInfo, takePairFromSymbol } from './shared'
-import { findPositionToCover, chunkAmountToSellCond, makeOpenedPosition, makeClosedPosition, Order, Trade, Position } from './modules/positions'
+import { findPositionToCover, chunkAmountToSellCond } from './modules/positions'
 
 const findByAssetProp = o(find, propEq('asset'))
 const parseFreeProp = o(parseFloat, prop('free'))
@@ -83,10 +80,11 @@ const checkSignal = (account: string, requests: any) =>
     const { quantity, error, positionToCover } = getTradeSide(side)
     if (error) throw error
 
-    return equals('BUY', side) ?
-      await trade({ sendOrder, myTrades, openPosition, position: { account, symbol, quantity } }) :
+    equals('BUY', side) ?
+      await trade({ sendOrder, myTrades, openPosition, position: { account, symbol, quantity }, price }) :
       await trade({ sendOrder, myTrades, closePosition, positionToCover })
 
+    return null
   } catch (err) {
     const errorEvent = {
       type: 'orderExecutionError',
@@ -94,7 +92,8 @@ const checkSignal = (account: string, requests: any) =>
       side,
       account,
       symbol,
-      price
+      price,
+      forced
     }
     logError(errorEvent)
   }
