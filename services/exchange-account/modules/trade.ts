@@ -17,10 +17,11 @@ type Props = {
   openPosition?: (a: {}) => {},
   closePosition?: (a: {}) => {},
   position?: { symbol: string, quantity: number, account: string}
-  positionToCover?: Position
+  positionToCover?: Position,
+  price?: number
 }
 
-export default async ({ openPosition, closePosition, sendOrder, myTrades, positionToCover, position }: Props): Promise<{} | void> => {
+export default async ({ openPosition, closePosition, sendOrder, myTrades, positionToCover, position, price }: Props): Promise<{} | void> => {
   const account: string = getAccount(position)
   const side: string = getSide(positionToCover)
   const symbol: string = getSymbol(or(position, positionToCover))
