@@ -6,7 +6,7 @@ type Symbol = string
 type Candle = any[]
 type SymbolCandles = [ Symbol, Candle[] ]
 
-const stochRsiProps = { rsiPeriod: 14, stochasticPeriod: 12, kPeriod: 3, dPeriod: 4 }
+const stochRsiProps = { rsiPeriod: 14, stochasticPeriod: 12, kPeriod: 3, dPeriod: 6 }
 const stochRsiCheck = o(stochRsiIsGrow, calcStochRsi)
 const checkFn = o(o(stochRsiCheck, merge(stochRsiProps)), closePricesAsValues)
 const checkSignal = ifElse(o(checkFn, last), makeSignal('BUY'), always(null))
