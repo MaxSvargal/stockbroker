@@ -1,6 +1,6 @@
 import { Requester, Publisher } from 'cote'
 import { observe, Stream } from 'most'
-import { curry, flip, invoker, map, o, concat, zip, converge, without, apply, difference, head } from 'ramda'
+import { curry, flip, invoker, map, o, concat, zip } from 'ramda'
 import { log, error } from '../utils/log'
 
 import makeAnalysisBuys from './modules/checkBuy'
@@ -13,13 +13,7 @@ const requestSymbolsToBuy = {
   filter: { '4h': true, '1h': true, '15m': true },
   row: 'symbol',
 }
-const requestSymbolsOfGrow = {
-  type: 'dbFilterAllRowsConcat',
-  table: 'symbolsState',
-  filter: { '4h': true },
-  row: 'symbol',
-}
-const requestSymbolsOfAccounts = {
+const requestSymbolsToSell = {
   type: 'dbFilterAllRowsConcat',
   table: 'positions',
   filter: { 'closed': false },
@@ -29,7 +23,6 @@ const requestSymbolsOfAccounts = {
 const invokeSend = flip(invoker(1, 'send'))
 const invokePublish = invoker(2, 'publish')
 const invokePublishNewSignal = flip(invokePublish('newSignal'))
-const similarity = converge(without, [ apply(difference), head ])
 
 const makeGetCandles = curry((fetch: Function, limit: number, interval: string, symbol: string) =>
   fetch(`https://binance.com/api/v1/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`)
@@ -48,12 +41,7 @@ const main: Main = (exitProcess, mainLoopStream, requester, publisher, fetch) =>
 
   const iterate = async () => {
     try {
-      const [ symbolsToBuy, symbolsOfAccounts, symbolsOfGrow ] = await Promise.all([
-        request(requestSymbolsToBuy),
-        request(requestSymbolsOfAccounts),
-        request(requestSymbolsOfGrow),
-      ])
-      const symbolsToSell: any[] = similarity([ symbolsOfGrow, symbolsOfAccounts ])
+      const [ symbolsToBuy, symbolsToSell ] = await Promise.all([ request(requestSymbolsToBuy), request(requestSymbolsToSell) ])
       const candlesForBuy = await Promise.all(map(fetchCandles('1m'), symbolsToBuy))
       const candlesForSell = await Promise.all(map(fetchCandles('5m'), symbolsToSell))
       const buysSignals = makeAnalysisBuys(zip(symbolsToBuy, candlesForBuy))
