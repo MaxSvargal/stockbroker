@@ -1,4 +1,4 @@
-import { error as logError } from '../utils/log'
+import { log, error as logError } from '../utils/log'
 import { o, cond, always, ifElse, equals, converge, divide, compose, length, subtract, filter, prop, propEq, find, T, gt, isNil, path, head, lte } from 'ramda'
 
 import trade from './modules/trade'
@@ -41,13 +41,18 @@ const checkSignal = (account: string, requests: any) =>
     const [
       symbolInfo,
       openedPositions,
-      { preferences: { chunksNumber = 8, minProfit = 0.006 } },
-      { balances }
+      { balances },
+      { preferences:
+        {
+          chunksNumber = 8,
+          minProfit = 0.006
+        }
+      }
     ] = await Promise.all([
       getSymbolInfo(symbol),
       getOpenedPositions(null),
+      accountInfo(null),
       getAccount(null),
-      accountInfo(null)
     ])
 
     const [ slaveCurrency, masterCurrency ] = takePairFromSymbol(symbol)
@@ -78,6 +83,8 @@ const checkSignal = (account: string, requests: any) =>
 
     const getTradeSide = ifElse(equals('BUY'), execBuy, execSell)
     const { quantity, error, positionToCover } = getTradeSide(side)
+
+    log(`Balance on account ${account}: %O`, balances)
     if (error) throw error
 
     equals('BUY', side) ?

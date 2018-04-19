@@ -1,3 +1,4 @@
+import { log } from '../../utils/log'
 import { or, prop, equals, unapply, converge, find, o, propEq, head, last, when, isNil, not, and, ifElse, always, path } from 'ramda'
 import { makeOpenedPosition, makeClosedPosition, Order, Trade, Position } from './positions'
 
@@ -42,6 +43,7 @@ export default async ({ openPosition, closePosition, sendOrder, myTrades, positi
   const order = await sendOrder({ side, symbol, quantity, type: 'MARKET' })
   const trades = await myTrades({ symbol, limit: 10 })
   const trade = findTradeByOrderId(prop('orderId', order), trades)
+  log({ account, side, order, trade })
 
   return equals('BUY', side) ?
     openPosition && await openPosition(makeOpenedPosition([ order, trade, { account } ])) :
