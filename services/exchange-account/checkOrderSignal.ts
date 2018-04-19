@@ -78,14 +78,15 @@ const checkSignal = (account: string, requests: any) =>
       const quantity: number = roundToMinQty(minQty, chunkAmountToSellCond([ avaliableToSell, chunkAmount ]))
       const error = sellErrorsCondition({ positionToCover, quantity, avaliableToSell })
 
+      log(`Balance on account ${account} of ${slaveCurrency}: ${avaliableToSell}, %O`, findBySlaveCurrency(balances))
+      positionToCover && log({ positionToCover })
+
       return { quantity, error, positionToCover }
     }
 
     const getTradeSide = ifElse(equals('BUY'), execBuy, execSell)
     const { quantity, error, positionToCover } = getTradeSide(side)
 
-    log(`Balance on account ${account}: %O`, balances)
-    positionToCover && log({ positionToCover })
     if (error) throw error
 
     equals('BUY', side) ?
