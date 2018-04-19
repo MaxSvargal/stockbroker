@@ -85,6 +85,7 @@ const checkSignal = (account: string, requests: any) =>
     const { quantity, error, positionToCover } = getTradeSide(side)
 
     log(`Balance on account ${account}: %O`, balances)
+    positionToCover && log({ positionToCover })
     if (error) throw error
 
     equals('BUY', side) ?
