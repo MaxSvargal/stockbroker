@@ -1,5 +1,5 @@
 import { log, error as logError } from '../utils/log'
-import { o, cond, always, ifElse, equals, converge, divide, compose, length, subtract, filter, prop, propEq, find, T, gt, isNil, path, head, lte } from 'ramda'
+import { and, o, cond, always, ifElse, equals, converge, divide, compose, length, subtract, filter, prop, propEq, find, T, gt, isNil, path, head, lte } from 'ramda'
 
 import trade from './modules/trade'
 import { roundToMinQty, getMinQtyFromSymbolInfo, takePairFromSymbol } from './shared'
@@ -8,6 +8,7 @@ import { findPositionToCover, chunkAmountToSellCond } from './modules/positions'
 const findByAssetProp = o(find, propEq('asset'))
 const parseFreeProp = o(parseFloat, prop('free'))
 const filterBySymbol = o(filter, propEq('symbol'))
+const checkBNBNotIsset = compose(gt(0.1), parseFloat, prop('free') as any, findByAssetProp('BNB'))
 
 const buyErrorsCondition = cond([
   [ o(equals(0), prop('avaliableChunks')), always(Error('Too much opened positions')) ],
@@ -54,6 +55,9 @@ const checkSignal = (account: string, requests: any) =>
       accountInfo(null),
       getAccount(null),
     ])
+
+    if(and(equals('BUY', side), checkBNBNotIsset(balances)))
+      return logError('Not enough BNB tokens to make new buys')
 
     const [ slaveCurrency, masterCurrency ] = takePairFromSymbol(symbol)
     const openedPositionsOfSymbol = filterBySymbol(symbol)(openedPositions)
