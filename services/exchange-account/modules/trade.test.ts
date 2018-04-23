@@ -38,7 +38,30 @@ describe('Exchange Account Trade', () => {
     expect(props.myTrades).toHaveBeenCalledWith({ symbol: 'BTCUSDT', limit: 10 })
 
     expect(props.closePosition).toHaveBeenCalledTimes(1)
-    expect(props.closePosition).toHaveBeenCalledWith({ closed: true, profitAmount: 0.04995, profitPerc: 2, close: { orderId: 0, origQty: 0.5, price: 0.2 } })
+    expect(props.closePosition).toHaveBeenCalledWith({ closed: true, profitAmount: 0.049975000000000006, profitPerc: 99.9, close: { orderId: 0, origQty: 0.5, price: 0.2 } })
+
+    expect(resp).toEqual({ updated: 1 })
+  })
+
+  test('sell should sell work correctly when no trade found', async () => {
+    const props = {
+      closePosition: jest.fn().mockReturnValueOnce(Promise.resolve({ updated: 1 })),
+      sendOrder: jest.fn().mockReturnValueOnce(Promise.resolve({ orderId: 1 })),
+      myTrades: jest.fn()
+        .mockReturnValueOnce(Promise.resolve([]))
+        .mockReturnValueOnce(Promise.resolve([ { orderId: 1, price: 0.2, origQty: 0.5 } ])),
+      positionToCover: { account: 'maxsvargal', symbol: 'BTCUSDT', closed: false, open: { orderId: 0, origQty: 0.5, price: 0.1 } }
+    }
+    const resp = await trade(props)
+
+    expect(props.sendOrder).toHaveBeenCalledTimes(1)
+    expect(props.sendOrder).toHaveBeenCalledWith({ side: 'SELL', type: 'MARKET', symbol: 'BTCUSDT', quantity: 0.5 })
+
+    expect(props.myTrades).toHaveBeenCalledTimes(2)
+    expect(props.myTrades).toHaveBeenCalledWith({ symbol: 'BTCUSDT', limit: 10 })
+
+    expect(props.closePosition).toHaveBeenCalledTimes(1)
+    expect(props.closePosition).toHaveBeenCalledWith({ closed: true, profitAmount: 0.049975000000000006, profitPerc: 99.9, close: { orderId: 1, origQty: 0.5, price: 0.2 } })
 
     expect(resp).toEqual({ updated: 1 })
   })
