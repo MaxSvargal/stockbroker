@@ -3,6 +3,7 @@ import { Requester, Subscriber } from 'cote'
 import { o, flip, invoker, map, applyTo } from 'ramda'
 
 import checkOrderSignal from './checkOrderSignal'
+import checkAccountInfo from './checkAccountInfo'
 
 const requestAccount = (id: string) => () =>
   ({ type: 'dbGet', table: 'accounts', id })
@@ -14,6 +15,8 @@ const requestOpenPosition = (data: {}) =>
   ({ type: 'dbInsert', table: 'positions', data })
 const requestOpenedPositions = (account: string) => () =>
   ({ type: 'dbFilterBy', table: 'positions', by: { account }, filter: { closed: false } })
+const requestUpdateAccount = ({ id, data }: { id: string, data: {} }) =>
+  ({ type: 'dbUpdate', table: 'accounts', id, data })
 
 const invokeSend = flip(invoker(1, 'send'))
 const invokeAccountInfo = flip(invoker(1, 'accountInfo'))
@@ -30,7 +33,7 @@ type Binance = {
 type ExitProcess = (a: Error) => void
 type Account = string
 type Main = (a: ExitProcess, b: Account, c: Binance, d: Subscriber, e: Requester, f: Stream) => void
-const main: Main = (exitProcess, account, binance, subscriber, requester, loopStream) => {
+const main: Main = (exitProcess, account, binance, subscriber, requester, accountInfoStream) => {
   const propagateSignalStream = fromEvent('newSignal', subscriber)
   const binanceInvokers = [ invokeAccountInfo, invokeOrder, invokeMyTrades, invokePrices ]
   const [ accountInfo, sendOrder, myTrades, getPrices ] = map(applyTo(binance), binanceInvokers)
@@ -49,6 +52,7 @@ const main: Main = (exitProcess, account, binance, subscriber, requester, loopSt
   }
 
   observe(checkOrderSignal(account, requests), propagateSignalStream)
+  observe(checkAccountInfo(account, { accountInfo, updateAccount: o(request, requestUpdateAccount) }), accountInfoStream)
 }
 
 export default main

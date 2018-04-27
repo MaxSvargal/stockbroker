@@ -28,9 +28,9 @@ requester.send({ type: 'dbGet', table: 'accounts', id: account }).then(accountRe
   try {
     const [ apiKey, apiSecret ] = o(map(decrypt), getKeysPair, accountRes)
     const binance = binanceCons({ apiKey, apiSecret })
-    const checkStopLimitLoopStream = periodic(60000)
+    const checkAccountInfoStream = periodic(60000 * 60)
 
-    main(exitProcess, account, binance, subscriber, requester, checkStopLimitLoopStream)
+    main(exitProcess, account, binance, subscriber, requester, checkAccountInfoStream)
   } catch (err) {
     throw Error(`Account ${account} not found in database or keys are not isset.`)
   }

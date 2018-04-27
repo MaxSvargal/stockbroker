@@ -2,6 +2,7 @@ import r from 'rethinkdb'
 
 r.dbCreate('stockbroker')
 r.db('stockbroker').tableCreate('accounts', { primaryKey: 'name' })
+r.db('stockbroker').table('accounts').indexCreate('telegramId')
 r.db('stockbroker').tableCreate('exchangeInfoSymbols', { primaryKey: 'symbol' })
 r.db('stockbroker').tableCreate('symbolsState', { primaryKey: 'symbol' })
 r.db('stockbroker').tableCreate('positions')
