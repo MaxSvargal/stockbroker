@@ -47,6 +47,7 @@ const lastIsOverZero = o(lt(0), last)
 const wrPair = o(pairEmaAndLast, calcWR)
 const wrNotOverbought = o(gt(-20), last)
 const wrNotOversold = o(lt(-80), last)
+const wrIsLow = o(gt(-50), last)
 const wrIsJustGrow = o(isGrow, wrPair)
 const wrIsStartedGrow = o(allPass([ isGrow, wrNotOverbought, wrNotOversold ]), wrPair)
 const wrIsNotOverbought = o(both(isGrow, wrNotOverbought), wrPair)
@@ -61,7 +62,7 @@ const cciIsOverZero = o(lastIsOverZero, calcCCI)
 
 const wr7IsNotOverbought = o(wrNotOverbought, calcWR7)
 const wr14IsNotOverbought = o(wrNotOverbought, calcWR14)
-const wr14IsBeginGrow = compose(allPass([ isGrow, wrNotOverbought, wrNotOversold ]), takeLast(2), calcWR14)
+const wr14IsBeginGrow = compose(allPass([ isGrow, wrIsLow, wrNotOversold ]), takeLast(2), calcWR14)
 
 export {
   wrIsStartedGrow,
