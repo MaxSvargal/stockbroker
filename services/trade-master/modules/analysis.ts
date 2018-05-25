@@ -20,10 +20,10 @@ type MainInput = {
 const propEqFalse: (a: string) => (b: {}) => boolean = converge(equals, [ always(false), prop ])
 const m = (n: number): number => 1000 * 60 * n
 const checkTimeOffset = cond([
-  [ propEqFalse('4h'), always(m(20)) ],
-  [ propEqFalse('1h'), always(m(10)) ],
-  [ propEqFalse('15m'), always(m(5)) ],
-  [ T, always(m(3)) ],
+  [ propEqFalse('4h'), always(m(30)) ],
+  [ propEqFalse('1h'), always(m(15)) ],
+  [ propEqFalse('15m'), always(m(6)) ],
+  [ T, always(m(4)) ],
 ])
 const compareTimes = ([ a, b ]: [ number, number ]) => Date.now() - b > new Date(a).getTime()
 const needToCheck = either(isNil, o(compareTimes, converge(pair, [ prop('timestamp'), checkTimeOffset ])))
