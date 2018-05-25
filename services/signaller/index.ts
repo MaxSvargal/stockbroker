@@ -17,6 +17,6 @@ const publisher = publisherCons({
   name: 'Signaller Publisher',
   broadcasts: [ 'newSignal' ]
 })
-const mainLoopStream = periodic(40000)
+const mainLoopStream = periodic(60000)
 
 main(exitProcess, mainLoopStream, requester, publisher, fetch)
