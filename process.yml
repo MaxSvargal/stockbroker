@@ -2,6 +2,7 @@ apps:
   - name    : 'DB Rethink'
     script  : 'services/db-rethink/index.ts'
     max_memory_restart: '140M'
+    cron_restart: '*/12 * * * *'
     env     :
       DEBUG   : 'app:log,app:error'
 
@@ -20,11 +21,13 @@ apps:
   - name    : 'Signaller'
     script  : 'services/signaller/index.ts'
     max_memory_restart: '150M'
+    cron_restart: '*/12 * * * *'
     env     :
       DEBUG   : 'app:log,app:error'
 
   - name    : 'Master Trade'
     script  : 'services/trade-master/index.ts'
     max_memory_restart: '130M'
+    cron_restart: '*/12 * * * *'
     env     :
       DEBUG   : 'app:log,app:error'
