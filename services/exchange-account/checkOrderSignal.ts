@@ -17,7 +17,6 @@ const buyErrorsCondition = cond([
   [ T, always(null) ]
 ])
 const sellErrorsCondition = cond([
-  [ o(isNil, prop('positionToCover')), always(Error('No position to cover')) ],
   [ converge(gt, [ prop('quantity'), prop('avaliableToSell') ]), always(Error('No funds avaliable to cover position')) ],
   [ T, always(null) ]
 ])
@@ -80,10 +79,9 @@ const checkSignal = (account: string, requests: any) =>
       const positionToCover = forced ? head(openedPositionsOfSymbol) : findPositionToCover(price, minProfit, openedPositionsOfSymbol)
       const chunkAmount = path([ 'open', 'origQty' ], positionToCover)
       const quantity: number = roundToMinQty(minQty, chunkAmountToSellCond([ avaliableToSell, chunkAmount ]))
-      const error = sellErrorsCondition({ positionToCover, quantity, avaliableToSell })
+      const error = sellErrorsCondition({ quantity, avaliableToSell })
 
-      log(`Balance on account ${account} of ${slaveCurrency}: ${avaliableToSell}, %O`, findBySlaveCurrency(balances))
-      positionToCover && log({ positionToCover })
+      positionToCover && log(`Balance on account ${account} of ${slaveCurrency}: ${avaliableToSell}. Position to cover: %O`, positionToCover)
 
       return { quantity, error, positionToCover }
     }
@@ -92,6 +90,7 @@ const checkSignal = (account: string, requests: any) =>
     const { quantity, error, positionToCover } = getTradeSide(side)
 
     if (error) throw error
+    if (!positionToCover && equals('SELL', side)) return false
 
     equals('BUY', side) ?
       await trade({ sendOrder, myTrades, openPosition, position: { account, symbol, quantity }, price }) :
