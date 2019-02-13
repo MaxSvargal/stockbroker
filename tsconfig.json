@@ -19,6 +19,7 @@
     "sourceMap": true,
     "strict": true,
     "strictNullChecks": true,
+    "strictFunctionTypes": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
   },
